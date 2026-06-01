@@ -1,11 +1,11 @@
 use crate::{AudioStatusEvent, CaptureMode, SessionSettings};
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
+use std::io::Write;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
 };
-use std::io::Write;
 use std::thread;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter};
@@ -51,7 +51,13 @@ pub async fn spawn_capture(
     platform::spawn_capture(app, settings, audio_tx, stop)
 }
 
-fn emit_audio_status(app: &AppHandle, state: &str, device_name: Option<String>, volume: Option<f32>, message: impl Into<String>) {
+fn emit_audio_status(
+    app: &AppHandle,
+    state: &str,
+    device_name: Option<String>,
+    volume: Option<f32>,
+    message: impl Into<String>,
+) {
     let _ = app.emit(
         "audio_status",
         AudioStatusEvent {
@@ -89,7 +95,9 @@ mod platform {
             capture_mode: CaptureMode::WasapiLoopback,
             is_default: true,
             available: false,
-            note: Some("当前运行环境不是 Windows，音频采集模块只能在 Windows 桌面端工作。".to_string()),
+            note: Some(
+                "当前运行环境不是 Windows，音频采集模块只能在 Windows 桌面端工作。".to_string(),
+            ),
         }])
     }
 
@@ -107,7 +115,9 @@ mod platform {
             "当前环境不是 Windows，无法采集系统输出声音。请在 Windows 上运行桌面端。",
         );
         stop.store(true, Ordering::SeqCst);
-        Err(anyhow::anyhow!("Windows WASAPI loopback is required for live system-audio capture"))
+        Err(anyhow::anyhow!(
+            "Windows WASAPI loopback is required for live system-audio capture"
+        ))
     }
 }
 
@@ -129,7 +139,9 @@ mod platform {
         for device_result in &render_devices {
             let device = device_result?;
             let id = device.get_id()?;
-            let name = device.get_friendlyname().unwrap_or_else(|_| "系统输出设备".to_string());
+            let name = device
+                .get_friendlyname()
+                .unwrap_or_else(|_| "系统输出设备".to_string());
             sources.push(AudioSource {
                 is_default: default_render_id.as_deref() == Some(id.as_str()),
                 id,
@@ -144,11 +156,19 @@ mod platform {
         for device_result in &capture_devices {
             let device = device_result?;
             let id = device.get_id()?;
-            let name = device.get_friendlyname().unwrap_or_else(|_| "输入设备".to_string());
+            let name = device
+                .get_friendlyname()
+                .unwrap_or_else(|_| "输入设备".to_string());
             let lower = name.to_lowercase();
-            let likely_virtual = ["cable", "voicemeeter", "stereo mix", "virtual", "what u hear"]
-                .iter()
-                .any(|needle| lower.contains(needle));
+            let likely_virtual = [
+                "cable",
+                "voicemeeter",
+                "stereo mix",
+                "virtual",
+                "what u hear",
+            ]
+            .iter()
+            .any(|needle| lower.contains(needle));
             if likely_virtual {
                 sources.push(AudioSource {
                     id,
@@ -174,8 +194,16 @@ mod platform {
         let thread = thread::Builder::new()
             .name("system-audio-capture".to_string())
             .spawn(move || {
-                if let Err(err) = run_capture_thread(app.clone(), settings, audio_tx, thread_stop.clone()) {
-                    emit_audio_status(&app, "error", None, None, format!("系统声音采集失败：{err}"));
+                if let Err(err) =
+                    run_capture_thread(app.clone(), settings, audio_tx, thread_stop.clone())
+                {
+                    emit_audio_status(
+                        &app,
+                        "error",
+                        None,
+                        None,
+                        format!("系统声音采集失败：{err}"),
+                    );
                     thread_stop.store(true, Ordering::SeqCst);
                 }
             })
@@ -197,7 +225,11 @@ mod platform {
         let enumerator = DeviceEnumerator::new().context("创建 WASAPI device enumerator 失败")?;
         let (device, source_kind) = match settings.capture_mode {
             CaptureMode::WasapiLoopback => {
-                let device = if let Some(device_id) = settings.audio_device_id.as_deref().filter(|id| !id.trim().is_empty()) {
+                let device = if let Some(device_id) = settings
+                    .audio_device_id
+                    .as_deref()
+                    .filter(|id| !id.trim().is_empty())
+                {
                     enumerator.get_device(device_id)?
                 } else {
                     enumerator.get_default_device(&Direction::Render)?
@@ -235,7 +267,9 @@ mod platform {
             format!("正在采集{source_kind}：{device_name}"),
         );
 
-        println!("[interview-copilot][audio] start capture kind={source_kind} device={device_name}");
+        println!(
+            "[interview-copilot][audio] start capture kind={source_kind} device={device_name}"
+        );
         let started_at = Instant::now();
         let mut chunks_sent = 0u64;
         let mut max_volume = 0.0f32;
@@ -288,7 +322,10 @@ mod platform {
                 } else {
                     format!("正在采集{source_kind}：{device_name}")
                 };
-                if chunks_sent == 1 || chunks_sent % 25 == 0 || (silent_for_a_while && !silence_notice_sent) {
+                if chunks_sent == 1
+                    || chunks_sent % 25 == 0
+                    || (silent_for_a_while && !silence_notice_sent)
+                {
                     println!(
                         "[interview-copilot][audio] chunk={} elapsed_ms={} volume={:.4} max_volume={:.4} device={}",
                         chunks_sent,
@@ -314,9 +351,17 @@ mod platform {
         }
 
         let _ = audio_client.stop_stream();
-        println!("[interview-copilot][audio] stop capture chunks={} max_volume={:.4}", chunks_sent, max_volume);
-        emit_audio_status(&app, "stopped", Some(device_name), Some(0.0), "系统声音采集已停止");
+        println!(
+            "[interview-copilot][audio] stop capture chunks={} max_volume={:.4}",
+            chunks_sent, max_volume
+        );
+        emit_audio_status(
+            &app,
+            "stopped",
+            Some(device_name),
+            Some(0.0),
+            "系统声音采集已停止",
+        );
         Ok(())
     }
 }
-

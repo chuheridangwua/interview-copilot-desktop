@@ -1,16 +1,16 @@
 use crate::doubao::{self, ServerFrame};
-use crate::matcher::{MatchCandidatesEvent, Matcher};
+use crate::matcher::Matcher;
 use crate::{AppSharedState, AsrTextEvent, SessionLogEvent, SessionSettings};
 use anyhow::{anyhow, Context};
 use futures_util::{SinkExt, StreamExt};
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc, Mutex,
-};
 use serde_json::json;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
@@ -31,7 +31,10 @@ pub async fn run_asr_session(
     {
         let headers = request.headers_mut();
         headers.insert("X-Api-Key", HeaderValue::from_str(&api_key)?);
-        headers.insert("X-Api-Resource-Id", HeaderValue::from_str(&settings.resource_id)?);
+        headers.insert(
+            "X-Api-Resource-Id",
+            HeaderValue::from_str(&settings.resource_id)?,
+        );
         headers.insert("X-Api-Request-Id", HeaderValue::from_str(&request_id)?);
         headers.insert("X-Api-Sequence", HeaderValue::from_static("-1"));
     }
@@ -39,7 +42,10 @@ pub async fn run_asr_session(
     emit_log(
         &app,
         SessionLogEvent {
-            message: format!("正在连接豆包流式 ASR · resource={} · request={}", settings.resource_id, request_id),
+            message: format!(
+                "正在连接豆包流式 ASR · resource={} · request={}",
+                settings.resource_id, request_id
+            ),
             asr_log_id: None,
             save_audio: settings.save_audio,
             asr_latency_ms: None,
@@ -64,7 +70,10 @@ pub async fn run_asr_session(
     emit_log(
         &app,
         SessionLogEvent {
-            message: format!("豆包流式 ASR 已连接 · {}ms", connect_started.elapsed().as_millis()),
+            message: format!(
+                "豆包流式 ASR 已连接 · {}ms",
+                connect_started.elapsed().as_millis()
+            ),
             asr_log_id: asr_log_id.clone(),
             save_audio: settings.save_audio,
             asr_latency_ms: None,
@@ -75,7 +84,9 @@ pub async fn run_asr_session(
     let (mut write, mut read) = ws_stream.split();
     let hotwords = doubao::default_hotwords();
     write
-        .send(Message::Binary(doubao::build_full_client_request(&hotwords)?))
+        .send(Message::Binary(doubao::build_full_client_request(
+            &hotwords,
+        )?))
         .await
         .context("发送豆包 full client request 失败")?;
     emit_log(
@@ -205,21 +216,25 @@ fn handle_transcript(
 ) {
     let event_name = if definite { "asr_final" } else { "asr_partial" };
     let asr_event = AsrTextEvent {
-            text: text.to_string(),
-            definite,
-            utterance_start_ms: start_ms,
-            utterance_end_ms: end_ms,
+        text: text.to_string(),
+        definite,
+        utterance_start_ms: start_ms,
+        utterance_end_ms: end_ms,
         received_at: now_ms(),
     };
     let _ = app.emit(event_name, asr_event.clone());
     if save_audio {
-        append_jsonl(session_dir, "transcript.jsonl", &json!({
-            "text": asr_event.text,
-            "definite": asr_event.definite,
-            "utteranceStartMs": asr_event.utterance_start_ms,
-            "utteranceEndMs": asr_event.utterance_end_ms,
-            "receivedAt": asr_event.received_at
-        }));
+        append_jsonl(
+            session_dir,
+            "transcript.jsonl",
+            &json!({
+                "text": asr_event.text,
+                "definite": asr_event.definite,
+                "utteranceStartMs": asr_event.utterance_start_ms,
+                "utteranceEndMs": asr_event.utterance_end_ms,
+                "receivedAt": asr_event.received_at
+            }),
+        );
     }
 
     let maybe_match = {
@@ -227,10 +242,14 @@ fn handle_transcript(
         if inner.matching_paused {
             None
         } else {
-            inner
-                .matcher
-                .as_ref()
-                .map(|matcher: &Matcher| matcher.search_with_event(text, inner.locked_answer))
+            let answer_locked = inner.locked_answer.is_some();
+            inner.matcher.as_ref().map(|matcher: &Matcher| {
+                let mut event = matcher.search_with_event(text, None);
+                event.locked = answer_locked;
+                event.definite = definite;
+                event.received_at = asr_event.received_at;
+                event
+            })
         }
     };
 
@@ -257,14 +276,10 @@ fn handle_transcript(
     }
 }
 
-pub fn emit_match_event(app: &AppHandle, matcher: &Matcher, query: &str, locked_id: Option<u32>) -> MatchCandidatesEvent {
-    let event = matcher.search_with_event(query, locked_id);
-    let _ = app.emit("match_candidates", event.clone());
-    event
-}
-
 fn append_jsonl<T: serde::Serialize>(session_dir: Option<&str>, filename: &str, payload: &T) {
-    let Some(session_dir) = session_dir else { return; };
+    let Some(session_dir) = session_dir else {
+        return;
+    };
     let path = Path::new(session_dir).join(filename);
     if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) {
         if serde_json::to_writer(&mut file, payload).is_ok() {
@@ -300,6 +315,3 @@ fn now_ms() -> i64 {
         .unwrap_or_default()
         .as_millis() as i64
 }
-
-pub type SharedLock = Arc<Mutex<crate::InnerState>>;
-

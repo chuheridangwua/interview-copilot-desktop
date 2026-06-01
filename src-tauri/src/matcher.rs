@@ -22,6 +22,8 @@ pub struct MatchCandidate {
 pub struct MatchCandidatesEvent {
     pub query: String,
     pub locked: bool,
+    pub definite: bool,
+    pub received_at: i64,
     pub candidates: Vec<MatchCandidate>,
     pub latency_ms: u128,
 }
@@ -146,6 +148,8 @@ impl Matcher {
         MatchCandidatesEvent {
             query: query.to_string(),
             locked: locked_id.is_some(),
+            definite: false,
+            received_at: 0,
             candidates,
             latency_ms: started.elapsed().as_millis(),
         }
@@ -174,7 +178,12 @@ impl Matcher {
     }
 }
 
-fn candidate_from_doc(doc: &IndexedQuestion, score: u32, hits: Vec<String>, status: &str) -> MatchCandidate {
+fn candidate_from_doc(
+    doc: &IndexedQuestion,
+    score: u32,
+    hits: Vec<String>,
+    status: &str,
+) -> MatchCandidate {
     let mut highlight_terms = hits.clone();
     highlight_terms.extend(doc.curated_hints.iter().take(8).cloned());
     MatchCandidate {
@@ -198,8 +207,23 @@ fn normalize(input: &str) -> String {
             if ch.is_ascii_punctuation()
                 || matches!(
                     ch,
-                    '，' | '。' | '！' | '？' | '；' | '：' | '、' | '（' | '）' | '【' | '】'
-                        | '《' | '》' | '“' | '”' | '"' | '\'' | '`'
+                    '，' | '。'
+                        | '！'
+                        | '？'
+                        | '；'
+                        | '：'
+                        | '、'
+                        | '（'
+                        | '）'
+                        | '【'
+                        | '】'
+                        | '《'
+                        | '》'
+                        | '“'
+                        | '”'
+                        | '"'
+                        | '\''
+                        | '`'
                 )
             {
                 ' '
@@ -263,13 +287,56 @@ fn hint_hits(query_norm: &str, hints: &[String]) -> Vec<String> {
 fn curated_hints(id: u32) -> Vec<String> {
     let raw: &[&str] = match id {
         4 => &["离开", "离职", "国企", "传统制造业", "薪资", "机会"],
-        5 => &["期望薪资", "薪资", "工资", "给不到", "多少钱", "待遇", "薪酬"],
-        9 => &["badcase", "反馈", "迭代", "机制", "准确率", "评测集", "标错", "漏标"],
-        17 => &["badcase", "负反馈", "收集", "迭代", "优化", "评测集", "准确率"],
-        20 => &["合同评审", "投标评审", "合同", "标书", "风险报告", "流程", "项目"],
+        5 => &[
+            "期望薪资",
+            "薪资",
+            "工资",
+            "给不到",
+            "多少钱",
+            "待遇",
+            "薪酬",
+        ],
+        9 => &[
+            "badcase",
+            "反馈",
+            "迭代",
+            "机制",
+            "准确率",
+            "评测集",
+            "标错",
+            "漏标",
+        ],
+        17 => &[
+            "badcase",
+            "负反馈",
+            "收集",
+            "迭代",
+            "优化",
+            "评测集",
+            "准确率",
+        ],
+        20 => &[
+            "合同评审",
+            "投标评审",
+            "合同",
+            "标书",
+            "风险报告",
+            "流程",
+            "项目",
+        ],
         24 => &[
-            "RAG", "复杂PDF", "PDF", "表格", "扫描件", "OCR", "知识库", "幻觉", "切片",
-            "召回", "重排序", "向量",
+            "RAG",
+            "复杂PDF",
+            "PDF",
+            "表格",
+            "扫描件",
+            "OCR",
+            "知识库",
+            "幻觉",
+            "切片",
+            "召回",
+            "重排序",
+            "向量",
         ],
         25 => &[
             "Agent",
@@ -293,4 +360,3 @@ fn dedupe(values: Vec<String>) -> Vec<String> {
         .filter(|value| seen.insert(normalize(value)))
         .collect()
 }
-

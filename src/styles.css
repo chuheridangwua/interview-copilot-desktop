@@ -50,8 +50,8 @@ button {
 }
 
 .shell {
-  display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   width: 100%;
   height: 100%;
@@ -255,7 +255,8 @@ button:disabled {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(280px, 0.9fr) minmax(340px, 1fr) minmax(420px, 1.3fr);
+  grid-template-columns: minmax(280px, 0.72fr) minmax(330px, 0.78fr) minmax(720px, 1.9fr);
+  flex: 1;
   min-height: 0;
   gap: 12px;
 }
@@ -289,11 +290,27 @@ button:disabled {
   justify-content: space-between;
 }
 
+.left-column,
+.question-panel,
 .transcript-panel,
 .candidate-panel,
 .answer-panel {
   display: flex;
   flex-direction: column;
+}
+
+.left-column {
+  min-width: 0;
+  min-height: 0;
+  gap: 12px;
+}
+
+.question-panel {
+  flex: 1.15;
+}
+
+.transcript-panel {
+  flex: 0.85;
 }
 
 .live-line {
@@ -302,14 +319,14 @@ button:disabled {
   gap: 10px;
   align-items: start;
   padding: 14px;
-  min-height: 112px;
+  min-height: 96px;
   border-bottom: 1px solid var(--line);
   background: #171512;
 }
 
 .live-line p {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.55;
 }
 
@@ -340,6 +357,7 @@ button:disabled {
   }
 }
 
+.question-list,
 .transcript-list,
 .candidate-list,
 .answer-body {
@@ -347,8 +365,75 @@ button:disabled {
   overflow: auto;
 }
 
+.question-list,
 .transcript-list {
   padding: 10px;
+}
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.question-record {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  color: var(--ink);
+  background: #171512;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.question-record.selected {
+  border-color: var(--gold);
+  background: #211c17;
+}
+
+.question-record.locked {
+  border-color: rgba(217, 164, 65, 0.7);
+}
+
+.record-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+  color: #8f8375;
+  font-size: 11px;
+}
+
+.record-meta strong {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.record-query,
+.record-match {
+  margin: 0;
+}
+
+.record-query {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.record-match {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.compact-empty {
+  min-height: 120px;
 }
 
 .muted,
@@ -518,7 +603,7 @@ button:disabled {
 }
 
 .answer-body {
-  padding: 18px 22px 34px;
+  padding: 22px 30px 40px;
 }
 
 .answer-section {
@@ -534,24 +619,28 @@ button:disabled {
 }
 
 .answer-section h3 {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   color: #514635;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.2;
 }
 
+.answer-source {
+  max-width: 780px;
+}
+
 .answer-body p {
-  margin: 0 0 15px;
-  font-size: 17px;
-  line-height: 1.8;
+  margin: 0 0 16px;
+  font-size: 18px;
+  line-height: 1.86;
 }
 
 .answer-body .logic-section p {
   margin: 0;
   color: #2f271e;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 750;
-  line-height: 1.65;
+  line-height: 1.68;
 }
 
 .answer-body .section-empty {
@@ -575,44 +664,6 @@ mark {
   text-align: center;
 }
 
-.bottom-log {
-  display: grid;
-  grid-template-columns: minmax(180px, 0.8fr) minmax(120px, 0.4fr) minmax(320px, 2fr);
-  gap: 8px;
-  min-height: 38px;
-}
-
-.bottom-log > div {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  gap: 8px;
-  padding: 8px 10px;
-  color: var(--muted);
-  background: rgba(29, 26, 23, 0.92);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
-.bottom-log strong {
-  color: var(--ink);
-}
-
-.bottom-log span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.log-stream {
-  justify-content: flex-start;
-}
-
-.log-stream span:not(:last-child)::after {
-  content: " / ";
-  color: #6f6253;
-}
-
 @media (max-width: 1180px) {
   body {
     overflow: auto;
@@ -633,6 +684,10 @@ mark {
 
   .workspace {
     grid-template-columns: 1fr;
+  }
+
+  .left-column {
+    min-height: 680px;
   }
 
   .panel {

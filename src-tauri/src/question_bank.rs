@@ -35,11 +35,7 @@ pub fn parse_question_bank(content: &str) -> anyhow::Result<Vec<QuestionItem>> {
             .map(|next| next.start())
             .unwrap_or(content.len());
 
-        let id = caps
-            .get(1)
-            .expect("id")
-            .as_str()
-            .parse::<u32>()?;
+        let id = caps.get(1).expect("id").as_str().parse::<u32>()?;
         let question = caps.get(2).expect("question").as_str().trim().to_string();
         let answer = content[full.end()..next_start].trim().to_string();
         let (answer_logic, answer_detail) = split_answer_sections(&answer);
@@ -67,7 +63,10 @@ fn split_answer_sections(answer: &str) -> (String, String) {
     };
     let logic_content_start = logic_start + logic_marker.len();
     let Some(detail_relative_start) = answer[logic_content_start..].find(detail_marker) else {
-        return (answer[logic_content_start..].trim().to_string(), String::new());
+        return (
+            answer[logic_content_start..].trim().to_string(),
+            String::new(),
+        );
     };
 
     let detail_start = logic_content_start + detail_relative_start;
@@ -105,4 +104,3 @@ mod tests {
         assert!(parsed[0].answer.contains("具体内容："));
     }
 }
-

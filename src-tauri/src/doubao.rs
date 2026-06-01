@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Context};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
-use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::io::{Read, Write};
 
@@ -15,14 +14,6 @@ const SERIALIZATION_NONE: u8 = 0x0;
 const SERIALIZATION_JSON: u8 = 0x1;
 const COMPRESSION_NONE: u8 = 0x0;
 const COMPRESSION_GZIP: u8 = 0x1;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DoubaoAsrSettings {
-    pub resource_id: String,
-    pub endpoint: String,
-    pub hotwords: Vec<String>,
-}
 
 #[derive(Debug, Clone)]
 pub enum ServerFrame {
@@ -205,9 +196,11 @@ fn extract_transcript(value: &Value) -> Option<TranscriptFrame> {
     let utterances = result_obj.get("utterances").and_then(Value::as_array);
     let definite = utterances
         .map(|items| {
-            items
-                .iter()
-                .any(|item| item.get("definite").and_then(Value::as_bool).unwrap_or(false))
+            items.iter().any(|item| {
+                item.get("definite")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false)
+            })
         })
         .unwrap_or(false);
     let last_utterance = utterances.and_then(|items| items.last());
@@ -264,7 +257,9 @@ fn read_u32(frame: &[u8], cursor: usize) -> anyhow::Result<u32> {
     let bytes = frame
         .get(cursor..cursor + 4)
         .ok_or_else(|| anyhow!("豆包 ASR 帧缺少 u32 字段"))?;
-    Ok(u32::from_be_bytes(bytes.try_into().expect("slice length checked")))
+    Ok(u32::from_be_bytes(
+        bytes.try_into().expect("slice length checked"),
+    ))
 }
 
 #[cfg(test)]
@@ -293,4 +288,3 @@ mod tests {
         assert_eq!(i32::from_be_bytes(frame[4..8].try_into().unwrap()), -8);
     }
 }
-

@@ -46,6 +46,8 @@ export interface MatchCandidate {
 export interface MatchCandidatesEvent {
   query: string;
   locked: boolean;
+  definite: boolean;
+  receivedAt: number;
   candidates: MatchCandidate[];
   latencyMs: number;
 }

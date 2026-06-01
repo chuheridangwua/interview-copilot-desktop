@@ -126,8 +126,8 @@ async fn start_session(
     }
 
     let api_key = resolve_api_key()?;
-    let question_bank = load_embedded_question_bank()
-        .map_err(|err| format!("读取内置问题库失败：{err}"))?;
+    let question_bank =
+        load_embedded_question_bank().map_err(|err| format!("读取内置问题库失败：{err}"))?;
     if question_bank.is_empty() {
         return Err("问题库为空，无法开始匹配".to_string());
     }
@@ -176,7 +176,16 @@ async fn start_session(
     let task_stop = stop.clone();
     let task_settings = settings.clone();
     let task = tauri::async_runtime::spawn(async move {
-        if let Err(err) = session::run_asr_session(app.clone(), shared, task_settings, api_key, audio_rx, task_stop.clone()).await {
+        if let Err(err) = session::run_asr_session(
+            app.clone(),
+            shared,
+            task_settings,
+            api_key,
+            audio_rx,
+            task_stop.clone(),
+        )
+        .await
+        {
             let _ = app.emit(
                 "audio_status",
                 AudioStatusEvent {
@@ -199,9 +208,7 @@ async fn start_session(
         });
     }
 
-    Ok(SessionStarted {
-        session_id,
-    })
+    Ok(SessionStarted { session_id })
 }
 
 #[tauri::command]
@@ -245,19 +252,9 @@ async fn resume_matching(state: State<'_, AppState>) -> Result<(), String> {
 }
 
 #[tauri::command]
-async fn lock_answer(app: AppHandle, state: State<'_, AppState>, question_id: u32) -> Result<(), String> {
-    let event = {
-        let mut inner = state.inner.lock().expect("state lock poisoned");
-        inner.locked_answer = Some(question_id);
-        inner
-            .matcher
-            .as_ref()
-            .map(|matcher| matcher.search_with_event("", Some(question_id)))
-    };
-
-    if let Some(event) = event {
-        app.emit("match_candidates", event).ok();
-    }
+async fn lock_answer(state: State<'_, AppState>, question_id: u32) -> Result<(), String> {
+    let mut inner = state.inner.lock().expect("state lock poisoned");
+    inner.locked_answer = Some(question_id);
     Ok(())
 }
 
@@ -269,7 +266,10 @@ async fn unlock_answer(state: State<'_, AppState>) -> Result<(), String> {
 }
 
 #[tauri::command]
-async fn search_questions(state: State<'_, AppState>, query: String) -> Result<Vec<matcher::MatchCandidate>, String> {
+async fn search_questions(
+    state: State<'_, AppState>,
+    query: String,
+) -> Result<Vec<matcher::MatchCandidate>, String> {
     let matcher = {
         let mut inner = state.inner.lock().expect("state lock poisoned");
         if inner.matcher.is_none() {
@@ -293,7 +293,9 @@ fn resolve_api_key() -> Result<String, String> {
         .map_err(|_| "未检测到豆包 API Key。请在 Windows 用户环境变量中配置 DOUBAO_API_KEY，重启应用后会自动读取。".to_string())?;
 
     if value.len() < 16 {
-        return Err("豆包 API Key 看起来过短，请检查 Windows 环境变量 DOUBAO_API_KEY。".to_string());
+        return Err(
+            "豆包 API Key 看起来过短，请检查 Windows 环境变量 DOUBAO_API_KEY。".to_string(),
+        );
     }
     Ok(value)
 }
@@ -315,4 +317,3 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running Interview Copilot");
 }
-

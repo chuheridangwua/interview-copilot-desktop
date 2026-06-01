@@ -23,7 +23,6 @@ import {
   listenEvent,
   MatchCandidate,
   MatchCandidatesEvent,
-  SessionLogEvent,
   SessionSettings,
 } from "./tauriClient";
 
@@ -31,12 +30,30 @@ const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
 
 interface TranscriptLine {
   text: string;
-  definite: boolean;
   receivedAt: number;
+}
+
+interface QuestionRecord {
+  id: string;
+  query: string;
+  receivedAt: number;
+  candidates: MatchCandidate[];
+  selectedCandidate: MatchCandidate | null;
+  locked: boolean;
 }
 
 function cls(...items: Array<string | false | null | undefined>) {
   return items.filter(Boolean).join(" ");
+}
+
+function formatTime(value: number) {
+  return new Date(value || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+function isTextInputTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  const tagName = target.tagName.toLowerCase();
+  return tagName === "input" || tagName === "textarea" || tagName === "select" || target.isContentEditable;
 }
 
 function highlightAnswer(answer: string, terms: string[]) {
@@ -88,21 +105,17 @@ export default function App() {
   const [locked, setLocked] = useState(false);
   const [audioStatus, setAudioStatus] = useState<AudioStatusEvent>({
     state: isTauriRuntime() ? "idle" : "error",
-    message: isTauriRuntime() ? "等待开始监听系统声音" : "未检测到 Tauri 桌面端后端",
+    message: isTauriRuntime() ? "空格开始监听系统声音" : "未检测到 Tauri 桌面端后端",
   });
   const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
   const [partialText, setPartialText] = useState("");
+  const [questionRecords, setQuestionRecords] = useState<QuestionRecord[]>([]);
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<MatchCandidate[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState<MatchCandidate | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [lastQuery, setLastQuery] = useState("");
-  const [sessionLogs, setSessionLogs] = useState<SessionLogEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  const selectedSource = useMemo(
-    () => sources.find((source) => source.id === selectedSourceId && source.captureMode === captureMode),
-    [captureMode, selectedSourceId, sources],
-  );
 
   const compatibleSources = useMemo(
     () => sources.filter((source) => source.captureMode === captureMode),
@@ -168,20 +181,46 @@ export default function App() {
 
       unlisteners.push(await listenEvent<AsrTextEvent>("asr_final", (payload) => {
         setPartialText("");
-        setTranscript((lines) => [...lines.slice(-80), { text: payload.text, definite: true, receivedAt: payload.receivedAt }]);
+        setTranscript((lines) => [...lines.slice(-14), { text: payload.text, receivedAt: payload.receivedAt }]);
       }));
 
       unlisteners.push(await listenEvent<MatchCandidatesEvent>("match_candidates", (payload) => {
+        const topCandidate = payload.candidates[0] ?? null;
+        const recordId = `${payload.receivedAt || Date.now()}-${topCandidate?.id ?? "none"}`;
+
+        if (payload.locked) {
+          setLocked(true);
+          return;
+        }
+
         setLastQuery(payload.query);
         setCandidates(payload.candidates);
-        setLocked(payload.locked);
-        if (!payload.locked && payload.candidates[0]) {
-          setSelectedCandidate(payload.candidates[0]);
-        }
-      }));
+        setLocked(false);
 
-      unlisteners.push(await listenEvent<SessionLogEvent>("session_log", (payload) => {
-        setSessionLogs((logs) => [...logs.slice(-8), payload]);
+        if (payload.definite && payload.query.trim()) {
+          const record: QuestionRecord = {
+            id: recordId,
+            query: payload.query,
+            receivedAt: payload.receivedAt || Date.now(),
+            candidates: payload.candidates,
+            selectedCandidate: topCandidate,
+            locked: payload.locked,
+          };
+          setQuestionRecords((records) => {
+            const withoutDuplicate = records.filter((item) => item.id !== record.id);
+            return [record, ...withoutDuplicate].slice(0, 30);
+          });
+          if (!payload.locked && topCandidate) {
+            setSelectedRecordId(recordId);
+            setSelectedCandidate(topCandidate);
+          }
+          return;
+        }
+
+        if (!payload.locked && topCandidate) {
+          setSelectedRecordId(null);
+          setSelectedCandidate(topCandidate);
+        }
       }));
 
       if (!mounted) unlisteners.splice(0).forEach((unlisten) => unlisten());
@@ -219,8 +258,11 @@ export default function App() {
       setLocked(false);
       setTranscript([]);
       setPartialText("");
+      setQuestionRecords([]);
+      setSelectedRecordId(null);
       setCandidates([]);
       setSelectedCandidate(null);
+      setLastQuery("");
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -235,6 +277,22 @@ export default function App() {
       setRunning(false);
       setMatchingPaused(false);
       setLocked(false);
+    }
+  }
+
+  async function prepareNextQuestion() {
+    try {
+      if (running) await api.unlockAnswer();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLocked(false);
+      setPartialText("");
+      setTranscript([]);
+      setCandidates([]);
+      setSelectedCandidate(null);
+      setSelectedRecordId(null);
+      setLastQuery("");
     }
   }
 
@@ -257,10 +315,32 @@ export default function App() {
       if (locked) {
         await api.unlockAnswer();
         setLocked(false);
+        setSelectedCandidate((current) => current ? { ...current, status: "candidate" as const } : current);
+        if (selectedRecordId) {
+          setQuestionRecords((records) => records.map((record) => (
+            record.id === selectedRecordId
+              ? {
+                  ...record,
+                  locked: false,
+                  selectedCandidate: record.selectedCandidate
+                    ? { ...record.selectedCandidate, status: "candidate" as const }
+                    : record.selectedCandidate,
+                }
+              : record
+          )));
+        }
       } else if (candidate) {
         await api.lockAnswer(candidate.id);
+        const lockedCandidate = { ...candidate, status: "locked" as const };
         setLocked(true);
-        setSelectedCandidate({ ...candidate, status: "locked" });
+        setSelectedCandidate(lockedCandidate);
+        if (selectedRecordId) {
+          setQuestionRecords((records) => records.map((record) => (
+            record.id === selectedRecordId
+              ? { ...record, locked: true, selectedCandidate: lockedCandidate }
+              : record
+          )));
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -273,17 +353,61 @@ export default function App() {
       const results = await api.searchQuestions(searchQuery.trim());
       setCandidates(results);
       setSelectedCandidate(results[0] ?? null);
+      setSelectedRecordId(null);
       setLastQuery(searchQuery.trim());
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
   }
 
-  const latestTranscript = partialText || transcript[transcript.length - 1]?.text || "等待面试官系统声音...";
+  function selectRecord(record: QuestionRecord) {
+    setSelectedRecordId(record.id);
+    setCandidates(record.candidates);
+    setSelectedCandidate(record.selectedCandidate ?? record.candidates[0] ?? null);
+    setLastQuery(record.query);
+    setLocked(record.locked);
+  }
+
+  function selectCandidate(candidate: MatchCandidate) {
+    const nextCandidate = locked ? { ...candidate, status: "locked" as const } : candidate;
+    setSelectedCandidate(nextCandidate);
+    if (selectedRecordId) {
+      setQuestionRecords((records) => records.map((record) => (
+        record.id === selectedRecordId ? { ...record, selectedCandidate: nextCandidate } : record
+      )));
+    }
+  }
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.code !== "Space" || event.repeat || isTextInputTarget(event.target)) return;
+      event.preventDefault();
+      if (!running) {
+        void startSession();
+        return;
+      }
+      if (locked) {
+        void prepareNextQuestion();
+        return;
+      }
+      if (selectedCandidate) {
+        void toggleLock(selectedCandidate);
+        return;
+      }
+      void prepareNextQuestion();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [locked, running, selectedCandidate, selectedSourceId, captureMode, resourceId, saveAudio, sources]);
+
+  const latestTranscript = partialText || transcript[transcript.length - 1]?.text || "空格开始监听，等待面试官系统声音...";
   const volumePercent = typeof audioStatus.volume === "number" ? Math.min(100, Math.round(audioStatus.volume * 100)) : null;
   const answerTerms = selectedCandidate?.highlightTerms ?? selectedCandidate?.hitTerms ?? [];
   const answerLogic = selectedCandidate?.answerLogic?.trim() ?? "";
   const answerDetail = selectedCandidate?.answerDetail?.trim() || selectedCandidate?.answer || "";
+  const selectedRecord = questionRecords.find((record) => record.id === selectedRecordId) ?? null;
+  const spaceHint = !running ? "空格开始监听" : locked ? "空格进入下一题" : selectedCandidate ? "空格锁定答案" : "等待候选";
 
   return (
     <main className="shell">
@@ -294,7 +418,7 @@ export default function App() {
           </div>
           <div>
             <h1>Interview Copilot</h1>
-            <p>系统声音实时识别 · 本地问题匹配 · 完整原文提示</p>
+            <p>系统声音实时识别 · 分段问题匹配 · 空格推进</p>
           </div>
         </section>
 
@@ -309,7 +433,7 @@ export default function App() {
           </div>
           <div className={cls("status-pill", locked && "locked")}>
             {locked ? <Lock size={16} /> : <Unlock size={16} />}
-            <span>{locked ? "答案已锁定" : matchingPaused ? "匹配已暂停" : "候选实时刷新"}</span>
+            <span>{spaceHint}</span>
           </div>
         </section>
       </header>
@@ -362,7 +486,7 @@ export default function App() {
           {matchingPaused ? <Play size={17} /> : <Pause size={17} />}
           <span>{matchingPaused ? "继续匹配" : "暂停匹配"}</span>
         </button>
-        <button className="icon-button" type="button" onClick={() => toggleLock(selectedCandidate)} disabled={!selectedCandidate} title="锁定当前答案，避免后续转写覆盖">
+        <button className="icon-button" type="button" onClick={() => toggleLock(selectedCandidate)} disabled={!selectedCandidate} title="锁定当前答案，下一次空格进入下一题">
           {locked ? <Unlock size={17} /> : <Lock size={17} />}
           <span>{locked ? "解锁" : "锁定"}</span>
         </button>
@@ -376,36 +500,76 @@ export default function App() {
       ) : null}
 
       <section className="workspace">
-        <aside className="panel transcript-panel">
-          <div className="panel-title">
-            <FileText size={18} />
-            <h2>实时转写</h2>
-          </div>
-          <div className="live-line">
-            <span className={partialText ? "streaming-dot" : "steady-dot"} />
-            <p>{latestTranscript}</p>
-          </div>
-          <div className="transcript-list">
-            {transcript.length === 0 ? <p className="muted">稳定分句会出现在这里。系统只监听桌面声音，不采集麦克风。</p> : null}
-            {transcript
-              .slice()
-              .reverse()
-              .map((line, index) => (
-                <article key={`${line.receivedAt}-${index}`} className="transcript-row">
-                  <span>{new Date(line.receivedAt).toLocaleTimeString()}</span>
-                  <p>{line.text}</p>
-                </article>
-              ))}
-          </div>
+        <aside className="left-column">
+          <section className="panel question-panel">
+            <div className="panel-title split">
+              <div>
+                <h2>问题列表</h2>
+                <p>每段稳定识别独立匹配</p>
+              </div>
+              <button className="icon-only" type="button" onClick={() => setQuestionRecords([])} title="清空问题列表">
+                <RotateCcw size={17} />
+              </button>
+            </div>
+            <div className="question-list">
+              {questionRecords.length === 0 ? (
+                <div className="empty-state compact-empty">
+                  <FileText size={24} />
+                  <p>面试官说完一段问题后，这里会新增一条匹配记录。</p>
+                </div>
+              ) : null}
+              {questionRecords.map((record) => {
+                const top = record.selectedCandidate ?? record.candidates[0] ?? null;
+                return (
+                  <button
+                    type="button"
+                    key={record.id}
+                    className={cls("question-record", selectedRecordId === record.id && "selected", record.locked && "locked")}
+                    onClick={() => selectRecord(record)}
+                  >
+                    <div className="record-meta">
+                      <span>{formatTime(record.receivedAt)}</span>
+                      {record.locked ? <strong>已锁定</strong> : null}
+                    </div>
+                    <p className="record-query">{record.query}</p>
+                    {top ? <p className="record-match">#{top.id} {top.question} · {top.score}%</p> : <p className="record-match">未匹配到候选</p>}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="panel transcript-panel">
+            <div className="panel-title">
+              <AudioLines size={18} />
+              <h2>实时转写</h2>
+            </div>
+            <div className="live-line">
+              <span className={partialText ? "streaming-dot" : "steady-dot"} />
+              <p>{latestTranscript}</p>
+            </div>
+            <div className="transcript-list">
+              {transcript.length === 0 ? <p className="muted">只监听系统声音，不采集麦克风。</p> : null}
+              {transcript
+                .slice()
+                .reverse()
+                .map((line, index) => (
+                  <article key={`${line.receivedAt}-${index}`} className="transcript-row">
+                    <span>{formatTime(line.receivedAt)}</span>
+                    <p>{line.text}</p>
+                  </article>
+                ))}
+            </div>
+          </section>
         </aside>
 
         <section className="panel candidate-panel">
           <div className="panel-title split">
             <div>
               <h2>Top 3 候选</h2>
-              <p>{lastQuery ? `当前问题：${lastQuery}` : "识别后自动刷新候选问题"}</p>
+              <p>{lastQuery ? `当前段：${lastQuery}` : "等待稳定识别或手动搜索"}</p>
             </div>
-            <button className="icon-only" type="button" onClick={() => setCandidates([])} title="清空候选">
+            <button className="icon-only" type="button" onClick={prepareNextQuestion} title="清空当前候选，准备下一题">
               <RotateCcw size={17} />
             </button>
           </div>
@@ -418,7 +582,7 @@ export default function App() {
               onKeyDown={(event) => {
                 if (event.key === "Enter") runSearch();
               }}
-              placeholder="ASR 误识别时手动搜：RAG / 薪资 / badcase"
+              placeholder="手动搜：RAG / 薪资 / badcase"
             />
             <button type="button" onClick={runSearch}>搜索</button>
           </div>
@@ -435,7 +599,7 @@ export default function App() {
                 type="button"
                 key={candidate.id}
                 className={cls("candidate-card", selectedCandidate?.id === candidate.id && "selected")}
-                onClick={() => setSelectedCandidate(candidate)}
+                onClick={() => selectCandidate(candidate)}
               >
                 <div className="candidate-rank">#{candidate.id}</div>
                 <div className="candidate-main">
@@ -449,7 +613,7 @@ export default function App() {
                     ))}
                   </div>
                   {candidate.answerLogic ? <p className="logic-preview">逻辑：{candidate.answerLogic}</p> : null}
-                  <small>{index === 0 ? (locked ? "已锁定" : "最可能命中") : "备选相关问题"}</small>
+                  <small>{index === 0 ? (locked ? "答案已锁定" : "最可能命中") : "备选相关问题"}</small>
                 </div>
               </button>
             ))}
@@ -460,7 +624,8 @@ export default function App() {
           <div className="panel-title split">
             <div>
               <h2>完整原文答案</h2>
-              <p>{selectedCandidate ? `#${selectedCandidate.id} · ${selectedCandidate.question}` : "选择一个候选问题查看答案"}</p>
+              <p>{selectedCandidate ? `#${selectedCandidate.id} · ${selectedCandidate.question}` : "选择候选问题查看答案"}</p>
+              {selectedRecord ? <p className="answer-source">来源：{formatTime(selectedRecord.receivedAt)} · {selectedRecord.query}</p> : null}
             </div>
             <button className="icon-button compact" type="button" onClick={() => toggleLock(selectedCandidate)} disabled={!selectedCandidate}>
               {locked ? <Unlock size={16} /> : <Lock size={16} />}
@@ -481,26 +646,11 @@ export default function App() {
             </div>
           ) : (
             <div className="answer-placeholder">
-              <p>候选问题出现后，这里会展示清单里的完整原文答案，并高亮和面试官问题最相关的词句。</p>
+              <p>候选问题出现后，这里会展示清单里的完整原文答案。</p>
             </div>
           )}
         </article>
       </section>
-
-      <footer className="bottom-log">
-        <div>
-          <strong>设备</strong>
-          <span>{selectedSource?.name ?? "未选择"}</span>
-        </div>
-        <div>
-          <strong>会话</strong>
-          <span>{running ? "运行中" : "未启动"}</span>
-        </div>
-        <div className="log-stream">
-          {sessionLogs.length === 0 ? <span>日志：等待会话事件</span> : sessionLogs.map((log, index) => <span key={`${log.message}-${index}`}>{log.message}</span>)}
-        </div>
-      </footer>
     </main>
   );
 }
-
