@@ -43,13 +43,16 @@ jobs:
           cargo --version
 
       - name: Install frontend dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm ci --registry=https://registry.npmjs.org/ --no-audit --no-fund
 
       - name: Test question matcher
         run: npm run test:matcher
 
+      - name: Typecheck frontend
+        run: npx tsc --noEmit
+
       - name: Build frontend
-        run: npm run build
+        run: npx vite build
 
       - name: Build Windows desktop client
         run: npm run tauri -- build
