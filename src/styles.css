@@ -482,6 +482,17 @@ button:disabled {
   font-size: 11px;
 }
 
+.logic-preview {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: -1px 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .candidate-main small {
   color: var(--muted);
 }
@@ -510,10 +521,42 @@ button:disabled {
   padding: 18px 22px 34px;
 }
 
+.answer-section {
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #d6c79e;
+}
+
+.answer-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.answer-section h3 {
+  margin: 0 0 10px;
+  color: #514635;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
 .answer-body p {
   margin: 0 0 15px;
   font-size: 17px;
   line-height: 1.8;
+}
+
+.answer-body .logic-section p {
+  margin: 0;
+  color: #2f271e;
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.65;
+}
+
+.answer-body .section-empty {
+  color: #766a58;
+  font-weight: 500;
 }
 
 mark {

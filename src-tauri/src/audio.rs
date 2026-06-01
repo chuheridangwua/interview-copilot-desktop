@@ -7,7 +7,7 @@ use std::sync::{
 };
 use std::io::Write;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
 
@@ -235,6 +235,11 @@ mod platform {
             format!("正在采集{source_kind}：{device_name}"),
         );
 
+        println!("[interview-copilot][audio] start capture kind={source_kind} device={device_name}");
+        let started_at = Instant::now();
+        let mut chunks_sent = 0u64;
+        let mut max_volume = 0.0f32;
+        let mut silence_notice_sent = false;
         let mut packet_buffer = Vec::with_capacity(PCM_200MS_BYTES * 2);
         let mut audio_file = if settings.save_audio {
             settings.session_dir.as_ref().and_then(|dir| {
@@ -275,12 +280,31 @@ mod platform {
                     let _ = file.write_all(&chunk);
                 }
                 let volume = rms_volume_i16(&chunk);
+                chunks_sent += 1;
+                max_volume = max_volume.max(volume);
+                let silent_for_a_while = chunks_sent >= 15 && max_volume < 0.001;
+                let message = if silent_for_a_while {
+                    format!("正在采集{source_kind}：{device_name}，但音量一直为 0，请确认会议声音从这个输出设备播放")
+                } else {
+                    format!("正在采集{source_kind}：{device_name}")
+                };
+                if chunks_sent == 1 || chunks_sent % 25 == 0 || (silent_for_a_while && !silence_notice_sent) {
+                    println!(
+                        "[interview-copilot][audio] chunk={} elapsed_ms={} volume={:.4} max_volume={:.4} device={}",
+                        chunks_sent,
+                        started_at.elapsed().as_millis(),
+                        volume,
+                        max_volume,
+                        device_name
+                    );
+                    silence_notice_sent |= silent_for_a_while;
+                }
                 emit_audio_status(
                     &app,
                     "capturing",
                     Some(device_name.clone()),
                     Some(volume),
-                    format!("正在采集{source_kind}：{device_name}"),
+                    message,
                 );
                 if audio_tx.blocking_send(chunk).is_err() {
                     stop.store(true, Ordering::SeqCst);
@@ -290,6 +314,7 @@ mod platform {
         }
 
         let _ = audio_client.stop_stream();
+        println!("[interview-copilot][audio] stop capture chunks={} max_volume={:.4}", chunks_sent, max_volume);
         emit_audio_status(&app, "stopped", Some(device_name), Some(0.0), "系统声音采集已停止");
         Ok(())
     }

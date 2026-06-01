@@ -39,7 +39,7 @@ pub async fn run_asr_session(
     emit_log(
         &app,
         SessionLogEvent {
-            message: "正在连接豆包流式 ASR".to_string(),
+            message: format!("正在连接豆包流式 ASR · resource={} · request={}", settings.resource_id, request_id),
             asr_log_id: None,
             save_audio: settings.save_audio,
             asr_latency_ms: None,
@@ -47,8 +47,9 @@ pub async fn run_asr_session(
         },
     );
 
+    let connect_started = Instant::now();
     let (ws_stream, response) = tokio::time::timeout(
-        Duration::from_secs(10),
+        Duration::from_secs(20),
         tokio_tungstenite::connect_async(request),
     )
     .await
@@ -63,7 +64,7 @@ pub async fn run_asr_session(
     emit_log(
         &app,
         SessionLogEvent {
-            message: "豆包流式 ASR 已连接".to_string(),
+            message: format!("豆包流式 ASR 已连接 · {}ms", connect_started.elapsed().as_millis()),
             asr_log_id: asr_log_id.clone(),
             save_audio: settings.save_audio,
             asr_latency_ms: None,
@@ -77,8 +78,19 @@ pub async fn run_asr_session(
         .send(Message::Binary(doubao::build_full_client_request(&hotwords)?))
         .await
         .context("发送豆包 full client request 失败")?;
+    emit_log(
+        &app,
+        SessionLogEvent {
+            message: format!("豆包 full request 已发送 · 热词 {} 个", hotwords.len()),
+            asr_log_id: asr_log_id.clone(),
+            save_audio: settings.save_audio,
+            asr_latency_ms: None,
+            match_latency_ms: None,
+        },
+    );
 
     let mut sequence = 1i32;
+    let mut audio_chunks_sent = 0u64;
     let mut last_audio_sent = Instant::now();
 
     loop {
@@ -86,6 +98,16 @@ pub async fn run_asr_session(
             let _ = write
                 .send(Message::Binary(doubao::build_last_audio_request(sequence)))
                 .await;
+            emit_log(
+                &app,
+                SessionLogEvent {
+                    message: format!("停止信号已发送到豆包 ASR · audio_chunks={audio_chunks_sent}"),
+                    asr_log_id: asr_log_id.clone(),
+                    save_audio: settings.save_audio,
+                    asr_latency_ms: None,
+                    match_latency_ms: None,
+                },
+            );
             break;
         }
 
@@ -93,9 +115,22 @@ pub async fn run_asr_session(
             maybe_chunk = audio_rx.recv() => {
                 if let Some(chunk) = maybe_chunk {
                     sequence += 1;
+                    audio_chunks_sent += 1;
                     last_audio_sent = Instant::now();
                     let frame = doubao::build_audio_request(sequence, &chunk, false)?;
                     write.send(Message::Binary(frame)).await.context("发送豆包音频包失败")?;
+                    if audio_chunks_sent == 1 || audio_chunks_sent % 10 == 0 {
+                        emit_log(
+                            &app,
+                            SessionLogEvent {
+                                message: format!("豆包音频包已发送 · chunks={} · seq={} · bytes={}", audio_chunks_sent, sequence, chunk.len()),
+                                asr_log_id: asr_log_id.clone(),
+                                save_audio: settings.save_audio,
+                                asr_latency_ms: None,
+                                match_latency_ms: None,
+                            },
+                        );
+                    }
                 } else {
                     stop.store(true, Ordering::SeqCst);
                 }
@@ -239,6 +274,23 @@ fn append_jsonl<T: serde::Serialize>(session_dir: Option<&str>, filename: &str, 
 }
 
 fn emit_log(app: &AppHandle, payload: SessionLogEvent) {
+    println!(
+        "[interview-copilot][session] {}{}{}{}",
+        payload.message,
+        payload
+            .asr_log_id
+            .as_deref()
+            .map(|log_id| format!(" · logid={log_id}"))
+            .unwrap_or_default(),
+        payload
+            .asr_latency_ms
+            .map(|latency| format!(" · asr_latency={latency}ms"))
+            .unwrap_or_default(),
+        payload
+            .match_latency_ms
+            .map(|latency| format!(" · match_latency={latency}ms"))
+            .unwrap_or_default(),
+    );
     let _ = app.emit("session_log", payload);
 }
 

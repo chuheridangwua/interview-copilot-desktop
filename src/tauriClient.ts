@@ -35,6 +35,8 @@ export interface MatchCandidate {
   id: number;
   question: string;
   answer: string;
+  answerLogic: string;
+  answerDetail: string;
   score: number;
   hitTerms: string[];
   highlightTerms: string[];

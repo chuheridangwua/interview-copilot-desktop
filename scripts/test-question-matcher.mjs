@@ -5,6 +5,22 @@ const embeddedQuestionBankPath = new URL("../src-tauri/src/question_bank_embedde
 const fixtureQuestionBankPath = new URL("./fixtures/interview-questions.sample.md", import.meta.url);
 const questionBankPath = process.env.QUESTION_BANK_PATH || (fs.existsSync(embeddedQuestionBankPath) ? embeddedQuestionBankPath : fixtureQuestionBankPath);
 
+function splitAnswerSections(answer) {
+  const logicMarker = "回答逻辑：";
+  const detailMarker = "具体内容：";
+  const logicStart = answer.indexOf(logicMarker);
+  if (logicStart < 0) return { answerLogic: "", answerDetail: answer.trim() };
+  const logicContentStart = logicStart + logicMarker.length;
+  const detailStart = answer.indexOf(detailMarker, logicContentStart);
+  if (detailStart < 0) {
+    return { answerLogic: answer.slice(logicContentStart).trim(), answerDetail: "" };
+  }
+  return {
+    answerLogic: answer.slice(logicContentStart, detailStart).trim(),
+    answerDetail: answer.slice(detailStart + detailMarker.length).trim(),
+  };
+}
+
 function parseQuestionBank(content) {
   const heading = /^(\d+)\.\s+(.+)$/gm;
   const matches = [...content.matchAll(heading)];
@@ -12,10 +28,14 @@ function parseQuestionBank(content) {
     const next = matches[index + 1];
     const answerStart = match.index + match[0].length;
     const answerEnd = next ? next.index : content.length;
+    const answer = content.slice(answerStart, answerEnd).trim();
+    const { answerLogic, answerDetail } = splitAnswerSections(answer);
     return {
       id: Number(match[1]),
       question: match[2].trim(),
-      answer: content.slice(answerStart, answerEnd).trim(),
+      answer,
+      answerLogic,
+      answerDetail,
     };
   });
 }
@@ -88,6 +108,9 @@ function search(query, bank) {
 const bank = parseQuestionBank(fs.readFileSync(questionBankPath, "utf8"));
 assert.equal(bank.length, 31, "should parse 31 numbered questions");
 assert.ok(bank.every((item) => item.id && item.question && item.answer), "each item should contain id, question, and answer");
+assert.ok(bank.every((item) => item.answerLogic && item.answerDetail), "each item should contain answer logic and detail sections");
+assert.equal(bank[0].answerLogic, "基本身份——核心经历——岗位匹配");
+assert.ok(bank[0].answerDetail.startsWith("【基本身份】"));
 
 const cases = [
   ["你们的 RAG 是怎么做的，复杂 PDF 和表格怎么处理", 24],

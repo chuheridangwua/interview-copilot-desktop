@@ -10,7 +10,6 @@ const MSG_FULL_SERVER_RESPONSE: u8 = 0x9;
 const MSG_ERROR: u8 = 0xf;
 const FLAG_NO_SEQUENCE: u8 = 0x0;
 const FLAG_POS_SEQUENCE: u8 = 0x1;
-const FLAG_LAST_NO_SEQUENCE: u8 = 0x2;
 const FLAG_NEG_SEQUENCE: u8 = 0x3;
 const SERIALIZATION_NONE: u8 = 0x0;
 const SERIALIZATION_JSON: u8 = 0x1;
@@ -130,25 +129,16 @@ pub fn build_audio_request(sequence: i32, pcm: &[u8], is_last: bool) -> anyhow::
 }
 
 pub fn build_last_audio_request(sequence: i32) -> Vec<u8> {
-    pack_payload(
-        MSG_AUDIO_ONLY_REQUEST,
-        FLAG_LAST_NO_SEQUENCE,
-        SERIALIZATION_NONE,
-        COMPRESSION_GZIP,
-        None,
-        &[],
-    )
-    .into_iter()
-    .enumerate()
-    .map(|(index, byte)| {
-        if index == 1 {
-            (MSG_AUDIO_ONLY_REQUEST << 4) | FLAG_NEG_SEQUENCE
-        } else {
-            byte
-        }
+    build_audio_request(sequence, &[], true).unwrap_or_else(|_| {
+        pack_payload(
+            MSG_AUDIO_ONLY_REQUEST,
+            FLAG_NEG_SEQUENCE,
+            SERIALIZATION_NONE,
+            COMPRESSION_NONE,
+            Some(-sequence.abs()),
+            &[],
+        )
     })
-    .collect::<Vec<_>>()
-    .tap_sequence(sequence)
 }
 
 pub fn parse_server_frame(frame: &[u8]) -> anyhow::Result<ServerFrame> {
@@ -277,17 +267,6 @@ fn read_u32(frame: &[u8], cursor: usize) -> anyhow::Result<u32> {
     Ok(u32::from_be_bytes(bytes.try_into().expect("slice length checked")))
 }
 
-trait TapSequence {
-    fn tap_sequence(self, sequence: i32) -> Self;
-}
-
-impl TapSequence for Vec<u8> {
-    fn tap_sequence(mut self, sequence: i32) -> Self {
-        self.splice(4..4, (-sequence.abs()).to_be_bytes());
-        self
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -304,6 +283,14 @@ mod tests {
         let frame = build_audio_request(7, &[0, 1, 2], false).unwrap();
         assert_eq!(frame[1] >> 4, MSG_AUDIO_ONLY_REQUEST);
         assert_eq!(i32::from_be_bytes(frame[4..8].try_into().unwrap()), 7);
+    }
+
+    #[test]
+    fn builds_last_audio_request_with_negative_sequence() {
+        let frame = build_last_audio_request(8);
+        assert_eq!(frame[1] >> 4, MSG_AUDIO_ONLY_REQUEST);
+        assert_eq!(frame[1] & 0x0f, FLAG_NEG_SEQUENCE);
+        assert_eq!(i32::from_be_bytes(frame[4..8].try_into().unwrap()), -8);
     }
 }
 

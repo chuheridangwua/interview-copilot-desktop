@@ -282,6 +282,8 @@ export default function App() {
   const latestTranscript = partialText || transcript[transcript.length - 1]?.text || "等待面试官系统声音...";
   const volumePercent = typeof audioStatus.volume === "number" ? Math.min(100, Math.round(audioStatus.volume * 100)) : null;
   const answerTerms = selectedCandidate?.highlightTerms ?? selectedCandidate?.hitTerms ?? [];
+  const answerLogic = selectedCandidate?.answerLogic?.trim() ?? "";
+  const answerDetail = selectedCandidate?.answerDetail?.trim() || selectedCandidate?.answer || "";
 
   return (
     <main className="shell">
@@ -446,6 +448,7 @@ export default function App() {
                       <span key={`${candidate.id}-${term}`}>{term}</span>
                     ))}
                   </div>
+                  {candidate.answerLogic ? <p className="logic-preview">逻辑：{candidate.answerLogic}</p> : null}
                   <small>{index === 0 ? (locked ? "已锁定" : "最可能命中") : "备选相关问题"}</small>
                 </div>
               </button>
@@ -467,7 +470,14 @@ export default function App() {
 
           {selectedCandidate ? (
             <div className="answer-body">
-              {highlightAnswer(selectedCandidate.answer, answerTerms)}
+              <section className="answer-section logic-section">
+                <h3>回答逻辑：</h3>
+                {answerLogic ? <p>{answerLogic}</p> : <p className="section-empty">原文未提供回答逻辑。</p>}
+              </section>
+              <section className="answer-section detail-section">
+                <h3>具体内容：</h3>
+                {highlightAnswer(answerDetail, answerTerms)}
+              </section>
             </div>
           ) : (
             <div className="answer-placeholder">
