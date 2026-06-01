@@ -1,5 +1,5 @@
 use crate::{AudioStatusEvent, CaptureMode, SessionSettings};
-use anyhow::{anyhow, Context};
+use anyhow::Context;
 use serde::{Deserialize, Serialize};
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -107,7 +107,7 @@ mod platform {
             "当前环境不是 Windows，无法采集系统输出声音。请在 Windows 上运行桌面端。",
         );
         stop.store(true, Ordering::SeqCst);
-        Err(anyhow!("Windows WASAPI loopback is required for live system-audio capture"))
+        Err(anyhow::anyhow!("Windows WASAPI loopback is required for live system-audio capture"))
     }
 }
 
@@ -117,7 +117,7 @@ mod platform {
     use wasapi::{initialize_mta, DeviceEnumerator, Direction, SampleType, StreamMode, WaveFormat};
 
     pub fn list_audio_sources() -> anyhow::Result<Vec<AudioSource>> {
-        initialize_mta().context("初始化 Windows COM 失败")?;
+        initialize_mta().ok().context("初始化 Windows COM 失败")?;
         let enumerator = DeviceEnumerator::new().context("创建 WASAPI device enumerator 失败")?;
         let default_render_id = enumerator
             .get_default_device(&Direction::Render)
@@ -193,7 +193,7 @@ mod platform {
         audio_tx: mpsc::Sender<Vec<u8>>,
         stop: Arc<AtomicBool>,
     ) -> anyhow::Result<()> {
-        initialize_mta().context("初始化 Windows COM 失败")?;
+        initialize_mta().ok().context("初始化 Windows COM 失败")?;
         let enumerator = DeviceEnumerator::new().context("创建 WASAPI device enumerator 失败")?;
         let device = if let Some(device_id) = settings.audio_device_id.as_deref() {
             enumerator.get_device(device_id)?

@@ -194,9 +194,9 @@ pub fn parse_server_frame(frame: &[u8]) -> anyhow::Result<ServerFrame> {
     };
 
     let value: Value = serde_json::from_slice(&payload).context("解析豆包 ASR JSON 失败")?;
-    extract_transcript(&value)
+    Ok(extract_transcript(&value)
         .map(ServerFrame::Transcript)
-        .or(Ok(ServerFrame::Ack))
+        .unwrap_or(ServerFrame::Ack))
 }
 
 fn extract_transcript(value: &Value) -> Option<TranscriptFrame> {
