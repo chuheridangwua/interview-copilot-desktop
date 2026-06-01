@@ -1,6 +1,6 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{fs, sync::OnceLock};
+use std::sync::OnceLock;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -10,14 +10,15 @@ pub struct QuestionItem {
     pub answer: String,
 }
 
+const EMBEDDED_QUESTION_BANK: &str = include_str!("question_bank_embedded.md");
+
 fn heading_regex() -> &'static Regex {
     static HEADING: OnceLock<Regex> = OnceLock::new();
     HEADING.get_or_init(|| Regex::new(r"(?m)^(\d+)\.\s+(.+)$").expect("valid heading regex"))
 }
 
-pub fn load_question_bank(path: &str) -> anyhow::Result<Vec<QuestionItem>> {
-    let content = fs::read_to_string(path)?;
-    parse_question_bank(&content)
+pub fn load_embedded_question_bank() -> anyhow::Result<Vec<QuestionItem>> {
+    parse_question_bank(EMBEDDED_QUESTION_BANK)
 }
 
 pub fn parse_question_bank(content: &str) -> anyhow::Result<Vec<QuestionItem>> {

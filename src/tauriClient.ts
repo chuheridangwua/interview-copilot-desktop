@@ -10,12 +10,10 @@ export interface AudioSource {
 }
 
 export interface SessionSettings {
-  doubaoApiKey?: string;
   resourceId: string;
   captureMode: CaptureMode;
   audioDeviceId?: string;
   saveAudio: boolean;
-  questionBankPath: string;
 }
 
 export interface AudioStatusEvent {

@@ -6,17 +6,16 @@ mod session;
 
 use audio::AudioCaptureHandle;
 use matcher::Matcher;
-use question_bank::{load_question_bank, QuestionItem};
+use question_bank::{load_embedded_question_bank, QuestionItem};
 use serde::{Deserialize, Serialize};
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc, Mutex,
 };
-use tauri::{AppHandle, Emitter, Manager, State};
+use tauri::{AppHandle, Emitter, State};
 use tokio::sync::mpsc;
 use uuid::Uuid;
 
-const DEFAULT_QUESTION_BANK_PATH: &str = "/home/ubuntu/offer/面试可能遇到的问题清单.md";
 const DEFAULT_RESOURCE_ID: &str = "volc.seedasr.sauc.duration";
 
 pub type AppSharedState = Arc<Mutex<InnerState>>;
@@ -67,12 +66,10 @@ impl Default for CaptureMode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SessionSettings {
-    pub doubao_api_key: Option<String>,
     pub resource_id: String,
     pub capture_mode: CaptureMode,
     pub audio_device_id: Option<String>,
     pub save_audio: bool,
-    pub question_bank_path: String,
     pub session_dir: Option<String>,
 }
 
@@ -124,16 +121,13 @@ async fn start_session(
     state: State<'_, AppState>,
     mut settings: SessionSettings,
 ) -> Result<SessionStarted, String> {
-    if settings.question_bank_path.trim().is_empty() {
-        settings.question_bank_path = DEFAULT_QUESTION_BANK_PATH.to_string();
-    }
     if settings.resource_id.trim().is_empty() {
         settings.resource_id = DEFAULT_RESOURCE_ID.to_string();
     }
 
-    let api_key = resolve_api_key(settings.doubao_api_key.as_deref())?;
-    let question_bank = load_question_bank(&settings.question_bank_path)
-        .map_err(|err| format!("读取问题库失败：{err}"))?;
+    let api_key = resolve_api_key()?;
+    let question_bank = load_embedded_question_bank()
+        .map_err(|err| format!("读取内置问题库失败：{err}"))?;
     if question_bank.is_empty() {
         return Err("问题库为空，无法开始匹配".to_string());
     }
@@ -279,8 +273,8 @@ async fn search_questions(state: State<'_, AppState>, query: String) -> Result<V
     let matcher = {
         let mut inner = state.inner.lock().expect("state lock poisoned");
         if inner.matcher.is_none() {
-            let bank = load_question_bank(DEFAULT_QUESTION_BANK_PATH)
-                .map_err(|err| format!("读取默认问题库失败：{err}"))?;
+            let bank = load_embedded_question_bank()
+                .map_err(|err| format!("读取内置问题库失败：{err}"))?;
             inner.question_bank = bank.clone();
             inner.matcher = Some(Matcher::new(bank));
         }
@@ -292,17 +286,14 @@ async fn search_questions(state: State<'_, AppState>, query: String) -> Result<V
         .ok_or_else(|| "问题匹配器未初始化".to_string())
 }
 
-fn resolve_api_key(input: Option<&str>) -> Result<String, String> {
-    let value = input
-        .map(str::trim)
-        .filter(|value| !value.is_empty())
-        .map(str::to_string)
-        .or_else(|| std::env::var("DOUBAO_API_KEY").ok())
-        .or_else(|| std::env::var("VOLCENGINE_ASR_API_KEY").ok())
-        .ok_or_else(|| "未配置豆包 API Key。请输入运行时 Key，或设置 DOUBAO_API_KEY / VOLCENGINE_ASR_API_KEY 环境变量。".to_string())?;
+fn resolve_api_key() -> Result<String, String> {
+    let value = std::env::var("DOUBAO_API_KEY")
+        .or_else(|_| std::env::var("VOLCENGINE_ASR_API_KEY"))
+        .map(|value| value.trim().to_string())
+        .map_err(|_| "未检测到豆包 API Key。请在 Windows 用户环境变量中配置 DOUBAO_API_KEY，重启应用后会自动读取。".to_string())?;
 
     if value.len() < 16 {
-        return Err("豆包 API Key 看起来过短，请检查配置。".to_string());
+        return Err("豆包 API Key 看起来过短，请检查 Windows 环境变量 DOUBAO_API_KEY。".to_string());
     }
     Ok(value)
 }
@@ -321,12 +312,6 @@ pub fn run() {
             unlock_answer,
             search_questions
         ])
-        .setup(|app| {
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.set_fullscreen(true);
-            }
-            Ok(())
-        })
         .run(tauri::generate_context!())
         .expect("error while running Interview Copilot");
 }

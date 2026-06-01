@@ -136,21 +136,41 @@ button {
 
 .controls {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) minmax(170px, 0.9fr) minmax(260px, 1.5fr) 150px minmax(180px, 1fr) repeat(4, auto);
+  grid-template-columns: minmax(170px, 0.8fr) 150px 150px minmax(240px, 1.3fr) repeat(4, auto);
   gap: 8px;
   align-items: end;
 }
 
-label {
+label,
+.inline-info {
   display: flex;
   flex-direction: column;
   gap: 5px;
   min-width: 0;
 }
 
-label span {
+label span,
+.inline-info span {
   color: var(--muted);
   font-size: 11px;
+}
+
+.inline-info {
+  justify-content: flex-end;
+  height: 53px;
+  min-width: 0;
+  padding: 0 10px 1px;
+  color: var(--ink);
+  background: rgba(29, 26, 23, 0.75);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.inline-info strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
 }
 
 input,
@@ -562,6 +582,10 @@ mark {
 
   .controls {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .inline-info {
+    height: 53px;
   }
 
   .workspace {

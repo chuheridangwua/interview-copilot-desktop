@@ -47,9 +47,13 @@ pub async fn run_asr_session(
         },
     );
 
-    let (ws_stream, response) = tokio_tungstenite::connect_async(request)
-        .await
-        .context("连接豆包流式 ASR 失败")?;
+    let (ws_stream, response) = tokio::time::timeout(
+        Duration::from_secs(10),
+        tokio_tungstenite::connect_async(request),
+    )
+    .await
+    .context("连接豆包流式 ASR 超时，请检查网络或火山引擎服务可用性")?
+    .context("连接豆包流式 ASR 失败")?;
     let asr_log_id = response
         .headers()
         .get("X-Tt-Logid")

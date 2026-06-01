@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
 
-const defaultQuestionBankPath = "/home/ubuntu/offer/面试可能遇到的问题清单.md";
+const embeddedQuestionBankPath = new URL("../src-tauri/src/question_bank_embedded.md", import.meta.url);
 const fixtureQuestionBankPath = new URL("./fixtures/interview-questions.sample.md", import.meta.url);
-const questionBankPath = process.env.QUESTION_BANK_PATH || (fs.existsSync(defaultQuestionBankPath) ? defaultQuestionBankPath : fixtureQuestionBankPath);
+const questionBankPath = process.env.QUESTION_BANK_PATH || (fs.existsSync(embeddedQuestionBankPath) ? embeddedQuestionBankPath : fixtureQuestionBankPath);
 
 function parseQuestionBank(content) {
   const heading = /^(\d+)\.\s+(.+)$/gm;

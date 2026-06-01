@@ -6,18 +6,15 @@ Windows 桌面端实时面试答案匹配器。第一版只支持 Windows 客户
 
 - 只采集系统输出声音，不采集麦克风。
 - 通过豆包/火山引擎流式 ASR 识别面试官声音。
-- 解析 `/home/ubuntu/offer/面试可能遇到的问题清单.md` 里的编号 Q&A。
+- 问题清单已内置到客户端安装包，不依赖 Windows 本地 Markdown 路径。
 - 本地毫秒级匹配 Top 3 问题，不实时调用大模型做匹配。
-- 桌面全屏控制台展示实时转写、Top 3 候选和完整原文答案。
+- 普通可缩放桌面窗口展示实时转写、Top 3 候选和完整原文答案。
 
 ## API Key 安全
 
 不要把 API Key 写进代码、配置文件或 GitHub 仓库。
 
-客户端支持两种方式：
-
-1. 启动后在页面里临时输入 API Key。
-2. 在 Windows 环境变量里设置：
+客户端不在页面里展示或保存 API Key，只从 Windows 运行时环境变量读取：
 
 ```powershell
 $env:DOUBAO_API_KEY="你的新Key"
@@ -135,8 +132,8 @@ npm run client:build
 
 1. 打开腾讯会议、飞书会议、Zoom 或 Teams。
 2. 确认面试官声音能从耳机或扬声器正常播放。
-3. 启动 Interview Copilot 客户端。
-4. 填入新的豆包 API Key，或提前设置 `DOUBAO_API_KEY`。
+3. 在 Windows 用户环境变量里提前设置 `DOUBAO_API_KEY`，然后重新打开客户端。
+4. 启动 Interview Copilot 客户端。
 5. `Resource ID` 默认使用：
 
 ```text
@@ -149,19 +146,14 @@ volc.seedasr.sauc.duration
 volc.seedasr.sauc.concurrent
 ```
 
-6. 问题库路径填 Windows 上真实路径，例如：
-
-```text
-D:\offer\面试可能遇到的问题清单.md
-```
-
+6. 问题库已经内置，不需要选择或填写本地文件路径。
 7. 采集模式优先选择：
 
 ```text
 WASAPI 系统声音
 ```
 
-8. 音频设备选择会议软件实际输出的设备。
+8. 音频设备选择会议软件实际输出的设备，开始后看状态栏音量百分比；如果一直是 0%，说明选错输出设备或会议声音没有从该设备播放。
 9. 点击 `开始监听`。
 10. 如果答案正确，点击 `锁定`，避免后续闲聊或追问刷新答案。
 11. 如果暂时不想刷新答案，点击 `暂停匹配`。

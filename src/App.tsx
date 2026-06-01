@@ -27,7 +27,6 @@ import {
   SessionSettings,
 } from "./tauriClient";
 
-const DEFAULT_BANK_PATH = "/home/ubuntu/offer/面试可能遇到的问题清单.md";
 const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
 
 interface TranscriptLine {
@@ -82,9 +81,7 @@ export default function App() {
   const [sources, setSources] = useState<AudioSource[]>([]);
   const [selectedSourceId, setSelectedSourceId] = useState("");
   const [captureMode, setCaptureMode] = useState<CaptureMode>("wasapi_loopback");
-  const [questionBankPath, setQuestionBankPath] = useState(DEFAULT_BANK_PATH);
   const [resourceId, setResourceId] = useState(DEFAULT_RESOURCE_ID);
-  const [apiKey, setApiKey] = useState("");
   const [saveAudio, setSaveAudio] = useState(false);
   const [running, setRunning] = useState(false);
   const [matchingPaused, setMatchingPaused] = useState(false);
@@ -103,8 +100,18 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   const selectedSource = useMemo(
-    () => sources.find((source) => source.id === selectedSourceId),
-    [selectedSourceId, sources],
+    () => sources.find((source) => source.id === selectedSourceId && source.captureMode === captureMode),
+    [captureMode, selectedSourceId, sources],
+  );
+
+  const compatibleSources = useMemo(
+    () => sources.filter((source) => source.captureMode === captureMode),
+    [captureMode, sources],
+  );
+
+  const hasVirtualSource = useMemo(
+    () => sources.some((source) => source.captureMode === "virtual_audio_device"),
+    [sources],
   );
 
   useEffect(() => {
@@ -131,6 +138,19 @@ export default function App() {
       disposed = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (sources.length === 0) return;
+    if (captureMode === "virtual_audio_device" && !hasVirtualSource) {
+      setCaptureMode("wasapi_loopback");
+      return;
+    }
+    const current = sources.find((source) => source.id === selectedSourceId && source.captureMode === captureMode);
+    if (current) return;
+    const next = sources.find((source) => source.captureMode === captureMode && source.isDefault)
+      ?? sources.find((source) => source.captureMode === captureMode);
+    setSelectedSourceId(next?.id ?? "");
+  }, [captureMode, hasVirtualSource, selectedSourceId, sources]);
 
   useEffect(() => {
     const unlisteners: Array<() => void> = [];
@@ -176,13 +196,20 @@ export default function App() {
 
   async function startSession() {
     setError(null);
+    const source = sources.find((item) => item.id === selectedSourceId && item.captureMode === captureMode);
+    if (!source) {
+      setError(captureMode === "virtual_audio_device"
+        ? "未检测到可用虚拟声卡。请安装 VB-CABLE / Voicemeeter 后重启应用，或切回 WASAPI 系统声音。"
+        : "请选择正在播放会议声音的系统输出设备。"
+      );
+      return;
+    }
+
     const settings: SessionSettings = {
-      doubaoApiKey: apiKey.trim() || undefined,
       resourceId: resourceId.trim() || DEFAULT_RESOURCE_ID,
       captureMode,
-      audioDeviceId: selectedSourceId || undefined,
+      audioDeviceId: source.id,
       saveAudio,
-      questionBankPath: questionBankPath.trim() || DEFAULT_BANK_PATH,
     };
 
     try {
@@ -253,6 +280,7 @@ export default function App() {
   }
 
   const latestTranscript = partialText || transcript[transcript.length - 1]?.text || "等待面试官系统声音...";
+  const volumePercent = typeof audioStatus.volume === "number" ? Math.min(100, Math.round(audioStatus.volume * 100)) : null;
   const answerTerms = selectedCandidate?.highlightTerms ?? selectedCandidate?.hitTerms ?? [];
 
   return (
@@ -271,11 +299,11 @@ export default function App() {
         <section className="status-strip" aria-label="运行状态">
           <div className={cls("status-pill", audioStatus.state === "capturing" && "good", audioStatus.state === "error" && "bad")}>
             <Activity size={16} />
-            <span>{audioStatus.message}</span>
+            <span>{audioStatus.message}{volumePercent !== null ? ` · 音量 ${volumePercent}%` : ""}</span>
           </div>
           <div className="status-pill">
             <ShieldCheck size={16} />
-            <span>Key {apiKey ? "已输入" : "仅运行时读取"}</span>
+            <span>Key 自动读取</span>
           </div>
           <div className={cls("status-pill", locked && "locked")}>
             {locked ? <Lock size={16} /> : <Unlock size={16} />}
@@ -286,41 +314,31 @@ export default function App() {
 
       <section className="controls">
         <label>
-          <span>豆包 API Key</span>
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(event) => setApiKey(event.target.value)}
-            placeholder="从环境变量读取时可留空"
-            autoComplete="off"
-          />
-        </label>
-        <label>
           <span>Resource ID</span>
           <input value={resourceId} onChange={(event) => setResourceId(event.target.value)} />
         </label>
-        <label className="wide">
+        <div className="inline-info">
           <span>问题库</span>
-          <input value={questionBankPath} onChange={(event) => setQuestionBankPath(event.target.value)} />
-        </label>
+          <strong>已内置 31 题</strong>
+        </div>
         <label>
           <span>采集模式</span>
           <select value={captureMode} onChange={(event) => setCaptureMode(event.target.value as CaptureMode)}>
             <option value="wasapi_loopback">WASAPI 系统声音</option>
-            <option value="virtual_audio_device">虚拟声卡</option>
+            <option value="virtual_audio_device" disabled={!hasVirtualSource}>虚拟声卡{hasVirtualSource ? "" : "（未检测到）"}</option>
           </select>
         </label>
         <label>
           <span>音频设备</span>
           <select value={selectedSourceId} onChange={(event) => setSelectedSourceId(event.target.value)}>
-            {sources.length === 0 ? <option value="">等待桌面端列出设备</option> : null}
-            {sources
-              .filter((source) => source.captureMode === captureMode)
-              .map((source) => (
-                <option key={source.id} value={source.id}>
-                  {source.name}
-                </option>
-              ))}
+            {compatibleSources.length === 0 ? (
+              <option value="">{captureMode === "virtual_audio_device" ? "未检测到虚拟声卡" : "等待桌面端列出设备"}</option>
+            ) : null}
+            {compatibleSources.map((source) => (
+              <option key={source.id} value={source.id}>
+                {source.name}
+              </option>
+            ))}
           </select>
         </label>
         <button className={cls("icon-button", saveAudio && "active")} type="button" onClick={() => setSaveAudio((value) => !value)} title="手动开启保存音频和日志">

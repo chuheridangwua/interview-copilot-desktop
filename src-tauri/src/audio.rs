@@ -195,12 +195,23 @@ mod platform {
     ) -> anyhow::Result<()> {
         initialize_mta().ok().context("初始化 Windows COM 失败")?;
         let enumerator = DeviceEnumerator::new().context("创建 WASAPI device enumerator 失败")?;
-        let device = if let Some(device_id) = settings.audio_device_id.as_deref() {
-            enumerator.get_device(device_id)?
-        } else if settings.capture_mode == CaptureMode::WasapiLoopback {
-            enumerator.get_default_device(&Direction::Render)?
-        } else {
-            enumerator.get_default_device(&Direction::Capture)?
+        let (device, source_kind) = match settings.capture_mode {
+            CaptureMode::WasapiLoopback => {
+                let device = if let Some(device_id) = settings.audio_device_id.as_deref().filter(|id| !id.trim().is_empty()) {
+                    enumerator.get_device(device_id)?
+                } else {
+                    enumerator.get_default_device(&Direction::Render)?
+                };
+                (device, "系统声音")
+            }
+            CaptureMode::VirtualAudioDevice => {
+                let device_id = settings
+                    .audio_device_id
+                    .as_deref()
+                    .filter(|id| !id.trim().is_empty())
+                    .ok_or_else(|| anyhow::anyhow!("未选择虚拟声卡设备。请安装 VB-CABLE / Voicemeeter，或切回 WASAPI 系统声音。"))?;
+                (enumerator.get_device(device_id)?, "虚拟声卡")
+            }
         };
 
         let device_name = device
@@ -212,9 +223,8 @@ mod platform {
             autoconvert: true,
             buffer_duration_hns: 2_000_000,
         };
-        let direction = Direction::Capture;
 
-        audio_client.initialize_client(&wave_format, &direction, &stream_mode)?;
+        audio_client.initialize_client(&wave_format, &Direction::Capture, &stream_mode)?;
         let capture_client = audio_client.get_audiocaptureclient()?;
         audio_client.start_stream()?;
         emit_audio_status(
@@ -222,7 +232,7 @@ mod platform {
             "capturing",
             Some(device_name.clone()),
             Some(0.0),
-            format!("正在采集系统声音：{device_name}"),
+            format!("正在采集{source_kind}：{device_name}"),
         );
 
         let mut packet_buffer = Vec::with_capacity(PCM_200MS_BYTES * 2);
@@ -251,8 +261,13 @@ mod platform {
 
             let bytes_to_read = packet_frames as usize * wave_format.get_blockalign() as usize;
             let mut data = vec![0u8; bytes_to_read];
-            let (_frames_read, _buffer_info) = capture_client.read_from_device(&mut data)?;
-            packet_buffer.extend_from_slice(&data);
+            let (frames_read, buffer_info) = capture_client.read_from_device(&mut data)?;
+            let bytes_read = frames_read as usize * wave_format.get_blockalign() as usize;
+            if buffer_info.flags.silent {
+                packet_buffer.extend(std::iter::repeat(0).take(bytes_read));
+            } else {
+                packet_buffer.extend_from_slice(&data[..bytes_read]);
+            }
 
             while packet_buffer.len() >= PCM_200MS_BYTES {
                 let chunk = packet_buffer.drain(..PCM_200MS_BYTES).collect::<Vec<_>>();
@@ -265,7 +280,7 @@ mod platform {
                     "capturing",
                     Some(device_name.clone()),
                     Some(volume),
-                    format!("正在采集系统声音：{device_name}"),
+                    format!("正在采集{source_kind}：{device_name}"),
                 );
                 if audio_tx.blocking_send(chunk).is_err() {
                     stop.store(true, Ordering::SeqCst);
