@@ -1,7 +1,9 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
 
-const questionBankPath = "/home/ubuntu/offer/面试可能遇到的问题清单.md";
+const defaultQuestionBankPath = "/home/ubuntu/offer/面试可能遇到的问题清单.md";
+const fixtureQuestionBankPath = new URL("./fixtures/interview-questions.sample.md", import.meta.url);
+const questionBankPath = process.env.QUESTION_BANK_PATH || (fs.existsSync(defaultQuestionBankPath) ? defaultQuestionBankPath : fixtureQuestionBankPath);
 
 function parseQuestionBank(content) {
   const heading = /^(\d+)\.\s+(.+)$/gm;
