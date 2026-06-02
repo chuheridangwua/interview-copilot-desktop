@@ -5,6 +5,7 @@ import {
   CircleStop,
   FileText,
   LoaderCircle,
+  Mic,
   OctagonAlert,
   Pause,
   Play,
@@ -19,12 +20,14 @@ import {
   AudioStatusEvent,
   AsrTextEvent,
   CaptureMode,
+  CompanyOption,
   HealthStatusEvent,
   HealthStatusItem,
   isDesktopRuntime,
   listenEvent,
   MatchCandidate,
   MatchCandidatesEvent,
+  MediaDeviceOptions,
   ModelAnswerUpdateEvent,
   ModelQuestionUpdateEvent,
   SessionSettings,
@@ -192,7 +195,12 @@ function highlightAnswer(answer: string, terms: string[]) {
 
 export default function App() {
   const [sources, setSources] = useState<AudioSource[]>([]);
+  const [mediaDevices, setMediaDevices] = useState<MediaDeviceOptions>({ audioInputs: [], audioOutputs: [] });
+  const [companies, setCompanies] = useState<CompanyOption[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [selectedSourceId, setSelectedSourceId] = useState("");
+  const [selectedAudioOutputId, setSelectedAudioOutputId] = useState("");
+  const [selectedMicrophoneId, setSelectedMicrophoneId] = useState("");
   const [captureMode, setCaptureMode] = useState<CaptureMode>("wasapi_loopback");
   const [resourceId, setResourceId] = useState(DEFAULT_RESOURCE_ID);
   const [saveAudio, setSaveAudio] = useState(false);
@@ -200,12 +208,15 @@ export default function App() {
   const sessionStateRef = useRef<SessionState>("idle");
   const [liveTranscript, setLiveTranscript] = useState<TranscriptSegment | null>(null);
   const [transcriptSegments, setTranscriptSegments] = useState<TranscriptSegment[]>([]);
+  const [microphoneLiveTranscript, setMicrophoneLiveTranscript] = useState<TranscriptSegment | null>(null);
+  const [microphoneTranscriptSegments, setMicrophoneTranscriptSegments] = useState<TranscriptSegment[]>([]);
   const [questionRecords, setQuestionRecords] = useState<QuestionRecord[]>([]);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const selectedRecordIdRef = useRef<string | null>(null);
   const [candidates, setCandidates] = useState<MatchCandidate[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState<MatchCandidate | null>(null);
-  const [audioVolumePercent, setAudioVolumePercent] = useState<number | null>(null);
+  const [systemAudioVolumePercent, setSystemAudioVolumePercent] = useState<number | null>(null);
+  const [microphoneVolumePercent, setMicrophoneVolumePercent] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [healthItems, setHealthItems] = useState<Record<string, HealthStatusItem>>(() => createInitialHealthItems());
@@ -220,21 +231,46 @@ export default function App() {
     selectedRecordIdRef.current = selectedRecordId;
   }, [selectedRecordId]);
 
-  const compatibleSources = useMemo(
-    () => sources.filter((source) => source.captureMode === captureMode),
-    [captureMode, sources],
-  );
-
   const hasVirtualSource = useMemo(
     () => sources.some((source) => source.captureMode === "virtual_audio_device"),
     [sources],
   );
 
+  const selectedCompany = useMemo(
+    () => companies.find((company) => company.id === selectedCompanyId) ?? null,
+    [companies, selectedCompanyId],
+  );
+
+  const selectedAudioOutput = useMemo(
+    () => mediaDevices.audioOutputs.find((device) => device.id === selectedAudioOutputId) ?? null,
+    [mediaDevices.audioOutputs, selectedAudioOutputId],
+  );
+
+  const selectedMicrophone = useMemo(
+    () => mediaDevices.audioInputs.find((device) => device.id === selectedMicrophoneId) ?? null,
+    [mediaDevices.audioInputs, selectedMicrophoneId],
+  );
+
+  const companySelectorDisabled = sessionState === "running" || sessionState === "paused";
+  const deviceSelectorDisabled = sessionState === "running" || sessionState === "paused";
+  const bankSummary = healthItems.bank?.message || "等待题库自检";
+
+  function clearInterviewResults() {
+    setLiveTranscript(null);
+    setTranscriptSegments([]);
+    setMicrophoneLiveTranscript(null);
+    setMicrophoneTranscriptSegments([]);
+    setQuestionRecords([]);
+    setSelectedRecordId(null);
+    setCandidates([]);
+    setSelectedCandidate(null);
+  }
+
   async function refreshHealthStatus() {
     if (!isDesktopRuntime()) return;
     setHealthItems(createInitialHealthItems());
     try {
-      const status = await api.getHealthStatus();
+      const status = await api.getHealthStatus(selectedCompanyId || undefined);
       setHealthItems((items) => ({ ...items, ...status.items }));
       setHealthCheckedAt(status.checkedAt);
       setLogDir(status.logDir || "");
@@ -273,8 +309,55 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    void refreshHealthStatus();
+    let disposed = false;
+
+    async function loadMediaDevices() {
+      if (!isDesktopRuntime()) return;
+      try {
+        const nextDevices = await api.listMediaDevices();
+        if (disposed) return;
+        setMediaDevices(nextDevices);
+      } catch (err) {
+        if (!disposed) setError(err instanceof Error ? err.message : String(err));
+      }
+    }
+
+    loadMediaDevices();
+    return () => {
+      disposed = true;
+    };
   }, []);
+
+  useEffect(() => {
+    let disposed = false;
+
+    async function loadCompanies() {
+      if (!isDesktopRuntime()) return;
+      try {
+        const nextCompanies = await api.listCompanies();
+        if (disposed) return;
+        setCompanies(nextCompanies);
+      } catch (err) {
+        if (!disposed) setError(err instanceof Error ? err.message : String(err));
+      }
+    }
+
+    loadCompanies();
+    return () => {
+      disposed = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    void refreshHealthStatus();
+  }, [selectedCompanyId]);
+
+  useEffect(() => {
+    if (!selectedCompanyId) return;
+    if (companies.some((company) => company.id === selectedCompanyId)) return;
+    setSelectedCompanyId("");
+    clearInterviewResults();
+  }, [companies, selectedCompanyId]);
 
   useEffect(() => {
     if (sources.length === 0) return;
@@ -290,15 +373,30 @@ export default function App() {
   }, [captureMode, hasVirtualSource, selectedSourceId, sources]);
 
   useEffect(() => {
+    if (selectedAudioOutputId && !mediaDevices.audioOutputs.some((device) => device.id === selectedAudioOutputId)) {
+      setSelectedAudioOutputId("");
+    }
+    if (selectedMicrophoneId && !mediaDevices.audioInputs.some((device) => device.id === selectedMicrophoneId)) {
+      setSelectedMicrophoneId("");
+    }
+  }, [mediaDevices, selectedAudioOutputId, selectedMicrophoneId]);
+
+  useEffect(() => {
     const unlisteners: Array<() => void> = [];
     let mounted = true;
 
     async function attachEvents() {
       unlisteners.push(await listenEvent<AudioStatusEvent>("audio_status", (payload) => {
         if (typeof payload.volume === "number") {
-          setAudioVolumePercent(Math.min(100, Math.round(payload.volume * 100)));
+          setSystemAudioVolumePercent(Math.min(100, Math.round(payload.volume * 100)));
         }
         if (payload.state === "error") setError(payload.message);
+      }));
+
+      unlisteners.push(await listenEvent<AudioStatusEvent>("microphone_audio_status", (payload) => {
+        if (typeof payload.volume === "number") {
+          setMicrophoneVolumePercent(Math.min(100, Math.round(payload.volume * 100)));
+        }
       }));
 
       unlisteners.push(await listenEvent<HealthStatusEvent>("health_status", (payload) => {
@@ -326,6 +424,31 @@ export default function App() {
         if (sessionStateRef.current !== "running" || !payload.text.trim()) return;
         setLiveTranscript({
           id: `live-${payload.receivedAt}`,
+          text: payload.text,
+          rewrittenText: payload.rewrittenText,
+          receivedAt: payload.receivedAt,
+        });
+      }));
+
+      unlisteners.push(await listenEvent<AsrTextEvent>("mic_asr_final", (payload) => {
+        if (sessionStateRef.current !== "running") return;
+        const nextSegment = {
+          id: `mic-${payload.receivedAt}-${normalizeText(payload.text).slice(0, 18)}`,
+          text: payload.text,
+          rewrittenText: payload.rewrittenText,
+          receivedAt: payload.receivedAt,
+        };
+        setMicrophoneLiveTranscript(nextSegment);
+        const timelineText = typeof payload.rewrittenText === "string" ? payload.rewrittenText : payload.text;
+        if (timelineText.trim()) {
+          setMicrophoneTranscriptSegments((segments) => appendTranscriptSegment(segments, nextSegment));
+        }
+      }));
+
+      unlisteners.push(await listenEvent<AsrTextEvent>("mic_asr_partial", (payload) => {
+        if (sessionStateRef.current !== "running" || !payload.text.trim()) return;
+        setMicrophoneLiveTranscript({
+          id: `mic-live-${payload.receivedAt}`,
           text: payload.text,
           rewrittenText: payload.rewrittenText,
           receivedAt: payload.receivedAt,
@@ -485,16 +608,25 @@ export default function App() {
       resourceId: resourceId.trim() || DEFAULT_RESOURCE_ID,
       captureMode,
       audioDeviceId: source.id,
+      audioOutputDeviceId: selectedAudioOutputId || undefined,
+      audioOutputDeviceName: selectedAudioOutput?.label || "默认系统输出",
+      microphoneDeviceId: selectedMicrophoneId || undefined,
+      microphoneDeviceName: selectedMicrophone?.label || "默认麦克风",
       saveAudio,
+      companyId: selectedCompanyId || undefined,
     };
 
-    setAudioVolumePercent(0);
+    setSystemAudioVolumePercent(0);
+    setMicrophoneVolumePercent(0);
     try {
       await api.startSession(settings);
+      void api.listMediaDevices().then(setMediaDevices).catch(() => undefined);
       sessionStateRef.current = "running";
       setSessionState("running");
       setLiveTranscript(null);
       setTranscriptSegments([]);
+      setMicrophoneLiveTranscript(null);
+      setMicrophoneTranscriptSegments([]);
       setQuestionRecords([]);
       setSelectedRecordId(null);
       setCandidates([]);
@@ -549,6 +681,12 @@ export default function App() {
     }
   }
 
+  function handleCompanyChange(nextCompanyId: string) {
+    if (companySelectorDisabled) return;
+    setSelectedCompanyId(nextCompanyId);
+    clearInterviewResults();
+  }
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.code !== "Space" || event.repeat || isTextInputTarget(event.target)) return;
@@ -566,7 +704,18 @@ export default function App() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedSourceId, captureMode, resourceId, saveAudio, sources]);
+  }, [
+    selectedSourceId,
+    selectedAudioOutputId,
+    selectedMicrophoneId,
+    captureMode,
+    resourceId,
+    saveAudio,
+    selectedCompanyId,
+    selectedAudioOutput,
+    selectedMicrophone,
+    sources,
+  ]);
 
   const answerTerms = selectedCandidate?.highlightTerms ?? selectedCandidate?.hitTerms ?? [];
   const answerLogic = selectedCandidate?.answerLogic?.trim() ?? "";
@@ -579,6 +728,7 @@ export default function App() {
   const modelAnswerStreaming = selectedRecord?.modelAnswerStatus === "streaming";
   const modelAnswerVisible = Boolean(selectedRecord && (modelAnswer || modelAnswerStreaming || selectedRecord.modelAnswerStatus === "error"));
   const displayedTranscriptSegments = [...transcriptSegments].reverse();
+  const displayedMicrophoneTranscriptSegments = [...microphoneTranscriptSegments].reverse();
   return (
     <main className="shell">
       <header className="topbar">
@@ -593,9 +743,15 @@ export default function App() {
 
         <section className="topbar-actions">
           <div className="command-strip">
-            <div className="volume-indicator" title="系统音频输入音量">
-              <AudioLines size={15} />
-              <span>音量 {audioVolumePercent === null ? "--" : audioVolumePercent}%</span>
+            <div className="volume-cluster">
+              <div className="volume-indicator" title={`系统声音音量${selectedAudioOutput ? ` · ${selectedAudioOutput.label}` : ""}`}>
+                <AudioLines size={15} />
+                <span>系统 {systemAudioVolumePercent === null ? "--" : systemAudioVolumePercent}%</span>
+              </div>
+              <div className="volume-indicator microphone-volume" title={`麦克风音量${selectedMicrophone ? ` · ${selectedMicrophone.label}` : ""}`}>
+                <Mic size={14} />
+                <span>麦克风 {microphoneVolumePercent === null ? "--" : microphoneVolumePercent}%</span>
+              </div>
             </div>
             <button
               className="health-strip"
@@ -621,6 +777,21 @@ export default function App() {
                 );
               })}
             </button>
+            <label className="company-selector" title={selectedCompany ? `当前面试公司：${selectedCompany.name}` : "当前仅使用通用题库"}>
+              <span>面试公司</span>
+              <select
+                value={selectedCompanyId}
+                disabled={companySelectorDisabled}
+                onChange={(event) => handleCompanyChange(event.target.value)}
+              >
+                <option value="">无公司</option>
+                {companies.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button className="icon-button settings-command" type="button" onClick={() => setSettingsOpen(true)} title="打开采集和 ASR 设置">
               <Settings size={16} />
               <span>设置</span>
@@ -657,7 +828,7 @@ export default function App() {
             <div className="settings-head">
               <div>
                 <h2>客户端设置</h2>
-                <p>系统声音采集、ASR Resource 和本地保存</p>
+                <p>系统声音、麦克风、ASR Resource 和本地保存</p>
               </div>
               <button className="icon-only" type="button" onClick={() => setSettingsOpen(false)} title="关闭设置">
                 <X size={17} />
@@ -670,7 +841,7 @@ export default function App() {
               </label>
               <div className="inline-info">
                 <span>问题库</span>
-                <strong>已内置 31 题</strong>
+                <strong title={bankSummary}>{bankSummary}</strong>
               </div>
               <label>
                 <span>采集模式</span>
@@ -680,14 +851,31 @@ export default function App() {
                 </select>
               </label>
               <label className="wide-setting">
-                <span>音频设备</span>
-                <select value={selectedSourceId} onChange={(event) => setSelectedSourceId(event.target.value)}>
-                  {compatibleSources.length === 0 ? (
-                    <option value="">{captureMode === "virtual_audio_device" ? "未检测到虚拟声卡" : "等待桌面端列出设备"}</option>
-                  ) : null}
-                  {compatibleSources.map((source) => (
-                    <option key={source.id} value={source.id}>
-                      {source.name}
+                <span>系统音频输出设备</span>
+                <select
+                  value={selectedAudioOutputId}
+                  disabled={deviceSelectorDisabled}
+                  onChange={(event) => setSelectedAudioOutputId(event.target.value)}
+                >
+                  <option value="">默认系统输出</option>
+                  {mediaDevices.audioOutputs.map((device) => (
+                    <option key={device.id || device.label} value={device.id}>
+                      {device.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="wide-setting">
+                <span>麦克风输入设备</span>
+                <select
+                  value={selectedMicrophoneId}
+                  disabled={deviceSelectorDisabled}
+                  onChange={(event) => setSelectedMicrophoneId(event.target.value)}
+                >
+                  <option value="">默认麦克风</option>
+                  {mediaDevices.audioInputs.map((device) => (
+                    <option key={device.id || device.label} value={device.id}>
+                      {device.label}
                     </option>
                   ))}
                 </select>
@@ -709,89 +897,124 @@ export default function App() {
       ) : null}
 
       <section className="workspace">
-        <section className="panel question-panel">
-          <div className="panel-title split">
-            <div>
-              <h2>面试官问题列表</h2>
-            </div>
-          </div>
-          <div className="question-list">
-            {questionRecords.length === 0 ? (
-              <div className="empty-state compact-empty">
-                <FileText size={24} />
-                <p>识别到面试官问题后会按时间倒序显示。</p>
+        <section className="left-stack">
+          <section className="panel question-panel">
+            <div className="panel-title split">
+              <div>
+                <h2>面试官问题列表</h2>
               </div>
-            ) : null}
-            {questionRecords.map((record) => (
-              <button
-                type="button"
-                key={record.id}
-                className={cls(
-                  "question-record",
-                  selectedRecordId === record.id && "selected",
-                  record.provisional && "provisional",
-                  record.enhanced && "enhanced",
-                )}
-                onClick={() => selectRecord(record)}
-              >
-                <span className="record-time">{formatTime(record.receivedAt)}</span>
-                <p className="record-query">{record.questionText}</p>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="panel candidate-panel">
-          <div className="panel-title split">
-            <div>
-              <h2>匹配到的问题</h2>
             </div>
-          </div>
-
-          <div className="candidate-list">
-            {candidates.length === 0 ? (
-              <div className="empty-state">
-                <AudioLines size={28} />
-                <p>推断出问题后，这里会实时显示本地 Top 10 匹配。</p>
-              </div>
-            ) : null}
-            {candidates.map((candidate) => (
-            <button
-              type="button"
-              key={candidate.id}
-              className={cls("candidate-card", selectedCandidate?.id === candidate.id && "selected")}
-              onClick={() => selectCandidate(candidate)}
-            >
-                <div className="candidate-main">
-                  <div className="candidate-heading">
-                    <h3>{candidate.question}</h3>
-                    <span>{candidate.score}%</span>
-                  </div>
+            <div className="question-list">
+              {questionRecords.length === 0 ? (
+                <div className="empty-state compact-empty">
+                  <FileText size={22} />
+                  <p>识别到面试官问题后会按时间倒序显示。</p>
                 </div>
-              </button>
-            ))}
-          </div>
+              ) : null}
+              {questionRecords.map((record) => (
+                <button
+                  type="button"
+                  key={record.id}
+                  className={cls(
+                    "question-record",
+                    selectedRecordId === record.id && "selected",
+                    record.provisional && "provisional",
+                    record.enhanced && "enhanced",
+                  )}
+                  onClick={() => selectRecord(record)}
+                >
+                  <span className="record-time">{formatTime(record.receivedAt)}</span>
+                  <p className="record-query">{record.questionText}</p>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="panel candidate-panel">
+            <div className="panel-title split">
+              <div>
+                <h2>匹配到的问题</h2>
+              </div>
+            </div>
+
+            <div className="candidate-list">
+              {candidates.length === 0 ? (
+                <div className="empty-state">
+                  <AudioLines size={24} />
+                  <p>推断出问题后，这里会实时显示本地 Top 10 匹配。</p>
+                </div>
+              ) : null}
+              {candidates.map((candidate) => (
+                <button
+                  type="button"
+                  key={candidate.id}
+                  className={cls("candidate-card", selectedCandidate?.id === candidate.id && "selected")}
+                  onClick={() => selectCandidate(candidate)}
+                >
+                  <div className="candidate-main">
+                    <div className="candidate-heading">
+                      <h3>{candidate.question}</h3>
+                      <span>{candidate.score}%</span>
+                    </div>
+                    <div className="candidate-meta">
+                      <span className={cls("source-badge", candidate.source === "company" && "company-source")}>
+                        {candidate.sourceLabel || "通用"}
+                      </span>
+                      {candidate.source === "company" && typeof candidate.sourceQuestionId === "number" ? (
+                        <span>原题 #{candidate.sourceQuestionId}</span>
+                      ) : null}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
         </section>
 
-        <article className="panel answer-panel">
-          <div className="panel-title split">
-            <div>
-              <h2>完整原文答案</h2>
+        <section className="answer-split">
+          <article className="panel answer-panel original-answer-panel">
+            <div className="panel-title split">
+              <div>
+                <h2>匹配原文答案</h2>
+              </div>
             </div>
-          </div>
 
-          {selectedCandidate || selectedRecord ? (
-            <div className="answer-body">
-              {modelAnswerVisible ? (
+            {selectedCandidate ? (
+              <div className="answer-body">
+                <section className="answer-section logic-section">
+                  <h3>回答逻辑：</h3>
+                  {answerLogic ? <p>{answerLogic}</p> : <p className="section-empty">原文未提供回答逻辑。</p>}
+                </section>
+                <section className="answer-section detail-section">
+                  <h3>具体内容：</h3>
+                  {highlightAnswer(answerDetail, answerTerms)}
+                </section>
+              </div>
+            ) : (
+              <div className="answer-placeholder">
+                <p>选择候选题后显示题库原文答案。</p>
+              </div>
+            )}
+          </article>
+
+          <article className="panel answer-panel ai-answer-panel">
+            <div className="panel-title split">
+              <div>
+                <h2>AI 输出答案</h2>
+              </div>
+            </div>
+
+            {selectedRecord ? (
+              <div className="answer-body">
                 <section className={cls("answer-section", "model-answer-section", modelAnswerStreaming && "streaming")}>
                   <div className="model-answer-head">
                     <h3>模型口述稿：</h3>
                     {modelAnswerStreaming ? <span>生成中</span> : null}
-                    {!modelAnswerStreaming && typeof selectedRecord?.modelAnswerLatencyMs === "number" ? (
+                    {!modelAnswerStreaming && typeof selectedRecord.modelAnswerLatencyMs === "number" ? (
                       <span>{selectedRecord.modelAnswerLatencyMs}ms</span>
                     ) : null}
                   </div>
-                  {modelAnswerParagraphs.length || parsedModelAnswer.logic ? (
+                  {modelAnswerVisible && (modelAnswerParagraphs.length || parsedModelAnswer.logic) ? (
                     <div className="model-answer-content">
                       {parsedModelAnswer.logic ? (
                         <section className="model-answer-block model-answer-logic">
@@ -807,35 +1030,19 @@ export default function App() {
                       ) : null}
                     </div>
                   ) : (
-                    <p className="section-empty">{selectedRecord?.modelAnswerError || "正在生成模型口述稿。"}</p>
+                    <p className="section-empty">
+                      {selectedRecord.modelAnswerError || "等待稳定问题后生成 AI 口述稿。"}
+                    </p>
                   )}
                 </section>
-              ) : null}
-
-              {selectedCandidate ? (
-                <>
-                  <section className="answer-section logic-section">
-                    <h3>回答逻辑：</h3>
-                    {answerLogic ? <p>{answerLogic}</p> : <p className="section-empty">原文未提供回答逻辑。</p>}
-                  </section>
-                  <section className="answer-section detail-section">
-                    <h3>具体内容：</h3>
-                    {highlightAnswer(answerDetail, answerTerms)}
-                  </section>
-                </>
-              ) : (
-                <section className="answer-section detail-section">
-                  <h3>具体内容：</h3>
-                  <p className="section-empty">暂无可靠题库原文命中。</p>
-                </section>
-              )}
-            </div>
-          ) : (
-            <div className="answer-placeholder">
-              <p>候选问题出现后，这里会展示清单里的完整原文答案。</p>
-            </div>
-          )}
-        </article>
+              </div>
+            ) : (
+              <div className="answer-placeholder">
+                <p>选择面试官问题后显示 AI 口述稿。</p>
+              </div>
+            )}
+          </article>
+        </section>
 
         <section className="panel transcript-panel">
           <div className="panel-title">
@@ -844,20 +1051,42 @@ export default function App() {
               <h2>语音识别</h2>
             </div>
           </div>
-          <section className="live-transcript">
-            <div className="subpanel-title">实时识别</div>
-            <p>{liveTranscript?.text || "等待识别"}</p>
+          <section className="live-transcript-grid">
+            <section className="live-transcript">
+              <div className="subpanel-title">系统实时</div>
+              <p>{liveTranscript?.text || "等待系统声音"}</p>
+            </section>
+            <section className="live-transcript microphone-live">
+              <div className="subpanel-title">麦克风实时</div>
+              <p>{microphoneLiveTranscript?.text || "等待麦克风"}</p>
+            </section>
           </section>
-          <div className="subpanel-title timeline-title">重写内容</div>
-          <div className="transcript-list">
-            {displayedTranscriptSegments.length === 0 ? <p className="muted">暂无内容</p> : null}
-            {displayedTranscriptSegments.map((line) => (
-              <article key={line.id} className="transcript-row">
-                <span>{formatTime(line.receivedAt)}</span>
-                <p>{line.rewrittenText || line.text}</p>
-              </article>
-            ))}
-          </div>
+          <section className="transcript-streams">
+            <section className="transcript-stream">
+              <div className="subpanel-title timeline-title">系统转写</div>
+              <div className="transcript-list">
+                {displayedTranscriptSegments.length === 0 ? <p className="muted">暂无内容</p> : null}
+                {displayedTranscriptSegments.map((line) => (
+                  <article key={line.id} className="transcript-row">
+                    <span>{formatTime(line.receivedAt)}</span>
+                    <p>{line.rewrittenText || line.text}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <section className="transcript-stream">
+              <div className="subpanel-title timeline-title">麦克风转写</div>
+              <div className="transcript-list">
+                {displayedMicrophoneTranscriptSegments.length === 0 ? <p className="muted">暂无内容</p> : null}
+                {displayedMicrophoneTranscriptSegments.map((line) => (
+                  <article key={line.id} className="transcript-row microphone-row">
+                    <span>{formatTime(line.receivedAt)}</span>
+                    <p>{line.rewrittenText || line.text}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </section>
         </section>
       </section>
     </main>

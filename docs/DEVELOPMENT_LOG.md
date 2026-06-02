@@ -11,6 +11,132 @@
 - 如果改了启动方式、环境变量、端口、脚本或用户操作流程，必须同步更新 `README.md` 和 `docs/LOCAL_CODEX_HANDOFF.md`。
 - 如果发现线上或本机真实表现和本文档不一致，以本机实测为准，并立刻追加修正记录。
 
+## 2026-06-02 17:22 +08:00
+
+### 目标
+
+按界面标注继续增强音频可见性：顶部同时显示系统声音和麦克风音量，右侧同时显示系统转写和麦克风转写，设置里可以选择系统音频输出设备和麦克风输入设备。
+
+### 已完成
+
+- 顶部音量从单一 `音量` 改为 `系统` 和 `麦克风` 两个紧凑状态块。
+- Electron preload 新增 `listMediaDevices()`，通过 `navigator.mediaDevices.enumerateDevices()` 枚举：
+  - `audiooutput` 作为系统音频输出设备选项。
+  - `audioinput` 作为麦克风输入设备选项。
+- 设置弹窗新增：
+  - `系统音频输出设备` 下拉。
+  - `麦克风输入设备` 下拉。
+- 麦克风采集改为按设置里的 `microphoneDeviceId` 调用 `getUserMedia`。
+- main process 新增事件：
+  - `microphone_audio_status` 用于麦克风音量。
+  - `mic_asr_partial` / `mic_asr_final` 用于麦克风实时/稳定转写。
+- 右侧 `语音识别` 改为四块：
+  - 系统实时。
+  - 麦克风实时。
+  - 系统转写。
+  - 麦克风转写。
+- 麦克风转写仍只做上下文，不进入问题列表、不触发 matcher。
+
+### 验证结果
+
+已通过：
+
+```powershell
+node -c electron/main.cjs
+node -c electron/preload.cjs
+npm run build
+```
+
+### 已知问题
+
+- 系统音频输出设备选择用于确认和记录会议播放设备；Electron 当前 loopback 捕获仍依赖 Windows 实际播放路由，需要本机实测确认所选设备和会议输出一致。
+- 浏览器设备枚举在未授权前可能拿不到完整设备名称，麦克风授权后会刷新一次设备列表。
+
+### 下一步
+
+- Windows Electron 客户端实际开始面试，确认两路音量、两路转写、麦克风设备选择都符合预期。
+
+## 2026-06-02 16:59 +08:00
+
+### 目标
+
+按真实面试使用习惯重排页面，并让 AI 口述稿能利用最近对话上下文回答追问；新增麦克风识别，但麦克风只作为上下文，不参与题目生成。
+
+### 已完成
+
+- 主工作区从四列改为三块：
+  - 左侧上下堆叠：上方 `面试官问题列表`，下方 `匹配到的问题`。
+  - 中间左右拆分：左侧 `匹配原文答案`，右侧 `AI 输出答案`。
+  - 最右侧保留 `语音识别`。
+- UI 字号、标题栏、卡片 padding、列表间距和答案行高整体压缩，便于同屏查看更多内容。
+- Electron preload 新增麦克风采集：
+  - 系统音频继续发送 `audio_chunk`。
+  - 麦克风音频发送 `mic_audio_chunk`。
+  - 系统音频捕获失败会阻止开始；麦克风授权失败只写日志，不阻断面试。
+- Electron main process 新增第二路豆包 ASR：
+  - 系统音频 ASR 结果继续进入问题抽取、题库匹配和右侧语音识别。
+  - 麦克风 ASR final 结果只进入 `我：...` 最近对话上下文，不发 `asr_final/asr_partial`，不调用 matcher。
+- AI 口述稿生成新增 `conversation_context` 字段，截取最近约 2000 字上下文传给方舟。
+- 方舟提示词新增约束：上下文只用于理解面试进度和追问承接，`我：` 内容不能当成面试官问题。
+- 保存音频时新增可选 `microphone-audio.pcm` 和 `microphone-transcript.jsonl`。
+- README 和本地交接文档已同步系统音频/麦克风职责边界、页面布局和使用流程。
+
+### 验证结果
+
+已通过：
+
+```powershell
+node -c electron/main.cjs
+node -c electron/preload.cjs
+node -c electron/backend/arkQuestionEnhancer.cjs
+npm run test:matcher
+npm run build
+```
+
+### 已知问题
+
+- 第二路麦克风 ASR 需要账号侧支持并发连接；如果连接失败，当前策略是继续系统声音面试，只缺少候选人发言上下文。
+- 尚未在 Windows 真实会议场景手工确认麦克风授权、双路 ASR 并发和 UI 实际显示密度。
+
+### 下一步
+
+- Windows Electron 客户端端到端验证：系统声音生成问题、麦克风不生成问题、AI 口述稿能承接候选人刚才回答。
+
+## 2026-06-02 16:24 +08:00
+
+### 目标
+
+新增面试前公司选择：选择公司后自动合并公司题库，并把公司介绍和岗位资料注入模型口述稿。
+
+### 已完成
+
+- 顶部新增 `面试公司` 常驻下拉，默认 `无公司`，运行和暂停状态禁止切换。
+- Electron 后端扫描 `resources/company/<公司名>/Introduction.md` 和 `question.md`：
+  - `Introduction.md` 作为公司上下文注入最终口述稿生成。
+  - `question.md` 追加到本场 matcher。
+- 公司题库使用 `10000 + 原始编号` 作为内部 id，避免和通用题库编号冲突，并保留原始题号。
+- 候选题卡片显示来源徽标：`通用` 或公司名。
+- 题库健康状态改为动态文案，例如 `通用 31 题 · 数美 48 题`。
+- README 已补充公司资料目录约定和使用流程。
+
+### 验证结果
+
+已通过：
+
+```powershell
+npm run test:matcher
+npm run build
+```
+
+### 已知问题
+
+- 当前只支持单选一个面试公司，不支持多公司题库叠加。
+- 公司目录名直接作为展示名和 `companyId`，暂未设计别名或排序配置。
+
+### 下一步
+
+- 在 Windows Electron 客户端手工验证选择 `数美` 后候选来源、健康状态和模型口述稿是否符合真实面试节奏。
+
 ## 2026-06-02 15:55 +08:00
 
 ### 目标
@@ -32,7 +158,7 @@
 已通过：
 
 ```powershell
-rg -n "7010d01e|ark-0e2bcb7a|19506462812|3381965685|@qq\\.com" . -g "!node_modules" -g "!dist" -g "!logs"
+rg -n "<已脱敏的Key片段|手机号|QQ|邮箱样例>" . -g "!node_modules" -g "!dist" -g "!logs"
 npm run test:matcher
 npm run build
 git diff --check

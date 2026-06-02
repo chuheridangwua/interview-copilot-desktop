@@ -13,6 +13,7 @@ const {
 
 const embeddedQuestionBankPath = new URL("../resources/question_bank_embedded.md", import.meta.url);
 const fixtureQuestionBankPath = new URL("./fixtures/interview-questions.sample.md", import.meta.url);
+const shumeiQuestionBankPath = new URL("../resources/company/数美/question.md", import.meta.url);
 const questionBankPath = process.env.QUESTION_BANK_PATH
   || (fs.existsSync(embeddedQuestionBankPath) ? embeddedQuestionBankPath : fixtureQuestionBankPath);
 
@@ -22,8 +23,33 @@ const matcher = new Matcher(bank);
 assert.equal(bank.length, 31, "should parse 31 numbered questions");
 assert.ok(bank.every((item) => item.id && item.question && item.answer), "each item should contain id, question, and answer");
 assert.ok(bank.every((item) => item.answerLogic && item.answerDetail), "each item should contain answer logic and detail sections");
+assert.ok(bank.every((item) => item.source === "base" && item.sourceLabel === "通用"), "base items should carry source metadata");
 assert.equal(bank[0].answerLogic, "基本身份——核心经历——岗位匹配");
 assert.ok(bank[0].answerDetail.startsWith("【基本身份】"));
+
+assert.ok(fs.existsSync(shumeiQuestionBankPath), "数美 company question bank should exist");
+const shumeiBank = parseQuestionBank(fs.readFileSync(shumeiQuestionBankPath, "utf8"), {
+  source: "company",
+  sourceLabel: "数美",
+  idOffset: 10000,
+});
+const mergedBank = [...bank, ...shumeiBank];
+const mergedIds = new Set(mergedBank.map((item) => item.id));
+const shumeiMatcher = new Matcher(mergedBank);
+
+assert.ok(shumeiBank.length > 0, "数美 company question bank should parse at least one question");
+assert.equal(mergedBank.length, bank.length + shumeiBank.length, "merged bank should include base and company questions");
+assert.equal(mergedIds.size, mergedBank.length, "merged bank ids should not collide");
+assert.ok(shumeiBank.every((item) => item.id >= 10000 && item.source === "company"), "company items should be remapped and tagged");
+assert.ok(shumeiBank.every((item) => item.sourceLabel === "数美" && typeof item.sourceQuestionId === "number"), "company items should keep source labels and original ids");
+
+const baseOnlyCompanyQueryHits = matcher.search("你为什么想来数美科技", 10);
+assert.ok(baseOnlyCompanyQueryHits.every((item) => item.source === "base" && item.sourceLabel === "通用"), "base matcher should only return base candidates");
+
+const shumeiCompanyQueryHits = shumeiMatcher.search("你为什么想来数美科技", 10);
+assert.equal(shumeiCompanyQueryHits[0]?.source, "company", "company matcher should prioritize company question for company-specific query");
+assert.equal(shumeiCompanyQueryHits[0]?.sourceLabel, "数美");
+assert.equal(shumeiCompanyQueryHits[0]?.sourceQuestionId, 1);
 
 const matchCases = [
   ["你们的 RAG 是怎么做的，复杂 PDF 和表格怎么处理", 24],

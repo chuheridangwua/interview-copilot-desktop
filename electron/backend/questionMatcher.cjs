@@ -17,18 +17,25 @@ function splitAnswerSections(answer) {
   };
 }
 
-function parseQuestionBank(content) {
+function parseQuestionBank(content, options = {}) {
+  const source = options.source || "base";
+  const sourceLabel = options.sourceLabel || (source === "company" ? "公司" : "通用");
+  const idOffset = Number(options.idOffset || 0);
   const heading = /^(\d+)\.\s+(.+)$/gm;
   const matches = [...content.matchAll(heading)];
   return matches
     .map((match, index) => {
+      const sourceQuestionId = Number(match[1]);
       const next = matches[index + 1];
       const answerStart = match.index + match[0].length;
       const answerEnd = next ? next.index : content.length;
       const answer = content.slice(answerStart, answerEnd).trim();
       const { answerLogic, answerDetail } = splitAnswerSections(answer);
       return {
-        id: Number(match[1]),
+        id: sourceQuestionId + idOffset,
+        source,
+        sourceLabel,
+        sourceQuestionId: source === "company" ? sourceQuestionId : undefined,
         question: match[2].trim(),
         answer,
         answerLogic,
@@ -263,9 +270,14 @@ function cosineSimilarity(a, b) {
   return dot / Math.sqrt(normA * normB);
 }
 
+function itemCuratedHints(item) {
+  if (item.source && item.source !== "base") return [];
+  return curatedHints.get(item.id) ?? [];
+}
+
 function hintHits(query, item) {
   const queryNorm = normalize(query);
-  const itemHints = curatedHints.get(item.id) ?? [];
+  const itemHints = itemCuratedHints(item);
   return itemHints.filter((hint) => {
     const hintNorm = normalize(hint);
     return queryNorm.includes(hintNorm) || hintNorm.includes(queryNorm);
@@ -279,9 +291,12 @@ function candidateFromItem(item, score, hitTerms, highlightTerms = []) {
     answer: item.answer,
     answerLogic: item.answerLogic,
     answerDetail: item.answerDetail,
+    source: item.source || "base",
+    sourceLabel: item.sourceLabel || "通用",
+    sourceQuestionId: item.sourceQuestionId,
     score,
     hitTerms: dedupe(hitTerms),
-    highlightTerms: dedupe([...highlightTerms, ...(curatedHints.get(item.id) ?? []).slice(0, 8)]),
+    highlightTerms: dedupe([...highlightTerms, ...itemCuratedHints(item).slice(0, 8)]),
     status: "candidate",
   };
 }
@@ -290,7 +305,7 @@ class Matcher {
   constructor(items) {
     this.items = items;
     this.docs = items.map((item) => {
-      const hints = curatedHints.get(item.id) ?? [];
+      const hints = itemCuratedHints(item);
       const hintTokens = new Set(hints.flatMap((hint) => [...tokenize(hint)]));
       const answerPreview = `${item.answerLogic} ${String(item.answerDetail || item.answer).slice(0, 700)}`;
       return {

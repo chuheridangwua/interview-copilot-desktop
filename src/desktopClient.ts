@@ -9,11 +9,37 @@ export interface AudioSource {
   note?: string;
 }
 
+export interface MediaDeviceOption {
+  id: string;
+  label: string;
+  isDefault: boolean;
+  groupId?: string;
+}
+
+export interface MediaDeviceOptions {
+  audioInputs: MediaDeviceOption[];
+  audioOutputs: MediaDeviceOption[];
+}
+
 export interface SessionSettings {
   resourceId: string;
   captureMode: CaptureMode;
   audioDeviceId?: string;
+  audioOutputDeviceId?: string;
+  audioOutputDeviceName?: string;
+  microphoneDeviceId?: string;
+  microphoneDeviceName?: string;
   saveAudio: boolean;
+  companyId?: string;
+  microphoneContextEnabled?: boolean;
+}
+
+export interface CompanyOption {
+  id: string;
+  name: string;
+  hasIntroduction: boolean;
+  hasQuestionBank: boolean;
+  questionCount: number;
 }
 
 export interface AudioStatusEvent {
@@ -38,6 +64,9 @@ export interface MatchCandidate {
   answer: string;
   answerLogic: string;
   answerDetail: string;
+  source: "base" | "company";
+  sourceLabel: string;
+  sourceQuestionId?: number;
   score: number;
   hitTerms: string[];
   highlightTerms: string[];
@@ -118,12 +147,14 @@ export interface SessionLogEvent {
 
 export interface DesktopBridge {
   listAudioSources: () => Promise<AudioSource[]>;
+  listMediaDevices: () => Promise<MediaDeviceOptions>;
+  listCompanies: () => Promise<CompanyOption[]>;
   startSession: (settings: SessionSettings) => Promise<{ sessionId: string }>;
   stopSession: () => Promise<void>;
   pauseSession: () => Promise<void>;
   resumeSession: () => Promise<void>;
-  searchQuestions: (query: string) => Promise<MatchCandidate[]>;
-  getHealthStatus: () => Promise<HealthStatusEvent>;
+  searchQuestions: (query: string, companyId?: string) => Promise<MatchCandidate[]>;
+  getHealthStatus: (companyId?: string) => Promise<HealthStatusEvent>;
   listen: <T>(event: string, handler: (payload: T) => void) => () => void;
 }
 
@@ -151,10 +182,12 @@ export async function listenEvent<T>(event: string, handler: (payload: T) => voi
 
 export const api = {
   listAudioSources: () => bridge().listAudioSources(),
+  listMediaDevices: () => bridge().listMediaDevices(),
+  listCompanies: () => bridge().listCompanies(),
   startSession: (settings: SessionSettings) => bridge().startSession(settings),
   stopSession: () => bridge().stopSession(),
   pauseSession: () => bridge().pauseSession(),
   resumeSession: () => bridge().resumeSession(),
-  searchQuestions: (query: string) => bridge().searchQuestions(query),
-  getHealthStatus: () => bridge().getHealthStatus(),
+  searchQuestions: (query: string, companyId?: string) => bridge().searchQuestions(query, companyId),
+  getHealthStatus: (companyId?: string) => bridge().getHealthStatus(companyId),
 };

@@ -2,8 +2,11 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 const EVENT_CHANNELS = new Set([
   "audio_status",
+  "microphone_audio_status",
   "asr_partial",
   "asr_final",
+  "mic_asr_partial",
+  "mic_asr_final",
   "match_candidates",
   "session_log",
   "model_question_update",
@@ -20,6 +23,12 @@ let processor = null;
 let sourceNode = null;
 let silentGain = null;
 let pendingPcm = Buffer.alloc(0);
+let microphoneStream = null;
+let microphoneAudioContext = null;
+let microphoneProcessor = null;
+let microphoneSourceNode = null;
+let microphoneSilentGain = null;
+let pendingMicrophonePcm = Buffer.alloc(0);
 let capturePaused = false;
 
 function computeVolume(floatSamples) {
@@ -70,6 +79,19 @@ function flushPcm(pcm, volume) {
   }
 }
 
+function flushMicrophonePcm(pcm, volume) {
+  if (capturePaused) {
+    pendingMicrophonePcm = Buffer.alloc(0);
+    return;
+  }
+  pendingMicrophonePcm = Buffer.concat([pendingMicrophonePcm, pcm]);
+  while (pendingMicrophonePcm.length >= PCM_CHUNK_BYTES) {
+    const chunk = pendingMicrophonePcm.subarray(0, PCM_CHUNK_BYTES);
+    pendingMicrophonePcm = pendingMicrophonePcm.subarray(PCM_CHUNK_BYTES);
+    ipcRenderer.send("mic_audio_chunk", { pcm: Uint8Array.from(chunk), volume });
+  }
+}
+
 async function stopSystemAudioCapture() {
   if (processor) {
     processor.disconnect();
@@ -93,6 +115,39 @@ async function stopSystemAudioCapture() {
     mediaStream = null;
   }
   pendingPcm = Buffer.alloc(0);
+  capturePaused = false;
+}
+
+async function stopMicrophoneCapture() {
+  if (microphoneProcessor) {
+    microphoneProcessor.disconnect();
+    microphoneProcessor.onaudioprocess = null;
+    microphoneProcessor = null;
+  }
+  if (microphoneSourceNode) {
+    microphoneSourceNode.disconnect();
+    microphoneSourceNode = null;
+  }
+  if (microphoneSilentGain) {
+    microphoneSilentGain.disconnect();
+    microphoneSilentGain = null;
+  }
+  if (microphoneAudioContext) {
+    await microphoneAudioContext.close().catch(() => undefined);
+    microphoneAudioContext = null;
+  }
+  if (microphoneStream) {
+    for (const track of microphoneStream.getTracks()) track.stop();
+    microphoneStream = null;
+  }
+  pendingMicrophonePcm = Buffer.alloc(0);
+}
+
+async function stopAllAudioCapture() {
+  await Promise.all([
+    stopSystemAudioCapture(),
+    stopMicrophoneCapture(),
+  ]);
   capturePaused = false;
 }
 
@@ -123,8 +178,69 @@ async function startSystemAudioCapture() {
   silentGain.connect(audioContext.destination);
 }
 
+async function startMicrophoneCapture(deviceId) {
+  await stopMicrophoneCapture();
+  const selectedDeviceId = String(deviceId ?? "").trim();
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: selectedDeviceId
+      ? {
+        deviceId: { exact: selectedDeviceId },
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      }
+      : {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+  });
+  const audioTracks = stream.getAudioTracks();
+  if (audioTracks.length === 0) {
+    for (const track of stream.getTracks()) track.stop();
+    throw new Error("没有拿到麦克风音频轨道。");
+  }
+  microphoneStream = stream;
+  microphoneAudioContext = new AudioContext();
+  microphoneSourceNode = microphoneAudioContext.createMediaStreamSource(new MediaStream(audioTracks));
+  microphoneProcessor = microphoneAudioContext.createScriptProcessor(4096, 1, 1);
+  microphoneSilentGain = microphoneAudioContext.createGain();
+  microphoneSilentGain.gain.value = 0;
+  microphoneProcessor.onaudioprocess = (event) => {
+    const input = event.inputBuffer.getChannelData(0);
+    const volume = computeVolume(input);
+    const downsampled = downsample(input, microphoneAudioContext.sampleRate, PCM_SAMPLE_RATE);
+    flushMicrophonePcm(floatTo16BitPcm(downsampled), volume);
+  };
+  microphoneSourceNode.connect(microphoneProcessor);
+  microphoneProcessor.connect(microphoneSilentGain);
+  microphoneSilentGain.connect(microphoneAudioContext.destination);
+}
+
+async function listMediaDevices() {
+  if (!navigator.mediaDevices?.enumerateDevices) {
+    return { audioInputs: [], audioOutputs: [] };
+  }
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const normalizeDevice = (device, index, fallbackPrefix) => ({
+    id: device.deviceId || "",
+    label: device.label || `${fallbackPrefix} ${index + 1}`,
+    isDefault: device.deviceId === "default" || device.deviceId === "",
+    groupId: device.groupId || "",
+  });
+  const audioInputs = devices
+    .filter((device) => device.kind === "audioinput")
+    .map((device, index) => normalizeDevice(device, index, "麦克风"));
+  const audioOutputs = devices
+    .filter((device) => device.kind === "audiooutput")
+    .map((device, index) => normalizeDevice(device, index, "系统输出"));
+  return { audioInputs, audioOutputs };
+}
+
 const api = {
   listAudioSources: () => ipcRenderer.invoke("list_audio_sources"),
+  listMediaDevices,
+  listCompanies: () => ipcRenderer.invoke("list_companies"),
   startSession: async (settings) => {
     try {
       await startSystemAudioCapture();
@@ -132,28 +248,37 @@ const api = {
       await ipcRenderer.invoke("audio_capture_error", error instanceof Error ? error.message : String(error));
       throw error;
     }
+    let microphoneContextEnabled = false;
     try {
-      return await ipcRenderer.invoke("start_session", settings);
+      await startMicrophoneCapture(settings?.microphoneDeviceId);
+      microphoneContextEnabled = true;
     } catch (error) {
-      await stopSystemAudioCapture();
+      await stopMicrophoneCapture();
+      await ipcRenderer.invoke("microphone_capture_error", error instanceof Error ? error.message : String(error));
+    }
+    try {
+      return await ipcRenderer.invoke("start_session", { ...settings, microphoneContextEnabled });
+    } catch (error) {
+      await stopAllAudioCapture();
       throw error;
     }
   },
   stopSession: async () => {
-    await stopSystemAudioCapture();
+    await stopAllAudioCapture();
     return ipcRenderer.invoke("stop_session");
   },
   pauseSession: async () => {
     capturePaused = true;
     pendingPcm = Buffer.alloc(0);
+    pendingMicrophonePcm = Buffer.alloc(0);
     return ipcRenderer.invoke("pause_session");
   },
   resumeSession: async () => {
     capturePaused = false;
     return ipcRenderer.invoke("resume_session");
   },
-  searchQuestions: (query) => ipcRenderer.invoke("search_questions", query),
-  getHealthStatus: () => ipcRenderer.invoke("get_health_status"),
+  searchQuestions: (query, companyId) => ipcRenderer.invoke("search_questions", query, companyId),
+  getHealthStatus: (companyId) => ipcRenderer.invoke("get_health_status", companyId),
   listen: (channel, handler) => {
     if (!EVENT_CHANNELS.has(channel)) return () => undefined;
     const listener = (_event, payload) => handler(payload);

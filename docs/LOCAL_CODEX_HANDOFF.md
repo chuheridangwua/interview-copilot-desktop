@@ -14,23 +14,25 @@ docs/DEVELOPMENT_LOG.md
 
 ## 当前目标
 
-做一个 Windows 桌面客户端，用于真实面试时监听系统输出声音，将面试官问题送到豆包/火山引擎流式 ASR，并从内置问题库中匹配 Top 3 问题和答案。
+做一个 Windows 桌面客户端，用于真实面试时监听系统输出声音，将面试官问题送到豆包/火山引擎流式 ASR，并从内置问题库和可选公司题库中匹配候选问题和答案。
 
 核心约束：
 
-- 只监听系统声音，不采集麦克风。
-- 问题库内置到客户端，不读取 Windows 本地 Markdown。
+- 系统声音用于识别面试官问题；麦克风只作为模型口述稿的最近对话上下文，不生成题目、不参与 matcher。
+- 通用问题库内置到客户端；面试前可选 `resources/company/<公司名>` 下的公司资料和公司题库。
 - 本地毫秒级匹配优先，小模型后台确认问题、重排候选，并为每个 final 问题生成流式口述稿。
 - 面试会话流程：开始面试 -> 暂停面试 -> 继续面试 -> 结束面试。
 - 空格快捷键：未开始时开始、进行中暂停、暂停中继续。
 - API Key 不写入仓库和文档；当前 ASR Key 仍从环境变量读取。
 - 调试日志固定写入项目根目录 `logs/`，该目录已加入 `.gitignore`。
 - `resources/jianli.md` 用作模型口述稿上下文，只保留经历、项目、技能和成果，不提交手机号、邮箱、QQ 等个人联系方式。
+- `resources/company/<公司名>/Introduction.md` 用作公司背景和岗位上下文，`question.md` 会在选择公司后追加进本场 matcher。
 
 ## 技术栈
 
 - Electron main process：窗口、IPC、豆包 ASR WebSocket、题库解析、匹配事件分发。
-- Electron preload：调用 `getDisplayMedia` 获取系统音频，转成 `16kHz / 16bit / mono / PCM`，按 200ms 分包发给 main process。
+- Electron preload：调用 `getDisplayMedia` 获取系统音频，并按设置里的麦克风输入调用 `getUserMedia` 获取麦克风音频；两路都转成 `16kHz / 16bit / mono / PCM`，按 200ms 分包发给 main process。
+- Electron main process：系统音频 ASR 结果进入问题抽取和题库匹配；麦克风 ASR 结果只进入最近对话上下文，AI 口述稿生成时传入最近约 2000 字。
 - React/Vite/TypeScript：桌面控制台 UI。
 - 火山方舟 Ark Chat API：后台短 JSON 任务用于问题确认和题库候选重排，流式任务用于生成模型口述稿。
 - electron-builder：Windows `.exe` / `.msi` 打包。
@@ -42,6 +44,8 @@ package.json
 README.md
 .github/workflows/build-windows-client.yml
 resources/question_bank_embedded.md
+resources/company/<公司名>/Introduction.md
+resources/company/<公司名>/question.md
 resources/icon.ico
 electron/main.cjs
 electron/preload.cjs
@@ -153,9 +157,12 @@ npm ci --dry-run --no-audit --no-fund
 需要在 Windows 本机继续验证：
 
 - Electron `getDisplayMedia` 是否能稳定拿到系统 loopback 音频。
+- 设置弹窗里的系统音频输出设备、麦克风输入设备枚举是否符合 Windows 本机实际设备。
+- Electron `getUserMedia` 是否能按所选麦克风稳定拿到音频；麦克风识别内容不应进入问题列表和候选匹配。
 - 顶部音量是否随会议声音变化。
 - PCM 发送豆包 ASR 后是否持续返回 partial/final。
 - 开始/暂停/继续/结束面试流程是否符合真实面试节奏。
+- 面试前选择公司后，题库健康状态、候选来源徽标和模型口述稿是否正确结合公司资料。
 - 小模型后台确认/重排是否在真实音频下能稳定 1 秒级返回。
 - `.exe` / `.msi` 安装包运行是否能读取环境变量。
 
@@ -163,13 +170,15 @@ npm ci --dry-run --no-audit --no-fund
 
 1. 打开会议软件并让面试官声音从 Windows 系统输出设备播放。
 2. 启动客户端：`npm run client`。
-3. 按空格或点击 `开始面试`。
-4. Electron 会请求屏幕/系统音频捕获权限，选择屏幕并允许系统音频。
-5. 状态栏音量不是 0%，说明采到了声音。
-6. 顶部状态胶囊会显示音频、ASR、题库、简历、AI 自检状态。
-7. 面试官说完一段问题后，左侧问题列表新增记录，中间出 Top 3，右侧出题库答案和模型口述稿。
-8. 右侧语音识别列上方显示实时识别，下方按时间倒序显示完整重写内容。
-9. 按空格可在运行和暂停之间切换；点击 `结束面试` 会停止采集并保留本场结果。
+3. 顶部 `面试公司` 默认 `无公司`；如果本场有目标公司，先选择对应公司。
+4. 按空格或点击 `开始面试`。
+5. 设置里可选系统音频输出设备和麦克风输入设备；系统声音捕获仍依赖 Windows 当前会议播放路由。
+6. Electron 会请求屏幕/系统音频捕获权限，选择屏幕并允许系统音频；随后会按设置选择的麦克风请求权限作为回答上下文。
+7. 顶部系统声音和麦克风音量不是 0%，说明对应音频已采到。
+8. 顶部状态胶囊会显示音频、ASR、题库、简历、AI 自检状态；选择公司后题库状态会显示通用题和公司题数量。
+9. 面试官说完一段问题后，左侧问题列表新增记录，左下出候选题，中间出题库原文答案和 AI 口述稿。
+10. 右侧语音识别列同时显示系统实时/系统转写和麦克风实时/麦克风转写。
+11. 按空格可在运行和暂停之间切换；点击 `结束面试` 会停止采集并保留本场结果。运行或暂停时不能切换公司。
 
 ## 调试日志
 

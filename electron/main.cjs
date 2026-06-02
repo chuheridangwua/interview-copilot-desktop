@@ -12,20 +12,29 @@ const {
   resolveArkConfig,
 } = require("./backend/arkQuestionEnhancer.cjs");
 const { DoubaoAsrSession } = require("./backend/doubaoAsr.cjs");
-const { Matcher, inferQuestionsFromSegments, loadQuestionBank, normalize, rewriteTranscriptText } = require("./backend/questionMatcher.cjs");
+const {
+  Matcher,
+  inferQuestionsFromSegments,
+  loadQuestionBank,
+  normalize,
+  parseQuestionBank,
+  rewriteTranscriptText,
+} = require("./backend/questionMatcher.cjs");
 
 const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
+const COMPANY_QUESTION_ID_OFFSET = 10000;
 const isDev = Boolean(process.env.ELECTRON_DEV || process.env.ELECTRON_RENDERER_URL);
 
 let mainWindow = null;
-let matcher = null;
-let questionBank = [];
+let baseQuestionBank = [];
+const matcherBundleCache = new Map();
 let resumeText = "";
 let currentSession = null;
 let sessionPaused = false;
 let recentTranscriptSegments = [];
 let recentPartialSegments = [];
 let pendingQuestionSegments = [];
+let conversationContextSegments = [];
 let recentQuestionKeys = [];
 let lastPartialQuestion = null;
 let lastPartialMatchedAt = 0;
@@ -72,6 +81,10 @@ function emitAudioStatus(payload) {
   emit("audio_status", payload);
 }
 
+function emitMicrophoneAudioStatus(payload) {
+  emit("microphone_audio_status", payload);
+}
+
 function emitLog(payload) {
   const event = {
     message: payload.message,
@@ -107,23 +120,153 @@ function emitDebugLog(type, payload = {}) {
   appendJsonl("debug.jsonl", compactPayload);
 }
 
-function ensureMatcher() {
-  if (!matcher) {
-    questionBank = loadQuestionBank(app.getAppPath());
-    matcher = new Matcher(questionBank);
-    console.log(`[interview-copilot][electron] embedded questions loaded: ${questionBank.length}`);
-  }
-  return matcher;
+function normalizeCompanyId(value) {
+  return String(value ?? "").trim();
+}
+
+function resourceRootCandidates() {
+  const candidates = [
+    path.join(app.getAppPath(), "resources"),
+    path.join(process.cwd(), "resources"),
+    path.join(process.resourcesPath || "", "resources"),
+    process.resourcesPath || "",
+  ];
+  const seen = new Set();
+  return candidates.filter((item) => {
+    if (!item || seen.has(item)) return false;
+    seen.add(item);
+    return fs.existsSync(item);
+  });
 }
 
 function resolveResourceFile(filename) {
-  const candidates = [
-    path.join(app.getAppPath(), "resources", filename),
-    path.join(process.cwd(), "resources", filename),
-    path.join(process.resourcesPath || "", "resources", filename),
-    path.join(process.resourcesPath || "", filename),
-  ];
-  return candidates.find((item) => item && fs.existsSync(item));
+  return resourceRootCandidates()
+    .map((root) => path.join(root, filename))
+    .find((item) => item && fs.existsSync(item));
+}
+
+function resolveCompanyRoots() {
+  return resourceRootCandidates()
+    .map((root) => path.join(root, "company"))
+    .filter((item) => fs.existsSync(item));
+}
+
+function readTextFileIfExists(filePath) {
+  if (!filePath || !fs.existsSync(filePath)) return "";
+  return fs.readFileSync(filePath, "utf8");
+}
+
+function loadBaseQuestionBank() {
+  if (!baseQuestionBank.length) {
+    baseQuestionBank = loadQuestionBank(app.getAppPath());
+    console.log(`[interview-copilot][electron] base questions loaded: ${baseQuestionBank.length}`);
+  }
+  return baseQuestionBank;
+}
+
+function listCompanies() {
+  const companyById = new Map();
+  for (const root of resolveCompanyRoots()) {
+    const entries = fs.readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory());
+    for (const entry of entries) {
+      const id = entry.name;
+      if (companyById.has(id)) continue;
+      const dir = path.join(root, id);
+      const introductionPath = path.join(dir, "Introduction.md");
+      const questionPath = path.join(dir, "question.md");
+      const hasIntroduction = fs.existsSync(introductionPath);
+      const hasQuestionBank = fs.existsSync(questionPath);
+      if (!hasIntroduction && !hasQuestionBank) continue;
+      const questionCount = hasQuestionBank
+        ? parseQuestionBank(readTextFileIfExists(questionPath), {
+          source: "company",
+          sourceLabel: id,
+          idOffset: COMPANY_QUESTION_ID_OFFSET,
+        }).length
+        : 0;
+      companyById.set(id, {
+        id,
+        name: id,
+        hasIntroduction,
+        hasQuestionBank,
+        questionCount,
+        dir,
+        introductionPath,
+        questionPath,
+      });
+    }
+  }
+  return [...companyById.values()]
+    .sort((a, b) => a.name.localeCompare(b.name, "zh-Hans-CN"));
+}
+
+function publicCompanyOption(company) {
+  return {
+    id: company.id,
+    name: company.name,
+    hasIntroduction: company.hasIntroduction,
+    hasQuestionBank: company.hasQuestionBank,
+    questionCount: company.questionCount,
+  };
+}
+
+function loadCompanyContext(companyId, { strict = false } = {}) {
+  const normalizedCompanyId = normalizeCompanyId(companyId);
+  if (!normalizedCompanyId) return null;
+  const company = listCompanies().find((item) => item.id === normalizedCompanyId);
+  if (!company) {
+    throw new Error(`未找到面试公司：${normalizedCompanyId}`);
+  }
+
+  const introduction = company.hasIntroduction ? readTextFileIfExists(company.introductionPath) : "";
+  const companyItems = company.hasQuestionBank
+    ? parseQuestionBank(readTextFileIfExists(company.questionPath), {
+      source: "company",
+      sourceLabel: company.name,
+      idOffset: COMPANY_QUESTION_ID_OFFSET,
+    })
+    : [];
+
+  if (strict && company.hasQuestionBank && companyItems.length === 0) {
+    throw new Error(`公司题库为空或格式不正确：resources/company/${company.id}/question.md`);
+  }
+  if (strict && !introduction.trim() && companyItems.length === 0) {
+    throw new Error(`公司资料为空：resources/company/${company.id}`);
+  }
+
+  return {
+    id: company.id,
+    name: company.name,
+    introduction,
+    questionCount: companyItems.length,
+    hasQuestionBank: company.hasQuestionBank,
+    hasIntroduction: company.hasIntroduction,
+    items: companyItems,
+  };
+}
+
+function getMatcherBundle(companyId = "") {
+  const normalizedCompanyId = normalizeCompanyId(companyId);
+  const cacheKey = normalizedCompanyId || "__base__";
+  const cached = matcherBundleCache.get(cacheKey);
+  if (cached) return cached;
+
+  const baseItems = loadBaseQuestionBank();
+  const companyContext = normalizedCompanyId ? loadCompanyContext(normalizedCompanyId, { strict: true }) : null;
+  const items = companyContext ? [...baseItems, ...companyContext.items] : [...baseItems];
+  const bundle = {
+    matcher: new Matcher(items),
+    items,
+    baseCount: baseItems.length,
+    companyCount: companyContext?.items.length ?? 0,
+    companyContext,
+  };
+  matcherBundleCache.set(cacheKey, bundle);
+  return bundle;
+}
+
+function activeMatcherBundle() {
+  return currentSession?.matcherBundle || getMatcherBundle("");
 }
 
 function loadResumeText() {
@@ -170,6 +313,45 @@ function appendJsonl(filename, payload) {
   } catch (error) {
     console.warn("[interview-copilot][electron] session log write failed", error?.message || error);
   }
+}
+
+function rememberConversationContext(role, text, receivedAt = nowMs()) {
+  const cleanedText = String(text ?? "").replace(/\s+/g, " ").trim();
+  if (!cleanedText) return;
+  const normalizedRole = role === "candidate" ? "candidate" : "interviewer";
+  const last = conversationContextSegments.at(-1);
+  if (last?.role === normalizedRole && normalize(last.text) === normalize(cleanedText)) return;
+
+  conversationContextSegments.push({
+    role: normalizedRole,
+    text: cleanedText,
+    receivedAt,
+  });
+  conversationContextSegments = conversationContextSegments.slice(-80);
+  while (
+    conversationContextSegments.length > 12
+    && conversationContextSegments.reduce((sum, item) => sum + item.text.length, 0) > 6000
+  ) {
+    conversationContextSegments.shift();
+  }
+}
+
+function buildConversationContextText(maxChars = 2000) {
+  const lines = conversationContextSegments
+    .map((item) => {
+      const label = item.role === "candidate" ? "我" : "面试官";
+      return `${label}：${item.text}`;
+    })
+    .filter((line) => line.trim());
+  const selected = [];
+  let totalLength = 0;
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    const line = lines[index];
+    if (selected.length > 0 && totalLength + line.length + 1 > maxChars) break;
+    selected.push(line);
+    totalLength += line.length + 1;
+  }
+  return selected.reverse().join("\n").slice(-maxChars);
 }
 
 function rememberQuestionKey(questionText) {
@@ -260,6 +442,8 @@ function maybeGenerateFallbackAnswer({ matchId, questionText, candidates, reason
   const started = nowMs();
   let answer = "";
   const resume = loadResumeText();
+  const companyContext = currentSession?.matcherBundle?.companyContext || null;
+  const conversationContext = buildConversationContextText(2000);
   const pool = (candidates ?? []).slice(0, 5);
   const topScore = Number(pool[0]?.score ?? 0);
   const mode = topScore >= 65 ? "answer_guided" : "resume_generated";
@@ -271,6 +455,8 @@ function maybeGenerateFallbackAnswer({ matchId, questionText, candidates, reason
     question: snippet(cleanedQuestion, 140),
     candidates: pool.map((item) => `#${item.id}:${item.score}`).join(","),
     hasResume: resume.length > 0,
+    company: companyContext?.name || "",
+    conversationContextLength: conversationContext.length,
   });
   emitModelAnswerUpdate({
     matchId,
@@ -287,6 +473,8 @@ function maybeGenerateFallbackAnswer({ matchId, questionText, candidates, reason
     question: cleanedQuestion,
     candidates: pool,
     resumeText: resume,
+    companyContext,
+    conversationContext,
     mode,
     timeoutMs: 10000,
     onDelta: (delta, fullText) => {
@@ -376,7 +564,7 @@ function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transc
   const requestSessionSeq = arkEnhanceSeq;
   const sourceText = String(inferred.sourceText || event.sourceText || inferred.questionText || "").trim();
   const originalQuestion = String(inferred.questionText || event.query || "").trim();
-  const activeMatcher = ensureMatcher();
+  const activeMatcher = activeMatcherBundle().matcher;
   const originalPool = rerankPool.length ? rerankPool : activeMatcher.search(originalQuestion, 5);
   emitDebugLog("model_review_start", {
     matchId,
@@ -507,7 +695,7 @@ function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transc
 }
 
 function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enhanced = false }) {
-  const activeMatcher = ensureMatcher();
+  const activeMatcher = activeMatcherBundle().matcher;
   const event = activeMatcher.searchWithEvent(inferred.questionText, 10);
   const matchId = createMatchId(receivedAt, definite, enhanced);
   const rerankPool = activeMatcher.search(inferred.questionText, 10);
@@ -620,6 +808,7 @@ function handleTranscript(transcript) {
   }
 
   if (transcript.definite) {
+    rememberConversationContext("interviewer", rewrittenText || transcript.text, receivedAt);
     recentTranscriptSegments = [...recentTranscriptSegments, asrEvent].slice(-6);
     recentPartialSegments = [];
     const currentQuestionish = hasQuestionIntent(asrEvent);
@@ -701,14 +890,41 @@ function handleTranscript(transcript) {
   emitMatchForQuestion({ inferred, receivedAt, transcript, definite: false });
 }
 
+function handleMicTranscript(transcript) {
+  if (sessionPaused) return;
+  const receivedAt = nowMs();
+  const text = String(transcript.text ?? "").trim();
+  if (!text) return;
+  const asrEvent = {
+    text,
+    definite: transcript.definite,
+    utteranceStartMs: transcript.startMs,
+    utteranceEndMs: transcript.endMs,
+    receivedAt,
+  };
+  emit(transcript.definite ? "mic_asr_final" : "mic_asr_partial", asrEvent);
+  if (!transcript.definite) return;
+
+  rememberConversationContext("candidate", text, receivedAt);
+  appendJsonl("microphone-transcript.jsonl", asrEvent);
+  emitDebugLog("mic_asr_final", {
+    raw: snippet(text, 180),
+    asrLatencyMs: transcript.asrLatencyMs,
+    conversationContextLength: buildConversationContextText(2000).length,
+  });
+}
+
 function closeCurrentSession() {
   if (currentSession?.asr) currentSession.asr.close();
+  if (currentSession?.micAsr) currentSession.micAsr.close();
   if (currentSession?.audioFile) currentSession.audioFile.end();
+  if (currentSession?.micAudioFile) currentSession.micAudioFile.end();
   currentSession = null;
   sessionPaused = false;
   recentTranscriptSegments = [];
   recentPartialSegments = [];
   pendingQuestionSegments = [];
+  conversationContextSegments = [];
   recentQuestionKeys = [];
   lastPartialQuestion = null;
   lastPartialMatchedAt = 0;
@@ -773,7 +989,7 @@ async function getAudioSources() {
     isDefault: true,
     available: true,
     note: process.platform === "win32"
-      ? "Electron 通过桌面捕获拿系统输出声音，不采集麦克风。"
+      ? "Electron 通过桌面捕获拿系统输出声音用于识别面试官问题；麦克风只在开始面试后作为答案上下文采集。"
       : "非 Windows 仅用于界面开发；真实面试系统声音请在 Windows 本机调试。",
   },
   ];
@@ -783,9 +999,10 @@ function healthItem(state, label, message, extra = {}) {
   return { state, label, message, ...extra };
 }
 
-async function buildHealthStatus() {
+async function buildHealthStatus(companyId = "") {
   const checkedAt = nowMs();
   const items = {};
+  const normalizedCompanyId = normalizeCompanyId(companyId);
 
   try {
     const sources = await getAudioSources();
@@ -811,11 +1028,17 @@ async function buildHealthStatus() {
   }
 
   try {
-    const activeMatcher = ensureMatcher();
-    items.bank = questionBank.length
-      ? healthItem("ok", "题库", `已加载 ${questionBank.length} 道题`)
+    const bundle = getMatcherBundle(normalizedCompanyId);
+    const company = bundle.companyContext;
+    const message = company
+      ? bundle.companyCount > 0
+        ? `通用 ${bundle.baseCount} 题 · ${company.name} ${bundle.companyCount} 题`
+        : `通用 ${bundle.baseCount} 题 · ${company.name} 仅注入公司资料`
+      : `通用 ${bundle.baseCount} 题`;
+    items.bank = bundle.items.length
+      ? healthItem(company && bundle.companyCount === 0 ? "warning" : "ok", "题库", message)
       : healthItem("error", "题库", "题库为空");
-    if (!activeMatcher) {
+    if (!bundle.matcher) {
       items.bank = healthItem("error", "题库", "题库 matcher 未初始化");
     }
   } catch (error) {
@@ -867,6 +1090,7 @@ async function buildHealthStatus() {
     logDir: projectLogDir(),
   };
   emitDebugLog("health_check", {
+    companyId: normalizedCompanyId,
     items: Object.fromEntries(Object.entries(items).map(([key, item]) => [key, {
       state: item.state,
       message: item.message,
@@ -880,48 +1104,64 @@ async function buildHealthStatus() {
     asr: { state: items.asr?.state, message: items.asr?.message },
     bank: { state: items.bank?.state, message: items.bank?.message },
     resume: { state: items.resume?.state, message: items.resume?.message },
+    companyId: normalizedCompanyId,
   });
   return payload;
 }
 
 ipcMain.handle("list_audio_sources", async () => getAudioSources());
 
-ipcMain.handle("get_health_status", async () => {
-  const payload = await buildHealthStatus();
+ipcMain.handle("list_companies", async () => listCompanies().map(publicCompanyOption));
+
+ipcMain.handle("get_health_status", async (_event, companyId) => {
+  const payload = await buildHealthStatus(companyId);
   emit("health_status", payload);
   return payload;
 });
 
 ipcMain.handle("start_session", async (_event, settings) => {
   closeCurrentSession();
-  ensureMatcher();
+  const normalizedCompanyId = normalizeCompanyId(settings?.companyId);
+  const matcherBundle = getMatcherBundle(normalizedCompanyId);
   const apiKey = resolveApiKey();
   const sessionId = crypto.randomUUID();
   const normalizedSettings = {
     resourceId: String(settings?.resourceId || DEFAULT_RESOURCE_ID).trim() || DEFAULT_RESOURCE_ID,
     captureMode: settings?.captureMode || "wasapi_loopback",
     audioDeviceId: settings?.audioDeviceId || "electron-loopback",
+    audioOutputDeviceId: String(settings?.audioOutputDeviceId || "").trim(),
+    audioOutputDeviceName: String(settings?.audioOutputDeviceName || "").trim(),
+    microphoneDeviceId: String(settings?.microphoneDeviceId || "").trim(),
+    microphoneDeviceName: String(settings?.microphoneDeviceName || "").trim(),
     saveAudio: Boolean(settings?.saveAudio),
+    companyId: matcherBundle.companyContext?.id || "",
+    microphoneContextEnabled: Boolean(settings?.microphoneContextEnabled),
   };
   const sessionDir = normalizedSettings.saveAudio ? createSessionDir(sessionId) : null;
   const audioFile = sessionDir ? fs.createWriteStream(path.join(sessionDir, "system-audio.pcm"), { flags: "a" }) : null;
+  const micAudioFile = sessionDir && normalizedSettings.microphoneContextEnabled
+    ? fs.createWriteStream(path.join(sessionDir, "microphone-audio.pcm"), { flags: "a" })
+    : null;
   sessionPaused = false;
   recentTranscriptSegments = [];
   recentPartialSegments = [];
   pendingQuestionSegments = [];
+  conversationContextSegments = [];
   recentQuestionKeys = [];
   lastPartialQuestion = null;
   lastPartialMatchedAt = 0;
   arkEnhanceSeq += 1;
   lastArkEnhanceAt = 0;
+  fallbackAnswerMatchIds = new Set();
 
   emitAudioStatus({
     state: "starting",
-    deviceName: "Electron loopback",
+    deviceName: normalizedSettings.audioOutputDeviceName || "Electron loopback",
     volume: 0,
     message: "系统声音已授权，正在连接豆包 ASR",
   });
-  emitLog({ message: `正在连接豆包流式 ASR · resource=${normalizedSettings.resourceId} · request=${sessionId}` });
+  const companySuffix = matcherBundle.companyContext ? ` · company=${matcherBundle.companyContext.name}` : "";
+  emitLog({ message: `正在连接豆包流式 ASR · resource=${normalizedSettings.resourceId}${companySuffix} · request=${sessionId}` });
 
   const asr = new DoubaoAsrSession({
     apiKey,
@@ -930,12 +1170,55 @@ ipcMain.handle("start_session", async (_event, settings) => {
     emitLog,
     onTranscript: handleTranscript,
   });
-  currentSession = { sessionId, settings: normalizedSettings, asr, sessionDir, audioFile };
-  await asr.start();
+  currentSession = { sessionId, settings: normalizedSettings, asr, micAsr: null, sessionDir, audioFile, micAudioFile, matcherBundle };
+  try {
+    await asr.start();
+  } catch (error) {
+    closeCurrentSession();
+    throw error;
+  }
+
+  if (normalizedSettings.microphoneContextEnabled) {
+    emitMicrophoneAudioStatus({
+      state: "starting",
+      deviceName: normalizedSettings.microphoneDeviceName || "麦克风",
+      volume: 0,
+      message: "麦克风已授权，正在连接上下文 ASR",
+    });
+    const micAsr = new DoubaoAsrSession({
+      apiKey,
+      resourceId: normalizedSettings.resourceId,
+      requestId: `${sessionId}-mic`,
+      emitLog: (payload) => emitLog({ ...payload, message: `麦克风上下文：${payload.message}` }),
+      onTranscript: handleMicTranscript,
+    });
+    currentSession.micAsr = micAsr;
+    try {
+      await micAsr.start();
+      emitMicrophoneAudioStatus({
+        state: "starting",
+        deviceName: normalizedSettings.microphoneDeviceName || "麦克风",
+        volume: 0,
+        message: "麦克风上下文 ASR 已连接",
+      });
+      emitLog({ message: "麦克风上下文 ASR 已连接，只用于生成回答上下文" });
+    } catch (error) {
+      micAsr.close();
+      currentSession.micAsr = null;
+      normalizedSettings.microphoneContextEnabled = false;
+      emitMicrophoneAudioStatus({
+        state: "error",
+        deviceName: normalizedSettings.microphoneDeviceName || "麦克风",
+        volume: undefined,
+        message: `麦克风上下文 ASR 未启用：${error.message}`,
+      });
+      emitLog({ message: `麦克风上下文 ASR 未启用：${error.message}` });
+    }
+  }
 
   emitAudioStatus({
     state: "starting",
-    deviceName: "Electron loopback",
+    deviceName: normalizedSettings.audioOutputDeviceName || "Electron loopback",
     volume: 0,
     message: "ASR 已连接，正在采集系统声音",
   });
@@ -945,23 +1228,37 @@ ipcMain.handle("start_session", async (_event, settings) => {
 ipcMain.handle("stop_session", async () => {
   closeCurrentSession();
   emitAudioStatus({ state: "stopped", deviceName: undefined, volume: 0, message: "面试已结束" });
+  emitMicrophoneAudioStatus({ state: "stopped", deviceName: undefined, volume: 0, message: "麦克风上下文已停止" });
 });
 
 ipcMain.handle("pause_session", async () => {
   sessionPaused = true;
-  emitAudioStatus({ state: "paused", deviceName: "Electron loopback", volume: 0, message: "面试已暂停" });
+  emitAudioStatus({ state: "paused", deviceName: currentSession?.settings?.audioOutputDeviceName || "Electron loopback", volume: 0, message: "面试已暂停" });
+  if (currentSession?.settings?.microphoneContextEnabled) {
+    emitMicrophoneAudioStatus({ state: "paused", deviceName: currentSession.settings.microphoneDeviceName || "麦克风", volume: 0, message: "麦克风上下文已暂停" });
+  }
 });
 
 ipcMain.handle("resume_session", async () => {
   sessionPaused = false;
-  emitAudioStatus({ state: "capturing", deviceName: "Electron loopback", volume: 0, message: "面试已继续，正在采集系统声音" });
+  emitAudioStatus({ state: "capturing", deviceName: currentSession?.settings?.audioOutputDeviceName || "Electron loopback", volume: 0, message: "面试已继续，正在采集系统声音" });
+  if (currentSession?.settings?.microphoneContextEnabled) {
+    emitMicrophoneAudioStatus({ state: "capturing", deviceName: currentSession.settings.microphoneDeviceName || "麦克风", volume: 0, message: "麦克风上下文已继续" });
+  }
 });
 
-ipcMain.handle("search_questions", async (_event, query) => ensureMatcher().search(String(query ?? "")));
+ipcMain.handle("search_questions", async (_event, query, companyId) => (
+  getMatcherBundle(companyId).matcher.search(String(query ?? ""))
+));
 
 ipcMain.handle("audio_capture_error", async (_event, message) => {
   emitAudioStatus({ state: "error", deviceName: "Electron loopback", volume: undefined, message: `系统声音捕获失败：${message}` });
   emitLog({ message: `系统声音捕获失败：${message}` });
+});
+
+ipcMain.handle("microphone_capture_error", async (_event, message) => {
+  emitMicrophoneAudioStatus({ state: "error", deviceName: "麦克风", volume: undefined, message: `麦克风捕获失败：${message}` });
+  emitLog({ message: `麦克风上下文采集未启用：${message}` });
 });
 
 ipcMain.on("audio_chunk", (_event, payload) => {
@@ -972,9 +1269,23 @@ ipcMain.on("audio_chunk", (_event, payload) => {
   if (currentSession.audioFile) currentSession.audioFile.write(pcm);
   emitAudioStatus({
     state: "capturing",
-    deviceName: "Electron loopback",
+    deviceName: currentSession.settings.audioOutputDeviceName || "Electron loopback",
     volume: typeof payload?.volume === "number" ? payload.volume : undefined,
     message: "正在采集系统声音并发送豆包 ASR",
+  });
+});
+
+ipcMain.on("mic_audio_chunk", (_event, payload) => {
+  if (!currentSession?.micAsr || sessionPaused) return;
+  const pcm = Buffer.from(payload?.pcm ?? []);
+  if (!pcm.length) return;
+  currentSession.micAsr.sendAudio(pcm);
+  if (currentSession.micAudioFile) currentSession.micAudioFile.write(pcm);
+  emitMicrophoneAudioStatus({
+    state: "capturing",
+    deviceName: currentSession.settings.microphoneDeviceName || "麦克风",
+    volume: typeof payload?.volume === "number" ? payload.volume : undefined,
+    message: "正在采集麦克风并发送上下文 ASR",
   });
 });
 
