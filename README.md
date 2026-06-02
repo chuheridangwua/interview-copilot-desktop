@@ -1,6 +1,6 @@
 # Interview Copilot Desktop
 
-Windows 桌面端实时面试答案匹配器。第一版只支持 Windows 客户端运行，Linux 适合作为开发环境和提交代码环境。
+Electron + React 桌面端实时面试答案匹配器。当前目标是 Windows 本机真实面试使用；Linux 远程环境适合写代码、调前端、跑匹配测试。
 
 ## 核心能力
 
@@ -8,132 +8,129 @@ Windows 桌面端实时面试答案匹配器。第一版只支持 Windows 客户
 - 通过豆包/火山引擎流式 ASR 识别面试官声音。
 - 问题清单已内置到客户端安装包，不依赖 Windows 本地 Markdown 路径。
 - 本地毫秒级匹配 Top 3 问题，不实时调用大模型做匹配。
-- 普通可缩放桌面窗口展示实时转写、Top 3 候选和完整原文答案。
+- 普通可缩放桌面窗口展示问题列表、实时转写、Top 3 候选和完整原文答案。
+- 空格推进流程：开始监听 -> 锁定答案 -> 清空进入下一题。
 
 ## API Key 安全
 
 不要把 API Key 写进代码、配置文件或 GitHub 仓库。
 
-客户端不在页面里展示或保存 API Key，只从 Windows 运行时环境变量读取：
+客户端不在页面里展示或保存 API Key，只从运行时环境变量读取：
 
 ```powershell
-$env:DOUBAO_API_KEY="你的新Key"
+setx DOUBAO_API_KEY "你的新Key"
 ```
 
 或：
 
 ```powershell
-$env:VOLCENGINE_ASR_API_KEY="你的新Key"
+setx VOLCENGINE_ASR_API_KEY "你的新Key"
 ```
 
-如果 Key 曾经发到聊天里，请先去火山/豆包控制台轮换新 Key。
+执行 `setx` 后要重新打开 PowerShell 或重新启动客户端。曾经发到聊天里的 Key 请先去火山/豆包控制台轮换。
 
-## Linux 开发方式
+## Linux Remote SSH 开发
 
-Linux 上可以做代码开发、前端构建和匹配测试：
+在 Linux 远程服务器上可以做代码开发、前端预览、匹配测试和生产前端构建：
 
 ```bash
 npm install
+npm run dev
 npm run test:matcher
 npm run build
 ```
 
-不要在 Linux 上运行下面这个命令：
+`npm run dev` 只启动 Vite 前端。用 VSCode Remote SSH 转发 `1420` 端口后，可以在 Windows 浏览器打开：
 
-```bash
-npm run tauri -- dev
+```text
+http://127.0.0.1:1420
 ```
 
-原因：这个项目第一版的系统声音采集走 Windows WASAPI loopback，客户端必须在 Windows 环境启动。
+这个页面不是桌面客户端，所以会提示“未检测到 Electron 桌面端后端”。这是正常的，只能用于看布局和前端样式。
 
-如果你误运行了，可以改用更明确的客户端入口：
+Linux 如果有图形桌面，也可以尝试启动 Electron 壳：
 
 ```bash
 npm run client
 ```
 
-在 Linux 上它会直接提示当前系统不能启动 Windows 客户端。
+但真实系统声音采集仍建议在 Windows 本机验证，因为面试声音实际在 Windows 音频会话里。
 
-## 推荐工作流：Linux 开发，GitHub Actions 打 Windows 安装包
+## Windows 本机开发
 
-这是你当前最适合的方式：
+Windows 现在不需要 Rust/Tauri。需要安装：
 
-1. 在 Linux 上开发和测试：
+- Node.js 22 或 LTS
+- npm
+- Microsoft Edge WebView2 Runtime，通常 Windows 已内置
 
-```bash
-npm install
-npm run test:matcher
-npm run build
-```
-
-2. 把 `interview-copilot-desktop` 作为一个单独 GitHub 仓库推上去。
-
-3. 打开 GitHub 仓库的 `Actions` 页面。
-
-4. 选择 `Build Windows Client`。
-
-5. 点击 `Run workflow`。
-
-6. 等构建完成后，在 workflow run 页面下载 artifact：
-
-```text
-interview-copilot-windows
-```
-
-7. artifact 里会包含 Windows 客户端安装包，通常在：
-
-```text
-src-tauri/target/release/bundle/msi/*.msi
-src-tauri/target/release/bundle/nsis/*.exe
-```
-
-8. 把 `.exe` 或 `.msi` 下载到 Windows 电脑安装使用。
-
-项目已经包含 GitHub Actions 工作流：
-
-```text
-.github/workflows/build-windows-client.yml
-```
-
-这个工作流会在 `windows-latest` 上执行：
-
-```bash
-npm ci
-npm run test:matcher
-npm run build
-npm run tauri -- build
-```
-
-然后上传 Windows 安装包 artifact。
-
-## Windows 本地运行方式
-
-如果你也想在 Windows 上本地开发或调试客户端，需要先安装：
-
-- Node.js
-- Rust / Cargo：https://rustup.rs/
-- Microsoft Visual Studio Build Tools，勾选 `Desktop development with C++`
-- Microsoft Edge WebView2 Runtime
-
-然后在 Windows PowerShell 中运行：
+启动开发客户端：
 
 ```powershell
+cd E:\CLX\project\interview-copilot-desktop
 npm install
 npm run client
 ```
 
-构建安装包：
+构建 Windows 安装包：
 
 ```powershell
 npm run client:build
+```
+
+或运行 PowerShell 脚本：
+
+```powershell
+.\scripts\build-windows.ps1
+```
+
+构建产物在：
+
+```text
+release/*.exe
+release/*.msi
+```
+
+## 推荐工作流
+
+1. Linux Remote SSH 写代码和调前端：
+
+```bash
+cd /home/ubuntu/offer/interview-copilot-desktop
+npm run dev
+npm run test:matcher
+npm run build
+```
+
+2. 提交推送到 GitHub：
+
+```bash
+git add .
+git commit -m "..."
+git push
+```
+
+3. Windows 本机拉最新代码并调真实客户端：
+
+```powershell
+cd E:\CLX\project\interview-copilot-desktop
+git pull
+npm install
+npm run client
+```
+
+4. GitHub Actions 自动打包 Windows 安装包，artifact 名称：
+
+```text
+interview-copilot-windows
 ```
 
 ## 使用客户端
 
 1. 打开腾讯会议、飞书会议、Zoom 或 Teams。
 2. 确认面试官声音能从耳机或扬声器正常播放。
-3. 在 Windows 用户环境变量里提前设置 `DOUBAO_API_KEY`，然后重新打开客户端。
-4. 启动 Interview Copilot 客户端。
+3. 设置 `DOUBAO_API_KEY` 环境变量并重新打开客户端。
+4. 启动 Interview Copilot。
 5. `Resource ID` 默认使用：
 
 ```text
@@ -146,32 +143,18 @@ volc.seedasr.sauc.duration
 volc.seedasr.sauc.concurrent
 ```
 
-6. 问题库已经内置，不需要选择或填写本地文件路径。
-7. 采集模式优先选择：
-
-```text
-WASAPI 系统声音
-```
-
-8. 音频设备选择会议软件实际输出的设备，开始后看状态栏音量百分比；如果一直是 0%，说明选错输出设备或会议声音没有从该设备播放。
-9. 点击 `开始监听`。
-10. 如果答案正确，点击 `锁定`，避免后续闲聊或追问刷新答案。
-11. 如果暂时不想刷新答案，点击 `暂停匹配`。
-12. 如果 ASR 识别错了，用手动搜索框搜索关键词，如 `RAG`、`badcase`、`薪资`、`离开国企`。
-
-## 虚拟声卡兜底
-
-如果 WASAPI 采不到会议声音，可以安装 VB-CABLE 或 Voicemeeter：
-
-1. 把会议软件输出设备设置为虚拟声卡。
-2. 在客户端里把采集模式切到 `虚拟声卡`。
-3. 选择对应虚拟声卡设备。
+6. 点击或按空格开始监听。
+7. Electron 会请求系统声音/屏幕捕获权限。请选择屏幕并允许系统音频。
+8. 状态栏音量不是 0%，说明采到了系统声音。
+9. 面试官说完一段问题后，左侧新增问题记录，中间显示 Top 3，右侧显示答案。
+10. 再按空格锁定答案，后续转写不会覆盖右侧答案。
+11. 再按空格清空当前题，进入下一题。
 
 ## 可选保存
 
 默认不保存音频。
 
-手动开启保存后，会生成：
+手动开启保存后，会写入 Electron 用户数据目录下的会话目录：
 
 ```text
 sessions/<session-id>/system-audio.pcm
@@ -180,3 +163,11 @@ sessions/<session-id>/matches.jsonl
 ```
 
 `system-audio.pcm` 是原始 PCM：16 kHz、16-bit、mono。
+
+## 当前实现说明
+
+- 运行壳已迁移到 Electron。
+- React UI 和本地匹配逻辑保留。
+- Electron main process 负责豆包 ASR WebSocket、问题库解析、匹配事件分发。
+- Electron preload 负责调用 `getDisplayMedia` 获取系统音频并转成 `16kHz / 16bit / mono / PCM`，按 200ms 分包发给 main process。
+- Windows 真实系统音频采集需要在 Windows 本机继续实测和调优。

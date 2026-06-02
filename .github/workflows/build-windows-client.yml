@@ -13,7 +13,8 @@ on:
       - "vite.config.ts"
       - "tsconfig*.json"
       - "src/**"
-      - "src-tauri/**"
+      - "electron/**"
+      - "resources/**"
       - "scripts/**"
       - ".github/workflows/build-windows-client.yml"
 
@@ -29,61 +30,41 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Rust dependencies and target
+      - name: Cache Electron downloads
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            src-tauri/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/Cargo.toml') }}
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+          key: ${{ runner.os }}-electron-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Cache Tauri bundler tools
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/AppData/Local/tauri
-            ~/AppData/Local/tauri-rs
-          key: ${{ runner.os }}-tauri-bundler-v1
-          restore-keys: |
-            ${{ runner.os }}-tauri-bundler-
+            ${{ runner.os }}-electron-
 
       - name: Print tool versions
         run: |
           node --version
           npm --version
-          rustc --version
-          cargo --version
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: npm ci --registry=https://registry.npmjs.org/ --no-audit --no-fund
 
       - name: Test question matcher
         run: npm run test:matcher
 
-      - name: Typecheck frontend
-        run: npx tsc --noEmit
-
-      - name: Build frontend
-        run: npx vite build
+      - name: Typecheck and build frontend
+        run: npm run build
 
       - name: Build Windows desktop client
-        run: npm run tauri -- build
+        run: npm run client:build
 
       - name: Upload Windows installer artifacts
         uses: actions/upload-artifact@v4
         with:
           name: interview-copilot-windows
           path: |
-            src-tauri/target/release/bundle/msi/*.msi
-            src-tauri/target/release/bundle/nsis/*.exe
-            src-tauri/target/release/*.exe
+            release/*.exe
+            release/*.msi
           if-no-files-found: error

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
 
-const embeddedQuestionBankPath = new URL("../src-tauri/src/question_bank_embedded.md", import.meta.url);
+const embeddedQuestionBankPath = new URL("../resources/question_bank_embedded.md", import.meta.url);
 const fixtureQuestionBankPath = new URL("./fixtures/interview-questions.sample.md", import.meta.url);
 const questionBankPath = process.env.QUESTION_BANK_PATH || (fs.existsSync(embeddedQuestionBankPath) ? embeddedQuestionBankPath : fixtureQuestionBankPath);
 

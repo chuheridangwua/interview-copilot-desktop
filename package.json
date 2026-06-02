@@ -7,23 +7,59 @@
     "dev": "vite --host 127.0.0.1 --port 1420",
     "build": "tsc && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
-    "tauri": "tauri",
-    "test:matcher": "node scripts/test-question-matcher.mjs",
-    "client": "node scripts/check-client-env.mjs && tauri dev",
-    "client:build": "node scripts/check-client-env.mjs --build && tauri build"
+    "electron:dev": "node scripts/electron-dev.cjs",
+    "electron:build": "npm run build && electron-builder --win nsis msi",
+    "client": "npm run electron:dev",
+    "client:build": "npm run electron:build",
+    "test:matcher": "node scripts/test-question-matcher.mjs"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.2.0",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.2.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^42.3.0",
+    "electron-builder": "^26.8.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.7"
-  }
+  },
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "com.offer.interviewcopilot",
+    "productName": "Interview Copilot",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "resources/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources"
+      }
+    ],
+    "win": {
+      "icon": "resources/icon.ico",
+      "target": [
+        "nsis",
+        "msi"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "description": "Electron desktop interview copilot for real-time system-audio ASR and answer matching",
+  "author": "chenlexiang"
 }

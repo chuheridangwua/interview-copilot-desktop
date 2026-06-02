@@ -19,12 +19,12 @@ import {
   AudioStatusEvent,
   AsrTextEvent,
   CaptureMode,
-  isTauriRuntime,
+  isDesktopRuntime,
   listenEvent,
   MatchCandidate,
   MatchCandidatesEvent,
   SessionSettings,
-} from "./tauriClient";
+} from "./desktopClient";
 
 const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
 
@@ -104,8 +104,8 @@ export default function App() {
   const [matchingPaused, setMatchingPaused] = useState(false);
   const [locked, setLocked] = useState(false);
   const [audioStatus, setAudioStatus] = useState<AudioStatusEvent>({
-    state: isTauriRuntime() ? "idle" : "error",
-    message: isTauriRuntime() ? "空格开始监听系统声音" : "未检测到 Tauri 桌面端后端",
+    state: isDesktopRuntime() ? "idle" : "error",
+    message: isDesktopRuntime() ? "空格开始监听系统声音" : "未检测到 Electron 桌面端后端",
   });
   const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
   const [partialText, setPartialText] = useState("");
@@ -131,7 +131,7 @@ export default function App() {
     let disposed = false;
 
     async function loadSources() {
-      if (!isTauriRuntime()) return;
+      if (!isDesktopRuntime()) return;
       try {
         const nextSources = await api.listAudioSources();
         if (disposed) return;
@@ -429,7 +429,7 @@ export default function App() {
           </div>
           <div className="status-pill">
             <ShieldCheck size={16} />
-            <span>Key 自动读取</span>
+            <span>Key 环境变量读取</span>
           </div>
           <div className={cls("status-pill", locked && "locked")}>
             {locked ? <Lock size={16} /> : <Unlock size={16} />}
