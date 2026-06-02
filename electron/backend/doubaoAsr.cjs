@@ -70,8 +70,8 @@ function buildFullClientRequest(hotwords = defaultHotwords()) {
       enable_punc: true,
       enable_ddc: false,
       show_utterances: true,
-      result_type: "full",
-      end_window_size: 800,
+      result_type: "single",
+      end_window_size: 350,
       corpus: {
         context: JSON.stringify(hotwordJson),
       },
@@ -133,16 +133,17 @@ function parseServerFrame(input) {
 function extractTranscript(value) {
   const result = value?.result;
   const resultObj = Array.isArray(result) ? result[0] : result;
-  const text = String(resultObj?.text ?? "").trim();
-  if (!text) return null;
   const utterances = Array.isArray(resultObj?.utterances) ? resultObj.utterances : [];
-  const definite = utterances.some((item) => Boolean(item?.definite));
   const last = utterances[utterances.length - 1] ?? {};
+  const utteranceText = String(last?.text ?? last?.utterance ?? "").trim();
+  const text = utteranceText || String(resultObj?.text ?? "").trim();
+  if (!text) return null;
+  const definite = utterances.length ? Boolean(last?.definite) : Boolean(resultObj?.definite);
   return {
     text,
     definite,
-    startMs: typeof last.start_time === "number" ? last.start_time : undefined,
-    endMs: typeof last.end_time === "number" ? last.end_time : undefined,
+    startMs: typeof last?.start_time === "number" ? last.start_time : undefined,
+    endMs: typeof last?.end_time === "number" ? last.end_time : undefined,
   };
 }
 
@@ -253,5 +254,6 @@ module.exports = {
   buildFullClientRequest,
   buildAudioRequest,
   buildLastAudioRequest,
+  extractTranscript,
   parseServerFrame,
 };

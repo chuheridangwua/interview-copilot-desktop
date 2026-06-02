@@ -1,12 +1,41 @@
 const net = require("node:net");
-const { spawn } = require("node:child_process");
+const { execFileSync, spawn } = require("node:child_process");
 const electronPath = require("electron");
 
 const isWindows = process.platform === "win32";
-const npmCommand = isWindows ? "npm.cmd" : "npm";
+const npmCommand = "npm";
+const npmSpawnOptions = isWindows ? { shell: true } : {};
 let viteProcess;
 let electronProcess;
 let shuttingDown = false;
+
+function findListeningPidsOnWindows(port) {
+  const output = execFileSync("netstat", ["-ano", "-p", "tcp"], { encoding: "utf8" });
+  const pids = new Set();
+  for (const line of output.split(/\r?\n/)) {
+    const parts = line.trim().split(/\s+/);
+    if (parts.length < 5 || parts[0] !== "TCP") continue;
+    const [_, localAddress, __, state, pid] = parts;
+    if (state === "LISTENING" && localAddress.endsWith(`:${port}`)) pids.add(pid);
+  }
+  return [...pids];
+}
+
+function releasePort(port) {
+  if (!isWindows) return;
+  let pids = [];
+  try {
+    pids = findListeningPidsOnWindows(port);
+  } catch (error) {
+    console.warn(`[interview-copilot] 检查端口 ${port} 占用失败：${error.message}`);
+    return;
+  }
+  for (const pid of pids) {
+    if (pid === String(process.pid)) continue;
+    console.log(`[interview-copilot] 端口 ${port} 被进程 ${pid} 占用，正在结束旧进程...`);
+    execFileSync("taskkill", ["/PID", pid, "/T", "/F"], { stdio: "inherit" });
+  }
+}
 
 function waitForPort(port, host = "127.0.0.1", timeoutMs = 30000) {
   const startedAt = Date.now();
@@ -39,7 +68,8 @@ function stopAll(code = 0) {
 }
 
 async function main() {
-  viteProcess = spawn(npmCommand, ["run", "dev"], { stdio: "inherit", env: process.env });
+  releasePort(1420);
+  viteProcess = spawn(npmCommand, ["run", "dev"], { stdio: "inherit", env: process.env, ...npmSpawnOptions });
   viteProcess.once("exit", (code) => {
     if (!shuttingDown) stopAll(code ?? 1);
   });

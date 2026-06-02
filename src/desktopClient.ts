@@ -17,7 +17,7 @@ export interface SessionSettings {
 }
 
 export interface AudioStatusEvent {
-  state: "idle" | "starting" | "capturing" | "error" | "stopped";
+  state: "idle" | "starting" | "capturing" | "paused" | "error" | "stopped";
   deviceName?: string;
   volume?: number;
   message: string;
@@ -25,6 +25,7 @@ export interface AudioStatusEvent {
 
 export interface AsrTextEvent {
   text: string;
+  rewrittenText?: string;
   definite: boolean;
   utteranceStartMs?: number;
   utteranceEndMs?: number;
@@ -40,15 +41,70 @@ export interface MatchCandidate {
   score: number;
   hitTerms: string[];
   highlightTerms: string[];
-  status: "candidate" | "locked";
+  status: "candidate";
+  aiReason?: string;
 }
 
 export interface MatchCandidatesEvent {
+  matchId?: string;
   query: string;
-  locked: boolean;
   definite: boolean;
   receivedAt: number;
   candidates: MatchCandidate[];
+  latencyMs: number;
+  sourceText?: string;
+  confidence?: number;
+  reason?: string;
+  provisional?: boolean;
+  enhanced?: boolean;
+}
+
+export interface ModelQuestionUpdateEvent {
+  matchId: string;
+  questionText: string;
+  sourceText: string;
+  confidence: number;
+  reason?: string;
+  candidates: MatchCandidate[];
+  receivedAt: number;
+}
+
+export interface AiMatchUpdateEvent {
+  matchId: string;
+  status: "ready" | "error";
+  questionText: string;
+  candidates: MatchCandidate[];
+  answer: string;
+  message?: string;
+  receivedAt: number;
+  latencyMs: number;
+}
+
+export type HealthItemState = "checking" | "ok" | "warning" | "error";
+
+export interface HealthStatusItem {
+  state: HealthItemState;
+  label: string;
+  message: string;
+  latencyMs?: number;
+  model?: string;
+}
+
+export interface HealthStatusEvent {
+  checkedAt: number;
+  items: Record<string, HealthStatusItem>;
+  logDir: string;
+}
+
+export interface ModelAnswerUpdateEvent {
+  matchId: string;
+  status: "streaming" | "done" | "error";
+  questionText: string;
+  delta?: string;
+  answer?: string;
+  message?: string;
+  reason?: string;
+  receivedAt: number;
   latencyMs: number;
 }
 
@@ -64,11 +120,10 @@ export interface DesktopBridge {
   listAudioSources: () => Promise<AudioSource[]>;
   startSession: (settings: SessionSettings) => Promise<{ sessionId: string }>;
   stopSession: () => Promise<void>;
-  pauseMatching: () => Promise<void>;
-  resumeMatching: () => Promise<void>;
-  lockAnswer: (questionId: number) => Promise<void>;
-  unlockAnswer: () => Promise<void>;
+  pauseSession: () => Promise<void>;
+  resumeSession: () => Promise<void>;
   searchQuestions: (query: string) => Promise<MatchCandidate[]>;
+  getHealthStatus: () => Promise<HealthStatusEvent>;
   listen: <T>(event: string, handler: (payload: T) => void) => () => void;
 }
 
@@ -98,9 +153,8 @@ export const api = {
   listAudioSources: () => bridge().listAudioSources(),
   startSession: (settings: SessionSettings) => bridge().startSession(settings),
   stopSession: () => bridge().stopSession(),
-  pauseMatching: () => bridge().pauseMatching(),
-  resumeMatching: () => bridge().resumeMatching(),
-  lockAnswer: (questionId: number) => bridge().lockAnswer(questionId),
-  unlockAnswer: () => bridge().unlockAnswer(),
+  pauseSession: () => bridge().pauseSession(),
+  resumeSession: () => bridge().resumeSession(),
   searchQuestions: (query: string) => bridge().searchQuestions(query),
+  getHealthStatus: () => bridge().getHealthStatus(),
 };

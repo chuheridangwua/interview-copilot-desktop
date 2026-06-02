@@ -1,6 +1,16 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-const EVENT_CHANNELS = new Set(["audio_status", "asr_partial", "asr_final", "match_candidates", "session_log"]);
+const EVENT_CHANNELS = new Set([
+  "audio_status",
+  "asr_partial",
+  "asr_final",
+  "match_candidates",
+  "session_log",
+  "model_question_update",
+  "ai_match_update",
+  "model_answer_update",
+  "health_status",
+]);
 const PCM_SAMPLE_RATE = 16000;
 const PCM_CHUNK_BYTES = PCM_SAMPLE_RATE * 2 / 5;
 
@@ -10,6 +20,7 @@ let processor = null;
 let sourceNode = null;
 let silentGain = null;
 let pendingPcm = Buffer.alloc(0);
+let capturePaused = false;
 
 function computeVolume(floatSamples) {
   let sum = 0;
@@ -47,6 +58,10 @@ function floatTo16BitPcm(samples) {
 }
 
 function flushPcm(pcm, volume) {
+  if (capturePaused) {
+    pendingPcm = Buffer.alloc(0);
+    return;
+  }
   pendingPcm = Buffer.concat([pendingPcm, pcm]);
   while (pendingPcm.length >= PCM_CHUNK_BYTES) {
     const chunk = pendingPcm.subarray(0, PCM_CHUNK_BYTES);
@@ -78,10 +93,12 @@ async function stopSystemAudioCapture() {
     mediaStream = null;
   }
   pendingPcm = Buffer.alloc(0);
+  capturePaused = false;
 }
 
 async function startSystemAudioCapture() {
   await stopSystemAudioCapture();
+  capturePaused = false;
   const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
   const audioTracks = stream.getAudioTracks();
   if (audioTracks.length === 0) {
@@ -126,11 +143,17 @@ const api = {
     await stopSystemAudioCapture();
     return ipcRenderer.invoke("stop_session");
   },
-  pauseMatching: () => ipcRenderer.invoke("pause_matching"),
-  resumeMatching: () => ipcRenderer.invoke("resume_matching"),
-  lockAnswer: (questionId) => ipcRenderer.invoke("lock_answer", questionId),
-  unlockAnswer: () => ipcRenderer.invoke("unlock_answer"),
+  pauseSession: async () => {
+    capturePaused = true;
+    pendingPcm = Buffer.alloc(0);
+    return ipcRenderer.invoke("pause_session");
+  },
+  resumeSession: async () => {
+    capturePaused = false;
+    return ipcRenderer.invoke("resume_session");
+  },
   searchQuestions: (query) => ipcRenderer.invoke("search_questions", query),
+  getHealthStatus: () => ipcRenderer.invoke("get_health_status"),
   listen: (channel, handler) => {
     if (!EVENT_CHANNELS.has(channel)) return () => undefined;
     const listener = (_event, payload) => handler(payload);

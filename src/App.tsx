@@ -1,45 +1,78 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Activity,
   AudioLines,
+  CheckCircle2,
   CircleStop,
   FileText,
-  Lock,
+  LoaderCircle,
+  OctagonAlert,
   Pause,
   Play,
-  RotateCcw,
   Save,
-  Search,
-  ShieldCheck,
-  Unlock,
+  Settings,
+  X,
 } from "lucide-react";
 import {
   api,
+  AiMatchUpdateEvent,
   AudioSource,
   AudioStatusEvent,
   AsrTextEvent,
   CaptureMode,
+  HealthStatusEvent,
+  HealthStatusItem,
   isDesktopRuntime,
   listenEvent,
   MatchCandidate,
   MatchCandidatesEvent,
+  ModelAnswerUpdateEvent,
+  ModelQuestionUpdateEvent,
   SessionSettings,
 } from "./desktopClient";
 
 const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
 
-interface TranscriptLine {
+type SessionState = "idle" | "running" | "paused" | "ended";
+
+interface TranscriptSegment {
+  id: string;
   text: string;
+  rewrittenText?: string;
   receivedAt: number;
 }
 
 interface QuestionRecord {
   id: string;
-  query: string;
+  matchId: string;
+  questionText: string;
+  sourceText: string;
+  confidence: number;
+  reason?: string;
+  provisional: boolean;
+  enhanced: boolean;
   receivedAt: number;
   candidates: MatchCandidate[];
   selectedCandidate: MatchCandidate | null;
-  locked: boolean;
+  modelAnswerStatus?: "streaming" | "done" | "error";
+  modelAnswer?: string;
+  modelAnswerError?: string;
+  modelAnswerReason?: string;
+  modelAnswerLatencyMs?: number;
+}
+
+const HEALTH_ITEMS: Array<[string, string]> = [
+  ["audio", "音频"],
+  ["asr", "ASR"],
+  ["bank", "题库"],
+  ["resume", "简历"],
+  ["ark", "AI"],
+];
+
+function createInitialHealthItems(): Record<string, HealthStatusItem> {
+  return Object.fromEntries(HEALTH_ITEMS.map(([key, label]) => [
+    key,
+    { state: "checking", label, message: "启动自检中" },
+  ]));
 }
 
 function cls(...items: Array<string | false | null | undefined>) {
@@ -54,6 +87,69 @@ function isTextInputTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   const tagName = target.tagName.toLowerCase();
   return tagName === "input" || tagName === "textarea" || tagName === "select" || target.isContentEditable;
+}
+
+function normalizeText(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[，。！？；：、（）【】《》“”"'`~!?,.;:()[\]{}<>]/g, "")
+    .replace(/\s+/g, "")
+    .trim();
+}
+
+function isNearDuplicate(a: string, b: string) {
+  const left = normalizeText(a);
+  const right = normalizeText(b);
+  if (!left || !right) return false;
+  return left === right || left.includes(right) || right.includes(left);
+}
+
+function appendTranscriptSegment(segments: TranscriptSegment[], next: TranscriptSegment) {
+  const last = segments[segments.length - 1];
+  const nextText = next.rewrittenText || next.text;
+  const lastText = last ? last.rewrittenText || last.text : "";
+  if (last && isNearDuplicate(lastText, nextText)) {
+    const replacement = normalizeText(nextText).length >= normalizeText(lastText).length ? next : last;
+    return [...segments.slice(0, -1), replacement].slice(-80);
+  }
+  const duplicate = segments.slice(-8).some((item) => isNearDuplicate(item.rewrittenText || item.text, nextText));
+  if (duplicate) return segments;
+  return [...segments, next].slice(-80);
+}
+
+function splitParagraphs(text: string) {
+  return text
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function parseModelAnswer(text: string) {
+  const value = String(text ?? "").trim();
+  if (!value) return { logic: "", detail: "" };
+  const logicMatch = value.match(/回答逻辑\s*[:：]/);
+  const detailMatch = value.match(/具体内容\s*[:：]/);
+  if (!logicMatch && !detailMatch) return { logic: "", detail: value };
+
+  const logicStart = logicMatch ? (logicMatch.index ?? 0) + logicMatch[0].length : 0;
+  const detailStart = detailMatch ? (detailMatch.index ?? value.length) : value.length;
+  const detailContentStart = detailMatch ? detailStart + detailMatch[0].length : value.length;
+  return {
+    logic: value.slice(logicStart, detailStart).trim(),
+    detail: value.slice(detailContentStart).trim(),
+  };
+}
+
+function mergeCandidateList(primary: MatchCandidate[], fallback: MatchCandidate[], limit = 10) {
+  const seen = new Set<number>();
+  const merged: MatchCandidate[] = [];
+  for (const candidate of [...primary, ...fallback]) {
+    if (seen.has(candidate.id)) continue;
+    seen.add(candidate.id);
+    merged.push(candidate);
+    if (merged.length >= limit) break;
+  }
+  return merged;
 }
 
 function highlightAnswer(answer: string, terms: string[]) {
@@ -100,22 +196,29 @@ export default function App() {
   const [captureMode, setCaptureMode] = useState<CaptureMode>("wasapi_loopback");
   const [resourceId, setResourceId] = useState(DEFAULT_RESOURCE_ID);
   const [saveAudio, setSaveAudio] = useState(false);
-  const [running, setRunning] = useState(false);
-  const [matchingPaused, setMatchingPaused] = useState(false);
-  const [locked, setLocked] = useState(false);
-  const [audioStatus, setAudioStatus] = useState<AudioStatusEvent>({
-    state: isDesktopRuntime() ? "idle" : "error",
-    message: isDesktopRuntime() ? "空格开始监听系统声音" : "未检测到 Electron 桌面端后端",
-  });
-  const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
-  const [partialText, setPartialText] = useState("");
+  const [sessionState, setSessionState] = useState<SessionState>("idle");
+  const sessionStateRef = useRef<SessionState>("idle");
+  const [liveTranscript, setLiveTranscript] = useState<TranscriptSegment | null>(null);
+  const [transcriptSegments, setTranscriptSegments] = useState<TranscriptSegment[]>([]);
   const [questionRecords, setQuestionRecords] = useState<QuestionRecord[]>([]);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
+  const selectedRecordIdRef = useRef<string | null>(null);
   const [candidates, setCandidates] = useState<MatchCandidate[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState<MatchCandidate | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [lastQuery, setLastQuery] = useState("");
+  const [audioVolumePercent, setAudioVolumePercent] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [healthItems, setHealthItems] = useState<Record<string, HealthStatusItem>>(() => createInitialHealthItems());
+  const [healthCheckedAt, setHealthCheckedAt] = useState<number | null>(null);
+  const [logDir, setLogDir] = useState("");
+
+  useEffect(() => {
+    sessionStateRef.current = sessionState;
+  }, [sessionState]);
+
+  useEffect(() => {
+    selectedRecordIdRef.current = selectedRecordId;
+  }, [selectedRecordId]);
 
   const compatibleSources = useMemo(
     () => sources.filter((source) => source.captureMode === captureMode),
@@ -126,6 +229,23 @@ export default function App() {
     () => sources.some((source) => source.captureMode === "virtual_audio_device"),
     [sources],
   );
+
+  async function refreshHealthStatus() {
+    if (!isDesktopRuntime()) return;
+    setHealthItems(createInitialHealthItems());
+    try {
+      const status = await api.getHealthStatus();
+      setHealthItems((items) => ({ ...items, ...status.items }));
+      setHealthCheckedAt(status.checkedAt);
+      setLogDir(status.logDir || "");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setHealthItems((items) => ({
+        ...items,
+        ark: { state: "error", label: "AI", message: `启动自检失败：${message}` },
+      }));
+    }
+  }
 
   useEffect(() => {
     let disposed = false;
@@ -153,6 +273,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    void refreshHealthStatus();
+  }, []);
+
+  useEffect(() => {
     if (sources.length === 0) return;
     if (captureMode === "virtual_audio_device" && !hasVirtualSource) {
       setCaptureMode("wasapi_loopback");
@@ -171,56 +295,169 @@ export default function App() {
 
     async function attachEvents() {
       unlisteners.push(await listenEvent<AudioStatusEvent>("audio_status", (payload) => {
-        setAudioStatus(payload);
+        if (typeof payload.volume === "number") {
+          setAudioVolumePercent(Math.min(100, Math.round(payload.volume * 100)));
+        }
         if (payload.state === "error") setError(payload.message);
       }));
 
-      unlisteners.push(await listenEvent<AsrTextEvent>("asr_partial", (payload) => {
-        setPartialText(payload.text);
+      unlisteners.push(await listenEvent<HealthStatusEvent>("health_status", (payload) => {
+        setHealthItems((items) => ({ ...items, ...payload.items }));
+        setHealthCheckedAt(payload.checkedAt);
+        setLogDir(payload.logDir || "");
       }));
 
       unlisteners.push(await listenEvent<AsrTextEvent>("asr_final", (payload) => {
-        setPartialText("");
-        setTranscript((lines) => [...lines.slice(-14), { text: payload.text, receivedAt: payload.receivedAt }]);
+        if (sessionStateRef.current !== "running") return;
+        const nextSegment = {
+          id: `${payload.receivedAt}-${normalizeText(payload.text).slice(0, 18)}`,
+          text: payload.text,
+          rewrittenText: payload.rewrittenText,
+          receivedAt: payload.receivedAt,
+        };
+        setLiveTranscript(nextSegment);
+        const timelineText = typeof payload.rewrittenText === "string" ? payload.rewrittenText : payload.text;
+        if (timelineText.trim()) {
+          setTranscriptSegments((segments) => appendTranscriptSegment(segments, nextSegment));
+        }
+      }));
+
+      unlisteners.push(await listenEvent<AsrTextEvent>("asr_partial", (payload) => {
+        if (sessionStateRef.current !== "running" || !payload.text.trim()) return;
+        setLiveTranscript({
+          id: `live-${payload.receivedAt}`,
+          text: payload.text,
+          rewrittenText: payload.rewrittenText,
+          receivedAt: payload.receivedAt,
+        });
       }));
 
       unlisteners.push(await listenEvent<MatchCandidatesEvent>("match_candidates", (payload) => {
+        if (sessionStateRef.current !== "running") return;
         const topCandidate = payload.candidates[0] ?? null;
-        const recordId = `${payload.receivedAt || Date.now()}-${topCandidate?.id ?? "none"}`;
+        const questionText = payload.query.trim();
+        if (!questionText) return;
+        const matchId = payload.matchId || `${payload.receivedAt || Date.now()}-${normalizeText(questionText).slice(0, 16)}`;
+        const recordId = payload.provisional
+          ? "question-live"
+          : matchId;
+        const record: QuestionRecord = {
+          id: recordId,
+          matchId,
+          questionText,
+          sourceText: payload.sourceText || questionText,
+          confidence: payload.confidence ?? 0.72,
+          reason: payload.reason,
+          provisional: Boolean(payload.provisional),
+          enhanced: Boolean(payload.enhanced),
+          receivedAt: payload.receivedAt || Date.now(),
+          candidates: payload.candidates,
+          selectedCandidate: topCandidate,
+        };
 
-        if (payload.locked) {
-          setLocked(true);
-          return;
-        }
-
-        setLastQuery(payload.query);
         setCandidates(payload.candidates);
-        setLocked(false);
-
-        if (payload.definite && payload.query.trim()) {
-          const record: QuestionRecord = {
-            id: recordId,
-            query: payload.query,
-            receivedAt: payload.receivedAt || Date.now(),
-            candidates: payload.candidates,
-            selectedCandidate: topCandidate,
-            locked: payload.locked,
-          };
-          setQuestionRecords((records) => {
-            const withoutDuplicate = records.filter((item) => item.id !== record.id);
-            return [record, ...withoutDuplicate].slice(0, 30);
-          });
-          if (!payload.locked && topCandidate) {
-            setSelectedRecordId(recordId);
-            setSelectedCandidate(topCandidate);
+        setQuestionRecords((records) => {
+          const baseRecords = payload.definite ? records.filter((item) => item.id !== "question-live") : records;
+          const duplicateIndex = baseRecords.findIndex((item) => (
+            item.id === record.id || isNearDuplicate(item.questionText, record.questionText)
+          ));
+          if (duplicateIndex >= 0) {
+            const next = [...baseRecords];
+            const existing = next[duplicateIndex];
+            if (record.provisional && !existing.provisional) {
+              return next.slice(0, 40);
+            }
+            next[duplicateIndex] = {
+              ...existing,
+              ...record,
+              id: existing.provisional && !record.provisional ? record.id : existing.id,
+              matchId: record.matchId,
+              provisional: record.provisional && !record.enhanced,
+            };
+            return next.slice(0, 40);
           }
-          return;
-        }
+          return [record, ...baseRecords].slice(0, 40);
+        });
+        setSelectedRecordId((current) => (
+          payload.definite || payload.enhanced || current === "question-live" || current === null ? recordId : current
+        ));
+        if (topCandidate) setSelectedCandidate(topCandidate);
+      }));
 
-        if (!payload.locked && topCandidate) {
-          setSelectedRecordId(null);
-          setSelectedCandidate(topCandidate);
-        }
+      unlisteners.push(await listenEvent<ModelQuestionUpdateEvent>("model_question_update", (payload) => {
+        setQuestionRecords((records) => {
+          let changedRecordId: string | null = null;
+          const next = records.map((record) => {
+            if (record.matchId !== payload.matchId) return record;
+            changedRecordId = record.id;
+            const selected = record.selectedCandidate && payload.candidates.some((candidate) => candidate.id === record.selectedCandidate?.id)
+              ? record.selectedCandidate
+              : payload.candidates[0] ?? record.selectedCandidate;
+            return {
+              ...record,
+              questionText: payload.questionText,
+              sourceText: payload.sourceText || record.sourceText,
+              confidence: payload.confidence,
+              reason: payload.reason || record.reason,
+              enhanced: true,
+              candidates: payload.candidates.length ? payload.candidates : record.candidates,
+              selectedCandidate: selected,
+            };
+          });
+          if (changedRecordId && selectedRecordIdRef.current === changedRecordId) {
+            const current = next.find((record) => record.id === changedRecordId);
+            if (current) {
+              setCandidates(current.candidates);
+              setSelectedCandidate(current.selectedCandidate ?? current.candidates[0] ?? null);
+            }
+          }
+          return next;
+        });
+      }));
+
+      unlisteners.push(await listenEvent<AiMatchUpdateEvent>("ai_match_update", (payload) => {
+        if (payload.status !== "ready" || payload.candidates.length === 0) return;
+        setQuestionRecords((records) => {
+          let changedRecordId: string | null = null;
+          const next = records.map((record) => {
+            if (record.matchId !== payload.matchId) return record;
+            changedRecordId = record.id;
+            const mergedCandidates = mergeCandidateList(payload.candidates, record.candidates, 10);
+            const selected = record.selectedCandidate && mergedCandidates.some((candidate) => candidate.id === record.selectedCandidate?.id)
+              ? mergedCandidates.find((candidate) => candidate.id === record.selectedCandidate?.id) ?? record.selectedCandidate
+              : mergedCandidates[0] ?? record.selectedCandidate;
+            return {
+              ...record,
+              candidates: mergedCandidates,
+              selectedCandidate: selected,
+            };
+          });
+          if (changedRecordId && selectedRecordIdRef.current === changedRecordId) {
+            const current = next.find((record) => record.id === changedRecordId);
+            if (current) {
+              setCandidates(current.candidates);
+              setSelectedCandidate(current.selectedCandidate ?? current.candidates[0] ?? null);
+            }
+          }
+          return next;
+        });
+      }));
+
+      unlisteners.push(await listenEvent<ModelAnswerUpdateEvent>("model_answer_update", (payload) => {
+        setQuestionRecords((records) => records.map((record) => {
+          if (record.matchId !== payload.matchId) return record;
+          const nextAnswer = typeof payload.answer === "string"
+            ? payload.answer
+            : `${record.modelAnswer || ""}${payload.delta || ""}`;
+          return {
+            ...record,
+            modelAnswerStatus: payload.status,
+            modelAnswer: nextAnswer,
+            modelAnswerError: payload.status === "error" ? payload.message : undefined,
+            modelAnswerReason: payload.reason || record.modelAnswerReason,
+            modelAnswerLatencyMs: payload.latencyMs,
+          };
+        }));
       }));
 
       if (!mounted) unlisteners.splice(0).forEach((unlisten) => unlisten());
@@ -233,7 +470,7 @@ export default function App() {
     };
   }, []);
 
-  async function startSession() {
+  async function startInterview() {
     setError(null);
     const source = sources.find((item) => item.id === selectedSourceId && item.captureMode === captureMode);
     if (!source) {
@@ -251,110 +488,47 @@ export default function App() {
       saveAudio,
     };
 
+    setAudioVolumePercent(0);
     try {
       await api.startSession(settings);
-      setRunning(true);
-      setMatchingPaused(false);
-      setLocked(false);
-      setTranscript([]);
-      setPartialText("");
+      sessionStateRef.current = "running";
+      setSessionState("running");
+      setLiveTranscript(null);
+      setTranscriptSegments([]);
       setQuestionRecords([]);
       setSelectedRecordId(null);
       setCandidates([]);
       setSelectedCandidate(null);
-      setLastQuery("");
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
   }
 
-  async function stopSession() {
+  async function pauseInterview() {
+    try {
+      await api.pauseSession();
+      sessionStateRef.current = "paused";
+      setSessionState("paused");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  async function resumeInterview() {
+    try {
+      await api.resumeSession();
+      sessionStateRef.current = "running";
+      setSessionState("running");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  async function endInterview() {
     try {
       await api.stopSession();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setRunning(false);
-      setMatchingPaused(false);
-      setLocked(false);
-    }
-  }
-
-  async function prepareNextQuestion() {
-    try {
-      if (running) await api.unlockAnswer();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLocked(false);
-      setPartialText("");
-      setTranscript([]);
-      setCandidates([]);
-      setSelectedCandidate(null);
-      setSelectedRecordId(null);
-      setLastQuery("");
-    }
-  }
-
-  async function togglePause() {
-    try {
-      if (matchingPaused) {
-        await api.resumeMatching();
-        setMatchingPaused(false);
-      } else {
-        await api.pauseMatching();
-        setMatchingPaused(true);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    }
-  }
-
-  async function toggleLock(candidate?: MatchCandidate | null) {
-    try {
-      if (locked) {
-        await api.unlockAnswer();
-        setLocked(false);
-        setSelectedCandidate((current) => current ? { ...current, status: "candidate" as const } : current);
-        if (selectedRecordId) {
-          setQuestionRecords((records) => records.map((record) => (
-            record.id === selectedRecordId
-              ? {
-                  ...record,
-                  locked: false,
-                  selectedCandidate: record.selectedCandidate
-                    ? { ...record.selectedCandidate, status: "candidate" as const }
-                    : record.selectedCandidate,
-                }
-              : record
-          )));
-        }
-      } else if (candidate) {
-        await api.lockAnswer(candidate.id);
-        const lockedCandidate = { ...candidate, status: "locked" as const };
-        setLocked(true);
-        setSelectedCandidate(lockedCandidate);
-        if (selectedRecordId) {
-          setQuestionRecords((records) => records.map((record) => (
-            record.id === selectedRecordId
-              ? { ...record, locked: true, selectedCandidate: lockedCandidate }
-              : record
-          )));
-        }
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    }
-  }
-
-  async function runSearch() {
-    if (!searchQuery.trim()) return;
-    try {
-      const results = await api.searchQuestions(searchQuery.trim());
-      setCandidates(results);
-      setSelectedCandidate(results[0] ?? null);
-      setSelectedRecordId(null);
-      setLastQuery(searchQuery.trim());
+      sessionStateRef.current = "ended";
+      setSessionState("ended");
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -364,16 +538,13 @@ export default function App() {
     setSelectedRecordId(record.id);
     setCandidates(record.candidates);
     setSelectedCandidate(record.selectedCandidate ?? record.candidates[0] ?? null);
-    setLastQuery(record.query);
-    setLocked(record.locked);
   }
 
   function selectCandidate(candidate: MatchCandidate) {
-    const nextCandidate = locked ? { ...candidate, status: "locked" as const } : candidate;
-    setSelectedCandidate(nextCandidate);
+    setSelectedCandidate(candidate);
     if (selectedRecordId) {
       setQuestionRecords((records) => records.map((record) => (
-        record.id === selectedRecordId ? { ...record, selectedCandidate: nextCandidate } : record
+        record.id === selectedRecordId ? { ...record, selectedCandidate: candidate } : record
       )));
     }
   }
@@ -382,33 +553,32 @@ export default function App() {
     function onKeyDown(event: KeyboardEvent) {
       if (event.code !== "Space" || event.repeat || isTextInputTarget(event.target)) return;
       event.preventDefault();
-      if (!running) {
-        void startSession();
+      if (sessionStateRef.current === "running") {
+        void pauseInterview();
         return;
       }
-      if (locked) {
-        void prepareNextQuestion();
+      if (sessionStateRef.current === "paused") {
+        void resumeInterview();
         return;
       }
-      if (selectedCandidate) {
-        void toggleLock(selectedCandidate);
-        return;
-      }
-      void prepareNextQuestion();
+      void startInterview();
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [locked, running, selectedCandidate, selectedSourceId, captureMode, resourceId, saveAudio, sources]);
+  }, [selectedSourceId, captureMode, resourceId, saveAudio, sources]);
 
-  const latestTranscript = partialText || transcript[transcript.length - 1]?.text || "空格开始监听，等待面试官系统声音...";
-  const volumePercent = typeof audioStatus.volume === "number" ? Math.min(100, Math.round(audioStatus.volume * 100)) : null;
   const answerTerms = selectedCandidate?.highlightTerms ?? selectedCandidate?.hitTerms ?? [];
   const answerLogic = selectedCandidate?.answerLogic?.trim() ?? "";
   const answerDetail = selectedCandidate?.answerDetail?.trim() || selectedCandidate?.answer || "";
   const selectedRecord = questionRecords.find((record) => record.id === selectedRecordId) ?? null;
-  const spaceHint = !running ? "空格开始监听" : locked ? "空格进入下一题" : selectedCandidate ? "空格锁定答案" : "等待候选";
-
+  const modelAnswer = selectedRecord?.modelAnswer?.trim() ?? "";
+  const parsedModelAnswer = parseModelAnswer(modelAnswer);
+  const modelAnswerDetail = parsedModelAnswer.detail || (!parsedModelAnswer.logic ? modelAnswer : "");
+  const modelAnswerParagraphs = splitParagraphs(modelAnswerDetail);
+  const modelAnswerStreaming = selectedRecord?.modelAnswerStatus === "streaming";
+  const modelAnswerVisible = Boolean(selectedRecord && (modelAnswer || modelAnswerStreaming || selectedRecord.modelAnswerStatus === "error"));
+  const displayedTranscriptSegments = [...transcriptSegments].reverse();
   return (
     <main className="shell">
       <header className="topbar">
@@ -418,79 +588,118 @@ export default function App() {
           </div>
           <div>
             <h1>Interview Copilot</h1>
-            <p>系统声音实时识别 · 分段问题匹配 · 空格推进</p>
           </div>
         </section>
 
-        <section className="status-strip" aria-label="运行状态">
-          <div className={cls("status-pill", audioStatus.state === "capturing" && "good", audioStatus.state === "error" && "bad")}>
-            <Activity size={16} />
-            <span>{audioStatus.message}{volumePercent !== null ? ` · 音量 ${volumePercent}%` : ""}</span>
-          </div>
-          <div className="status-pill">
-            <ShieldCheck size={16} />
-            <span>Key 环境变量读取</span>
-          </div>
-          <div className={cls("status-pill", locked && "locked")}>
-            {locked ? <Lock size={16} /> : <Unlock size={16} />}
-            <span>{spaceHint}</span>
+        <section className="topbar-actions">
+          <div className="command-strip">
+            <div className="volume-indicator" title="系统音频输入音量">
+              <AudioLines size={15} />
+              <span>音量 {audioVolumePercent === null ? "--" : audioVolumePercent}%</span>
+            </div>
+            <button
+              className="health-strip"
+              type="button"
+              onClick={refreshHealthStatus}
+              title={logDir ? `点击重测 · 日志目录：${logDir}` : "点击重测启动自检"}
+            >
+              {HEALTH_ITEMS.map(([key, fallbackLabel]) => {
+                const item = healthItems[key] ?? { state: "checking", label: fallbackLabel, message: "启动自检中" };
+                const title = [
+                  item.message,
+                  item.model ? `模型：${item.model}` : "",
+                  typeof item.latencyMs === "number" ? `耗时：${item.latencyMs}ms` : "",
+                  healthCheckedAt ? `检测时间：${formatTime(healthCheckedAt)}` : "",
+                  logDir ? `日志：${logDir}` : "",
+                ].filter(Boolean).join("\n");
+                const Icon = item.state === "ok" ? CheckCircle2 : item.state === "checking" ? LoaderCircle : OctagonAlert;
+                return (
+                  <span key={key} className={cls("health-pill", `health-${item.state}`)} title={title}>
+                    <Icon size={13} />
+                    <span>{item.label || fallbackLabel}</span>
+                  </span>
+                );
+              })}
+            </button>
+            <button className="icon-button settings-command" type="button" onClick={() => setSettingsOpen(true)} title="打开采集和 ASR 设置">
+              <Settings size={16} />
+              <span>设置</span>
+            </button>
+            {sessionState === "running" ? (
+              <button className="icon-button" type="button" onClick={pauseInterview}>
+                <Pause size={17} />
+                <span>暂停面试</span>
+              </button>
+            ) : sessionState === "paused" ? (
+              <button className="primary-command" type="button" onClick={resumeInterview}>
+                <Play size={17} />
+                <span>继续面试</span>
+              </button>
+            ) : (
+              <button className="primary-command" type="button" onClick={startInterview}>
+                <Play size={17} />
+                <span>开始面试</span>
+              </button>
+            )}
+            {(sessionState === "running" || sessionState === "paused") ? (
+              <button className="danger-command" type="button" onClick={endInterview}>
+                <CircleStop size={17} />
+                <span>结束面试</span>
+              </button>
+            ) : null}
           </div>
         </section>
       </header>
 
-      <section className="controls">
-        <label>
-          <span>Resource ID</span>
-          <input value={resourceId} onChange={(event) => setResourceId(event.target.value)} />
-        </label>
-        <div className="inline-info">
-          <span>问题库</span>
-          <strong>已内置 31 题</strong>
+      {settingsOpen ? (
+        <div className="modal-backdrop" role="presentation" onMouseDown={() => setSettingsOpen(false)}>
+          <section className="settings-dialog" role="dialog" aria-modal="true" aria-label="客户端设置" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="settings-head">
+              <div>
+                <h2>客户端设置</h2>
+                <p>系统声音采集、ASR Resource 和本地保存</p>
+              </div>
+              <button className="icon-only" type="button" onClick={() => setSettingsOpen(false)} title="关闭设置">
+                <X size={17} />
+              </button>
+            </div>
+            <div className="settings-grid">
+              <label className="wide-setting">
+                <span>Resource ID</span>
+                <input value={resourceId} onChange={(event) => setResourceId(event.target.value)} />
+              </label>
+              <div className="inline-info">
+                <span>问题库</span>
+                <strong>已内置 31 题</strong>
+              </div>
+              <label>
+                <span>采集模式</span>
+                <select value={captureMode} onChange={(event) => setCaptureMode(event.target.value as CaptureMode)}>
+                  <option value="wasapi_loopback">WASAPI 系统声音</option>
+                  <option value="virtual_audio_device" disabled={!hasVirtualSource}>虚拟声卡{hasVirtualSource ? "" : "（未检测到）"}</option>
+                </select>
+              </label>
+              <label className="wide-setting">
+                <span>音频设备</span>
+                <select value={selectedSourceId} onChange={(event) => setSelectedSourceId(event.target.value)}>
+                  {compatibleSources.length === 0 ? (
+                    <option value="">{captureMode === "virtual_audio_device" ? "未检测到虚拟声卡" : "等待桌面端列出设备"}</option>
+                  ) : null}
+                  {compatibleSources.map((source) => (
+                    <option key={source.id} value={source.id}>
+                      {source.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button className={cls("setting-toggle", saveAudio && "active")} type="button" onClick={() => setSaveAudio((value) => !value)}>
+                <Save size={17} />
+                <span>{saveAudio ? "保存音频和日志" : "不保存音频"}</span>
+              </button>
+            </div>
+          </section>
         </div>
-        <label>
-          <span>采集模式</span>
-          <select value={captureMode} onChange={(event) => setCaptureMode(event.target.value as CaptureMode)}>
-            <option value="wasapi_loopback">WASAPI 系统声音</option>
-            <option value="virtual_audio_device" disabled={!hasVirtualSource}>虚拟声卡{hasVirtualSource ? "" : "（未检测到）"}</option>
-          </select>
-        </label>
-        <label>
-          <span>音频设备</span>
-          <select value={selectedSourceId} onChange={(event) => setSelectedSourceId(event.target.value)}>
-            {compatibleSources.length === 0 ? (
-              <option value="">{captureMode === "virtual_audio_device" ? "未检测到虚拟声卡" : "等待桌面端列出设备"}</option>
-            ) : null}
-            {compatibleSources.map((source) => (
-              <option key={source.id} value={source.id}>
-                {source.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className={cls("icon-button", saveAudio && "active")} type="button" onClick={() => setSaveAudio((value) => !value)} title="手动开启保存音频和日志">
-          <Save size={17} />
-          <span>{saveAudio ? "保存开启" : "不保存"}</span>
-        </button>
-        {!running ? (
-          <button className="primary-command" type="button" onClick={startSession}>
-            <Play size={18} />
-            <span>开始监听</span>
-          </button>
-        ) : (
-          <button className="danger-command" type="button" onClick={stopSession}>
-            <CircleStop size={18} />
-            <span>停止</span>
-          </button>
-        )}
-        <button className="icon-button" type="button" onClick={togglePause} disabled={!running} title="继续转写，但暂停或恢复答案刷新">
-          {matchingPaused ? <Play size={17} /> : <Pause size={17} />}
-          <span>{matchingPaused ? "继续匹配" : "暂停匹配"}</span>
-        </button>
-        <button className="icon-button" type="button" onClick={() => toggleLock(selectedCandidate)} disabled={!selectedCandidate} title="锁定当前答案，下一次空格进入下一题">
-          {locked ? <Unlock size={17} /> : <Lock size={17} />}
-          <span>{locked ? "解锁" : "锁定"}</span>
-        </button>
-      </section>
+      ) : null}
 
       {error ? (
         <div className="error-banner">
@@ -500,120 +709,64 @@ export default function App() {
       ) : null}
 
       <section className="workspace">
-        <aside className="left-column">
-          <section className="panel question-panel">
-            <div className="panel-title split">
-              <div>
-                <h2>问题列表</h2>
-                <p>每段稳定识别独立匹配</p>
+        <section className="panel question-panel">
+          <div className="panel-title split">
+            <div>
+              <h2>面试官问题列表</h2>
+            </div>
+          </div>
+          <div className="question-list">
+            {questionRecords.length === 0 ? (
+              <div className="empty-state compact-empty">
+                <FileText size={24} />
+                <p>识别到面试官问题后会按时间倒序显示。</p>
               </div>
-              <button className="icon-only" type="button" onClick={() => setQuestionRecords([])} title="清空问题列表">
-                <RotateCcw size={17} />
+            ) : null}
+            {questionRecords.map((record) => (
+              <button
+                type="button"
+                key={record.id}
+                className={cls(
+                  "question-record",
+                  selectedRecordId === record.id && "selected",
+                  record.provisional && "provisional",
+                  record.enhanced && "enhanced",
+                )}
+                onClick={() => selectRecord(record)}
+              >
+                <span className="record-time">{formatTime(record.receivedAt)}</span>
+                <p className="record-query">{record.questionText}</p>
               </button>
-            </div>
-            <div className="question-list">
-              {questionRecords.length === 0 ? (
-                <div className="empty-state compact-empty">
-                  <FileText size={24} />
-                  <p>面试官说完一段问题后，这里会新增一条匹配记录。</p>
-                </div>
-              ) : null}
-              {questionRecords.map((record) => {
-                const top = record.selectedCandidate ?? record.candidates[0] ?? null;
-                return (
-                  <button
-                    type="button"
-                    key={record.id}
-                    className={cls("question-record", selectedRecordId === record.id && "selected", record.locked && "locked")}
-                    onClick={() => selectRecord(record)}
-                  >
-                    <div className="record-meta">
-                      <span>{formatTime(record.receivedAt)}</span>
-                      {record.locked ? <strong>已锁定</strong> : null}
-                    </div>
-                    <p className="record-query">{record.query}</p>
-                    {top ? <p className="record-match">#{top.id} {top.question} · {top.score}%</p> : <p className="record-match">未匹配到候选</p>}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="panel transcript-panel">
-            <div className="panel-title">
-              <AudioLines size={18} />
-              <h2>实时转写</h2>
-            </div>
-            <div className="live-line">
-              <span className={partialText ? "streaming-dot" : "steady-dot"} />
-              <p>{latestTranscript}</p>
-            </div>
-            <div className="transcript-list">
-              {transcript.length === 0 ? <p className="muted">只监听系统声音，不采集麦克风。</p> : null}
-              {transcript
-                .slice()
-                .reverse()
-                .map((line, index) => (
-                  <article key={`${line.receivedAt}-${index}`} className="transcript-row">
-                    <span>{formatTime(line.receivedAt)}</span>
-                    <p>{line.text}</p>
-                  </article>
-                ))}
-            </div>
-          </section>
-        </aside>
+            ))}
+          </div>
+        </section>
 
         <section className="panel candidate-panel">
           <div className="panel-title split">
             <div>
-              <h2>Top 3 候选</h2>
-              <p>{lastQuery ? `当前段：${lastQuery}` : "等待稳定识别或手动搜索"}</p>
+              <h2>匹配到的问题</h2>
             </div>
-            <button className="icon-only" type="button" onClick={prepareNextQuestion} title="清空当前候选，准备下一题">
-              <RotateCcw size={17} />
-            </button>
-          </div>
-
-          <div className="manual-search">
-            <Search size={16} />
-            <input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") runSearch();
-              }}
-              placeholder="手动搜：RAG / 薪资 / badcase"
-            />
-            <button type="button" onClick={runSearch}>搜索</button>
           </div>
 
           <div className="candidate-list">
             {candidates.length === 0 ? (
               <div className="empty-state">
                 <AudioLines size={28} />
-                <p>等待系统声音识别结果，或手动搜索问题库。</p>
+                <p>推断出问题后，这里会实时显示本地 Top 10 匹配。</p>
               </div>
             ) : null}
-            {candidates.map((candidate, index) => (
-              <button
-                type="button"
-                key={candidate.id}
-                className={cls("candidate-card", selectedCandidate?.id === candidate.id && "selected")}
-                onClick={() => selectCandidate(candidate)}
-              >
-                <div className="candidate-rank">#{candidate.id}</div>
+            {candidates.map((candidate) => (
+            <button
+              type="button"
+              key={candidate.id}
+              className={cls("candidate-card", selectedCandidate?.id === candidate.id && "selected")}
+              onClick={() => selectCandidate(candidate)}
+            >
                 <div className="candidate-main">
                   <div className="candidate-heading">
                     <h3>{candidate.question}</h3>
                     <span>{candidate.score}%</span>
                   </div>
-                  <div className="term-row">
-                    {(candidate.hitTerms.length ? candidate.hitTerms : candidate.highlightTerms).slice(0, 8).map((term) => (
-                      <span key={`${candidate.id}-${term}`}>{term}</span>
-                    ))}
-                  </div>
-                  {candidate.answerLogic ? <p className="logic-preview">逻辑：{candidate.answerLogic}</p> : null}
-                  <small>{index === 0 ? (locked ? "答案已锁定" : "最可能命中") : "备选相关问题"}</small>
                 </div>
               </button>
             ))}
@@ -624,25 +777,58 @@ export default function App() {
           <div className="panel-title split">
             <div>
               <h2>完整原文答案</h2>
-              <p>{selectedCandidate ? `#${selectedCandidate.id} · ${selectedCandidate.question}` : "选择候选问题查看答案"}</p>
-              {selectedRecord ? <p className="answer-source">来源：{formatTime(selectedRecord.receivedAt)} · {selectedRecord.query}</p> : null}
             </div>
-            <button className="icon-button compact" type="button" onClick={() => toggleLock(selectedCandidate)} disabled={!selectedCandidate}>
-              {locked ? <Unlock size={16} /> : <Lock size={16} />}
-              <span>{locked ? "解锁" : "锁定"}</span>
-            </button>
           </div>
 
-          {selectedCandidate ? (
+          {selectedCandidate || selectedRecord ? (
             <div className="answer-body">
-              <section className="answer-section logic-section">
-                <h3>回答逻辑：</h3>
-                {answerLogic ? <p>{answerLogic}</p> : <p className="section-empty">原文未提供回答逻辑。</p>}
-              </section>
-              <section className="answer-section detail-section">
-                <h3>具体内容：</h3>
-                {highlightAnswer(answerDetail, answerTerms)}
-              </section>
+              {modelAnswerVisible ? (
+                <section className={cls("answer-section", "model-answer-section", modelAnswerStreaming && "streaming")}>
+                  <div className="model-answer-head">
+                    <h3>模型口述稿：</h3>
+                    {modelAnswerStreaming ? <span>生成中</span> : null}
+                    {!modelAnswerStreaming && typeof selectedRecord?.modelAnswerLatencyMs === "number" ? (
+                      <span>{selectedRecord.modelAnswerLatencyMs}ms</span>
+                    ) : null}
+                  </div>
+                  {modelAnswerParagraphs.length || parsedModelAnswer.logic ? (
+                    <div className="model-answer-content">
+                      {parsedModelAnswer.logic ? (
+                        <section className="model-answer-block model-answer-logic">
+                          <h4>回答逻辑：</h4>
+                          <p>{parsedModelAnswer.logic}</p>
+                        </section>
+                      ) : null}
+                      {modelAnswerParagraphs.length ? (
+                        <section className="model-answer-block model-answer-detail">
+                          <h4>具体内容：</h4>
+                          {modelAnswerParagraphs.map((line, index) => <p key={index}>{line}</p>)}
+                        </section>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="section-empty">{selectedRecord?.modelAnswerError || "正在生成模型口述稿。"}</p>
+                  )}
+                </section>
+              ) : null}
+
+              {selectedCandidate ? (
+                <>
+                  <section className="answer-section logic-section">
+                    <h3>回答逻辑：</h3>
+                    {answerLogic ? <p>{answerLogic}</p> : <p className="section-empty">原文未提供回答逻辑。</p>}
+                  </section>
+                  <section className="answer-section detail-section">
+                    <h3>具体内容：</h3>
+                    {highlightAnswer(answerDetail, answerTerms)}
+                  </section>
+                </>
+              ) : (
+                <section className="answer-section detail-section">
+                  <h3>具体内容：</h3>
+                  <p className="section-empty">暂无可靠题库原文命中。</p>
+                </section>
+              )}
             </div>
           ) : (
             <div className="answer-placeholder">
@@ -650,6 +836,29 @@ export default function App() {
             </div>
           )}
         </article>
+
+        <section className="panel transcript-panel">
+          <div className="panel-title">
+            <AudioLines size={18} />
+            <div>
+              <h2>语音识别</h2>
+            </div>
+          </div>
+          <section className="live-transcript">
+            <div className="subpanel-title">实时识别</div>
+            <p>{liveTranscript?.text || "等待识别"}</p>
+          </section>
+          <div className="subpanel-title timeline-title">重写内容</div>
+          <div className="transcript-list">
+            {displayedTranscriptSegments.length === 0 ? <p className="muted">暂无内容</p> : null}
+            {displayedTranscriptSegments.map((line) => (
+              <article key={line.id} className="transcript-row">
+                <span>{formatTime(line.receivedAt)}</span>
+                <p>{line.rewrittenText || line.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
       </section>
     </main>
   );

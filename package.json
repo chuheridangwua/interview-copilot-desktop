@@ -11,7 +11,8 @@
     "electron:build": "npm run build && electron-builder --win nsis msi",
     "client": "npm run electron:dev",
     "client:build": "npm run electron:build",
-    "test:matcher": "node scripts/test-question-matcher.mjs"
+    "test:matcher": "node scripts/test-question-matcher.mjs && node scripts/test-asr-config.mjs",
+    "test:ark-speed": "node scripts/test-ark-speed.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
