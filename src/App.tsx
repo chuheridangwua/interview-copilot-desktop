@@ -203,7 +203,7 @@ export default function App() {
   const [selectedMicrophoneId, setSelectedMicrophoneId] = useState("");
   const [captureMode, setCaptureMode] = useState<CaptureMode>("wasapi_loopback");
   const [resourceId, setResourceId] = useState(DEFAULT_RESOURCE_ID);
-  const [saveAudio, setSaveAudio] = useState(false);
+  const saveAudio = true;
   const [sessionState, setSessionState] = useState<SessionState>("idle");
   const sessionStateRef = useRef<SessionState>("idle");
   const [liveTranscript, setLiveTranscript] = useState<TranscriptSegment | null>(null);
@@ -710,7 +710,6 @@ export default function App() {
     selectedMicrophoneId,
     captureMode,
     resourceId,
-    saveAudio,
     selectedCompanyId,
     selectedAudioOutput,
     selectedMicrophone,
@@ -880,10 +879,10 @@ export default function App() {
                   ))}
                 </select>
               </label>
-              <button className={cls("setting-toggle", saveAudio && "active")} type="button" onClick={() => setSaveAudio((value) => !value)}>
+              <div className="setting-toggle active auto-save-note" title="每场面试都会自动保存音频、转写、问题和答案归档">
                 <Save size={17} />
-                <span>{saveAudio ? "保存音频和日志" : "不保存音频"}</span>
-              </button>
+                <span>自动保存已开启</span>
+              </div>
             </div>
           </section>
         </div>

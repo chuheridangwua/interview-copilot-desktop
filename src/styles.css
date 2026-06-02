@@ -432,6 +432,11 @@ button:disabled {
   border-color: #9fcfff;
 }
 
+.auto-save-note {
+  cursor: default;
+  user-select: none;
+}
+
 .error-banner {
   display: flex;
   align-items: center;

@@ -11,6 +11,59 @@
 - 如果改了启动方式、环境变量、端口、脚本或用户操作流程，必须同步更新 `README.md` 和 `docs/LOCAL_CODEX_HANDOFF.md`。
 - 如果发现线上或本机真实表现和本文档不一致，以本机实测为准，并立刻追加修正记录。
 
+## 2026-06-02 17:31 +08:00
+
+### 目标
+
+按真实面试复盘需求，面试过程中自动保存系统录音、麦克风录音、两路识别文字、合并录音/文字、问题列表，以及每个问题对应的题库答案和 AI 答案。
+
+### 已完成
+
+- 每场面试开始时创建会话归档目录，目录名格式为 `sessions/YYYY-MM-DD_HH-mm-ss_<session-id>/`。
+- 后端强制开启自动保存，不再依赖前端手动勾选；设置弹窗显示只读的 `自动保存已开启`。
+- 系统声音写入 `system-audio.pcm`，麦克风上下文成功启用时写入 `microphone-audio.pcm`。
+- 结束面试时等待音频写入流收尾，并生成：
+  - `system-audio.wav`
+  - `microphone-audio.wav`
+  - `combined-audio.pcm`
+  - `combined-audio.wav`
+- ASR final 结果持续写入：
+  - `system-transcript.txt/json/jsonl`
+  - `microphone-transcript.txt/json/jsonl`
+  - `combined-transcript.txt/json/jsonl`
+- 问题和答案持续写入：
+  - `question-list.txt/json`
+  - `question-answers.md/json`
+  - `question-events.jsonl`
+- `question-answers.md` 按问题记录问题文本、ASR 原文、候选题库答案、其他候选和 AI 口述稿。
+- `session-metadata.json` 记录开始时间、公司、设备和主要文件；`session-summary.json/md` 在结束面试时记录结束时间、数量统计和主要文件。
+- README 和本地交接文档已同步自动归档目录和文件清单。
+
+### 验证结果
+
+已通过：
+
+```powershell
+node -c electron/main.cjs
+node -c electron/preload.cjs
+node -c electron/backend/arkQuestionEnhancer.cjs
+npm run test:matcher
+npm run build
+git diff --check
+```
+
+`git diff --check` 仅提示 Windows 工作区 LF/CRLF 转换，没有 whitespace 错误。
+
+### 已知问题
+
+- WAV 和合并音频需要点击 `结束面试` 后生成；如果直接杀掉 Electron 进程，仍可能来不及完成最终封装。
+- `combined-audio.wav` 目前是简单 16-bit mono 混音，不做回声消除和说话人分离。
+- 麦克风归档文件只在麦克风权限获取成功、上下文 ASR 成功启用后产生。
+
+### 下一步
+
+- Windows Electron 真机跑一场短面试，确认归档目录、两路 WAV、两路转写、合并转写、问题答案文件都按预期生成。
+
 ## 2026-06-02 17:22 +08:00
 
 ### 目标

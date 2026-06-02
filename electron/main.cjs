@@ -50,6 +50,44 @@ function dateStamp() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+
+function formatLocalDateTimeForFilename(date = new Date()) {
+  return [
+    date.getFullYear(),
+    pad2(date.getMonth() + 1),
+    pad2(date.getDate()),
+  ].join("-") + "_" + [
+    pad2(date.getHours()),
+    pad2(date.getMinutes()),
+    pad2(date.getSeconds()),
+  ].join("-");
+}
+
+function formatLocalDateTimeForText(value) {
+  const date = value instanceof Date ? value : new Date(value || Date.now());
+  return `${[
+    date.getFullYear(),
+    pad2(date.getMonth() + 1),
+    pad2(date.getDate()),
+  ].join("-")} ${[
+    pad2(date.getHours()),
+    pad2(date.getMinutes()),
+    pad2(date.getSeconds()),
+  ].join(":")}`;
+}
+
+function safeFilenamePart(value, fallback = "interview") {
+  const text = String(value ?? "").trim()
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return text || fallback;
+}
+
 function projectLogDir() {
   return path.join(process.cwd(), "logs");
 }
@@ -300,8 +338,9 @@ function resolveApiKey() {
   return value;
 }
 
-function createSessionDir(sessionId) {
-  const dir = path.join(app.getPath("userData"), "sessions", sessionId);
+function createSessionDir(sessionId, startedAt = new Date()) {
+  const dirName = `${formatLocalDateTimeForFilename(startedAt)}_${safeFilenamePart(sessionId, "session")}`;
+  const dir = path.join(app.getPath("userData"), "sessions", dirName);
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -313,6 +352,382 @@ function appendJsonl(filename, payload) {
   } catch (error) {
     console.warn("[interview-copilot][electron] session log write failed", error?.message || error);
   }
+}
+
+function appendSessionJsonl(session, filename, payload) {
+  if (!session?.sessionDir) return;
+  try {
+    fs.appendFileSync(path.join(session.sessionDir, filename), `${JSON.stringify(payload)}\n`);
+  } catch (error) {
+    console.warn("[interview-copilot][electron] archive jsonl write failed", error?.message || error);
+  }
+}
+
+function writeSessionTextFile(session, filename, content) {
+  if (!session?.sessionDir) return;
+  try {
+    fs.writeFileSync(path.join(session.sessionDir, filename), content);
+  } catch (error) {
+    console.warn("[interview-copilot][electron] archive text write failed", filename, error?.message || error);
+  }
+}
+
+function writeSessionJsonFile(session, filename, payload) {
+  writeSessionTextFile(session, filename, `${JSON.stringify(payload, null, 2)}\n`);
+}
+
+function compactArchivedCandidate(candidate) {
+  if (!candidate) return null;
+  return {
+    id: candidate.id,
+    source: candidate.source || "base",
+    sourceLabel: candidate.sourceLabel || "通用",
+    sourceQuestionId: candidate.sourceQuestionId,
+    question: candidate.question,
+    score: candidate.score,
+    answerLogic: candidate.answerLogic || "",
+    answerDetail: candidate.answerDetail || candidate.answer || "",
+    answer: candidate.answer || "",
+    aiReason: candidate.aiReason || "",
+  };
+}
+
+function createSessionArchive({ sessionId, startedAt, settings, matcherBundle }) {
+  return {
+    sessionId,
+    startedAt: startedAt.toISOString(),
+    startedAtLocal: formatLocalDateTimeForText(startedAt),
+    settings,
+    company: matcherBundle?.companyContext
+      ? {
+        id: matcherBundle.companyContext.id,
+        name: matcherBundle.companyContext.name,
+        questionCount: matcherBundle.companyCount,
+      }
+      : null,
+    systemTranscripts: [],
+    microphoneTranscripts: [],
+    combinedTranscripts: [],
+    questionsByMatchId: new Map(),
+  };
+}
+
+function transcriptLine(item) {
+  return `[${formatLocalDateTimeForText(item.receivedAt)}] ${item.speaker}：${item.text}`;
+}
+
+function writeTranscriptSnapshots(session) {
+  const archive = session?.archive;
+  if (!archive) return;
+  writeSessionTextFile(session, "system-transcript.txt", archive.systemTranscripts.map(transcriptLine).join("\n") + (archive.systemTranscripts.length ? "\n" : ""));
+  writeSessionJsonFile(session, "system-transcript.json", archive.systemTranscripts);
+  writeSessionTextFile(session, "microphone-transcript.txt", archive.microphoneTranscripts.map(transcriptLine).join("\n") + (archive.microphoneTranscripts.length ? "\n" : ""));
+  writeSessionJsonFile(session, "microphone-transcript.json", archive.microphoneTranscripts);
+  const combined = [...archive.combinedTranscripts].sort((a, b) => Number(a.receivedAt) - Number(b.receivedAt));
+  writeSessionTextFile(session, "combined-transcript.txt", combined.map(transcriptLine).join("\n") + (combined.length ? "\n" : ""));
+  writeSessionJsonFile(session, "combined-transcript.json", combined);
+}
+
+function rememberArchivedTranscript({ role, speaker, text, rawText, rewrittenText, receivedAt, startMs, endMs }) {
+  const session = currentSession;
+  if (!session?.archive) return;
+  const cleanedText = String(text ?? "").trim();
+  if (!cleanedText) return;
+  const record = {
+    role,
+    speaker,
+    text: cleanedText,
+    rawText: rawText || cleanedText,
+    rewrittenText: rewrittenText || "",
+    receivedAt,
+    receivedAtLocal: formatLocalDateTimeForText(receivedAt),
+    utteranceStartMs: startMs,
+    utteranceEndMs: endMs,
+  };
+  if (role === "interviewer") {
+    session.archive.systemTranscripts.push(record);
+    appendSessionJsonl(session, "system-transcript.jsonl", record);
+  } else {
+    session.archive.microphoneTranscripts.push(record);
+    appendSessionJsonl(session, "microphone-transcript.jsonl", record);
+  }
+  session.archive.combinedTranscripts.push(record);
+  appendSessionJsonl(session, "combined-transcript.jsonl", record);
+  writeTranscriptSnapshots(session);
+}
+
+function sortedArchivedQuestions(session) {
+  return [...(session?.archive?.questionsByMatchId?.values?.() ?? [])]
+    .sort((a, b) => Number(a.receivedAt || a.updatedAt || 0) - Number(b.receivedAt || b.updatedAt || 0));
+}
+
+function questionMarkdownBlock(question, index) {
+  const candidates = question.candidates || [];
+  const topCandidate = candidates[0] || null;
+  const aiAnswer = String(question.aiAnswer || "").trim();
+  return [
+    `## ${index + 1}. ${question.questionText || question.localQuestionText || "未命名问题"}`,
+    "",
+    `- matchId: ${question.matchId}`,
+    `- 时间: ${formatLocalDateTimeForText(question.receivedAt || question.updatedAt)}`,
+    `- 状态: ${question.provisional ? "临时" : "稳定"}${question.enhanced ? " · 方舟增强" : ""}`,
+    question.reason ? `- 推断原因: ${question.reason}` : "",
+    question.sourceText ? `- ASR 原文: ${question.sourceText}` : "",
+    "",
+    "### 题库答案",
+    topCandidate
+      ? [
+        `- 命中题: [${topCandidate.sourceLabel || "通用"}] ${topCandidate.question}`,
+        `- 分数: ${topCandidate.score}%`,
+        topCandidate.sourceQuestionId ? `- 公司原题编号: ${topCandidate.sourceQuestionId}` : "",
+        "",
+        "回答逻辑：",
+        topCandidate.answerLogic || "未提供",
+        "",
+        "具体内容：",
+        topCandidate.answerDetail || topCandidate.answer || "未提供",
+      ].filter(Boolean).join("\n")
+      : "暂无题库候选。",
+    "",
+    candidates.length > 1 ? [
+      "### 其他候选",
+      ...candidates.slice(1).map((candidate, candidateIndex) => `${candidateIndex + 2}. [${candidate.sourceLabel || "通用"}] ${candidate.question}（${candidate.score}%）`),
+      "",
+    ].join("\n") : "",
+    "### AI 答案",
+    aiAnswer || question.aiAnswerError || "暂未生成。",
+    "",
+  ].filter((line) => line !== "").join("\n");
+}
+
+function writeQuestionSnapshots(session) {
+  const questions = sortedArchivedQuestions(session);
+  writeSessionJsonFile(session, "question-list.json", questions.map((question, index) => ({
+    index: index + 1,
+    matchId: question.matchId,
+    questionText: question.questionText,
+    sourceText: question.sourceText,
+    confidence: question.confidence,
+    reason: question.reason,
+    provisional: question.provisional,
+    enhanced: question.enhanced,
+    receivedAt: question.receivedAt,
+    receivedAtLocal: formatLocalDateTimeForText(question.receivedAt || question.updatedAt),
+  })));
+  writeSessionTextFile(session, "question-list.txt", questions.map((question, index) => (
+    `${index + 1}. [${formatLocalDateTimeForText(question.receivedAt || question.updatedAt)}] ${question.questionText}`
+  )).join("\n") + (questions.length ? "\n" : ""));
+  writeSessionJsonFile(session, "question-answers.json", questions);
+  writeSessionTextFile(session, "question-answers.md", [
+    "# 面试问题、题库答案与 AI 答案",
+    "",
+    `- 面试ID: ${session.sessionId}`,
+    `- 开始时间: ${session.archive?.startedAtLocal || ""}`,
+    `- 公司: ${session.archive?.company?.name || "无公司"}`,
+    "",
+    ...questions.map(questionMarkdownBlock),
+  ].join("\n"));
+}
+
+function upsertArchivedQuestion(matchId, updater) {
+  const session = currentSession;
+  if (!session?.archive || !matchId) return;
+  const existing = session.archive.questionsByMatchId.get(matchId) || {
+    matchId,
+    receivedAt: nowMs(),
+    candidates: [],
+    aiAnswer: "",
+    aiAnswerStatus: "",
+  };
+  const updated = {
+    ...existing,
+    ...updater(existing),
+    updatedAt: nowMs(),
+  };
+  session.archive.questionsByMatchId.set(matchId, updated);
+  writeQuestionSnapshots(session);
+}
+
+function archiveMatchEvent(event) {
+  const matchId = event?.matchId;
+  if (!matchId) return;
+  const candidates = (event.candidates || []).map(compactArchivedCandidate).filter(Boolean);
+  upsertArchivedQuestion(matchId, () => ({
+    matchId,
+    questionText: event.query,
+    localQuestionText: event.query,
+    sourceText: event.sourceText || event.query,
+    confidence: event.confidence,
+    reason: event.reason,
+    provisional: Boolean(event.provisional),
+    enhanced: Boolean(event.enhanced),
+    receivedAt: event.receivedAt || nowMs(),
+    candidates,
+  }));
+  appendJsonl("question-events.jsonl", { type: "match", ...event });
+}
+
+function archiveModelQuestionUpdate(payload) {
+  const candidates = (payload.candidates || []).map(compactArchivedCandidate).filter(Boolean);
+  upsertArchivedQuestion(payload.matchId, (existing) => ({
+    questionText: payload.questionText || existing.questionText,
+    confirmedQuestionText: payload.questionText,
+    sourceText: payload.sourceText || existing.sourceText,
+    confidence: payload.confidence ?? existing.confidence,
+    reason: payload.reason || existing.reason,
+    enhanced: true,
+    candidates: candidates.length ? candidates : existing.candidates,
+    receivedAt: existing.receivedAt || payload.receivedAt || nowMs(),
+  }));
+}
+
+function archiveAiMatchUpdate(payload) {
+  const candidates = (payload.candidates || []).map(compactArchivedCandidate).filter(Boolean);
+  upsertArchivedQuestion(payload.matchId, (existing) => ({
+    questionText: payload.questionText || existing.questionText,
+    aiRerankedCandidates: candidates,
+    candidates: candidates.length ? candidates : existing.candidates,
+    receivedAt: existing.receivedAt || payload.receivedAt || nowMs(),
+  }));
+}
+
+function archiveModelAnswerUpdate(payload) {
+  upsertArchivedQuestion(payload.matchId, (existing) => ({
+    questionText: payload.questionText || existing.questionText,
+    aiAnswerStatus: payload.status,
+    aiAnswer: typeof payload.answer === "string" ? payload.answer : existing.aiAnswer,
+    aiAnswerError: payload.status === "error" ? payload.message : existing.aiAnswerError,
+    aiAnswerReason: payload.reason || existing.aiAnswerReason,
+    aiAnswerLatencyMs: payload.latencyMs,
+    receivedAt: existing.receivedAt || payload.receivedAt || nowMs(),
+  }));
+}
+
+function writeWavFromPcmFile(pcmPath, wavPath, { sampleRate = 16000, channels = 1, bitsPerSample = 16 } = {}) {
+  if (!pcmPath || !fs.existsSync(pcmPath)) return false;
+  const pcm = fs.readFileSync(pcmPath);
+  if (!pcm.length) return false;
+  const byteRate = sampleRate * channels * bitsPerSample / 8;
+  const blockAlign = channels * bitsPerSample / 8;
+  const header = Buffer.alloc(44);
+  header.write("RIFF", 0);
+  header.writeUInt32LE(36 + pcm.length, 4);
+  header.write("WAVE", 8);
+  header.write("fmt ", 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20);
+  header.writeUInt16LE(channels, 22);
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(byteRate, 28);
+  header.writeUInt16LE(blockAlign, 32);
+  header.writeUInt16LE(bitsPerSample, 34);
+  header.write("data", 36);
+  header.writeUInt32LE(pcm.length, 40);
+  fs.writeFileSync(wavPath, Buffer.concat([header, pcm]));
+  return true;
+}
+
+function mixPcmFiles(systemPcmPath, microphonePcmPath, outputPcmPath) {
+  const hasSystem = systemPcmPath && fs.existsSync(systemPcmPath) && fs.statSync(systemPcmPath).size > 0;
+  const hasMicrophone = microphonePcmPath && fs.existsSync(microphonePcmPath) && fs.statSync(microphonePcmPath).size > 0;
+  if (!hasSystem && !hasMicrophone) return false;
+  if (hasSystem && !hasMicrophone) {
+    fs.copyFileSync(systemPcmPath, outputPcmPath);
+    return true;
+  }
+  if (!hasSystem && hasMicrophone) {
+    fs.copyFileSync(microphonePcmPath, outputPcmPath);
+    return true;
+  }
+
+  const systemPcm = fs.readFileSync(systemPcmPath);
+  const microphonePcm = fs.readFileSync(microphonePcmPath);
+  const sampleCount = Math.max(Math.floor(systemPcm.length / 2), Math.floor(microphonePcm.length / 2));
+  const output = Buffer.alloc(sampleCount * 2);
+  for (let index = 0; index < sampleCount; index += 1) {
+    const offset = index * 2;
+    const left = offset + 1 < systemPcm.length ? systemPcm.readInt16LE(offset) : 0;
+    const right = offset + 1 < microphonePcm.length ? microphonePcm.readInt16LE(offset) : 0;
+    const mixed = Math.max(-32768, Math.min(32767, Math.round(left * 0.72 + right * 0.72)));
+    output.writeInt16LE(mixed, offset);
+  }
+  fs.writeFileSync(outputPcmPath, output);
+  return true;
+}
+
+function finalizeSessionArchive(session) {
+  if (!session?.sessionDir || !session.archive) return;
+  const endedAt = new Date();
+  const systemPcmPath = path.join(session.sessionDir, "system-audio.pcm");
+  const systemWavPath = path.join(session.sessionDir, "system-audio.wav");
+  const microphonePcmPath = path.join(session.sessionDir, "microphone-audio.pcm");
+  const microphoneWavPath = path.join(session.sessionDir, "microphone-audio.wav");
+  const combinedPcmPath = path.join(session.sessionDir, "combined-audio.pcm");
+  const combinedWavPath = path.join(session.sessionDir, "combined-audio.wav");
+
+  let systemWav = false;
+  let microphoneWav = false;
+  let combinedWav = false;
+  try {
+    systemWav = writeWavFromPcmFile(systemPcmPath, systemWavPath);
+    microphoneWav = writeWavFromPcmFile(microphonePcmPath, microphoneWavPath);
+    const combinedPcm = mixPcmFiles(systemPcmPath, microphonePcmPath, combinedPcmPath);
+    combinedWav = combinedPcm && writeWavFromPcmFile(combinedPcmPath, combinedWavPath);
+  } catch (error) {
+    console.warn("[interview-copilot][electron] archive audio finalize failed", error?.message || error);
+  }
+
+  writeTranscriptSnapshots(session);
+  writeQuestionSnapshots(session);
+  const questions = sortedArchivedQuestions(session);
+  const summary = {
+    sessionId: session.sessionId,
+    startedAt: session.archive.startedAt,
+    startedAtLocal: session.archive.startedAtLocal,
+    endedAt: endedAt.toISOString(),
+    endedAtLocal: formatLocalDateTimeForText(endedAt),
+    sessionDir: session.sessionDir,
+    company: session.archive.company,
+    counts: {
+      systemTranscript: session.archive.systemTranscripts.length,
+      microphoneTranscript: session.archive.microphoneTranscripts.length,
+      combinedTranscript: session.archive.combinedTranscripts.length,
+      questions: questions.length,
+      questionsWithAiAnswer: questions.filter((question) => String(question.aiAnswer || "").trim()).length,
+    },
+    files: {
+      systemAudioPcm: fs.existsSync(systemPcmPath) ? "system-audio.pcm" : "",
+      systemAudioWav: systemWav ? "system-audio.wav" : "",
+      microphoneAudioPcm: fs.existsSync(microphonePcmPath) ? "microphone-audio.pcm" : "",
+      microphoneAudioWav: microphoneWav ? "microphone-audio.wav" : "",
+      combinedAudioPcm: fs.existsSync(combinedPcmPath) ? "combined-audio.pcm" : "",
+      combinedAudioWav: combinedWav ? "combined-audio.wav" : "",
+      systemTranscriptText: "system-transcript.txt",
+      microphoneTranscriptText: "microphone-transcript.txt",
+      combinedTranscriptText: "combined-transcript.txt",
+      questionListText: "question-list.txt",
+      questionAnswersMarkdown: "question-answers.md",
+    },
+  };
+  writeSessionJsonFile(session, "session-summary.json", summary);
+  writeSessionTextFile(session, "session-summary.md", [
+    "# 面试会话归档",
+    "",
+    `- 面试ID: ${summary.sessionId}`,
+    `- 开始时间: ${summary.startedAtLocal}`,
+    `- 结束时间: ${summary.endedAtLocal}`,
+    `- 公司: ${summary.company?.name || "无公司"}`,
+    `- 系统转写: ${summary.counts.systemTranscript} 条`,
+    `- 麦克风转写: ${summary.counts.microphoneTranscript} 条`,
+    `- 问题数量: ${summary.counts.questions} 条`,
+    `- AI 答案数量: ${summary.counts.questionsWithAiAnswer} 条`,
+    "",
+    "## 主要文件",
+    "",
+    ...Object.entries(summary.files).filter(([, file]) => file).map(([key, file]) => `- ${key}: ${file}`),
+    "",
+  ].join("\n"));
+  emitLog({ message: `面试归档已保存：${session.sessionDir}` });
 }
 
 function rememberConversationContext(role, text, receivedAt = nowMs()) {
@@ -395,6 +810,7 @@ function createMatchId(receivedAt, definite, enhanced) {
 function emitModelQuestionUpdate(payload) {
   emit("model_question_update", payload);
   appendJsonl("model-question-updates.jsonl", payload);
+  archiveModelQuestionUpdate(payload);
   appendModelLog("question_update", {
     matchId: payload.matchId,
     question: snippet(payload.questionText, 160),
@@ -407,6 +823,7 @@ function emitModelQuestionUpdate(payload) {
 function emitAiMatchUpdate(payload) {
   emit("ai_match_update", payload);
   appendJsonl("ai-matches.jsonl", payload);
+  archiveAiMatchUpdate(payload);
   appendModelLog("match_update", {
     matchId: payload.matchId,
     status: payload.status,
@@ -420,6 +837,7 @@ function emitAiMatchUpdate(payload) {
 function emitModelAnswerUpdate(payload) {
   emit("model_answer_update", payload);
   appendJsonl("model-answers.jsonl", payload);
+  archiveModelAnswerUpdate(payload);
   appendModelLog("answer_update", {
     matchId: payload.matchId,
     status: payload.status,
@@ -708,6 +1126,7 @@ function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enha
   event.provisional = !definite;
   event.enhanced = enhanced;
   appendJsonl("matches.jsonl", event);
+  archiveMatchEvent(event);
   emit("match_candidates", event);
   emitDebugLog("question_emit", {
     definite,
@@ -809,6 +1228,16 @@ function handleTranscript(transcript) {
 
   if (transcript.definite) {
     rememberConversationContext("interviewer", rewrittenText || transcript.text, receivedAt);
+    rememberArchivedTranscript({
+      role: "interviewer",
+      speaker: "面试官",
+      text: rewrittenText || transcript.text,
+      rawText: transcript.text,
+      rewrittenText,
+      receivedAt,
+      startMs: transcript.startMs,
+      endMs: transcript.endMs,
+    });
     recentTranscriptSegments = [...recentTranscriptSegments, asrEvent].slice(-6);
     recentPartialSegments = [];
     const currentQuestionish = hasQuestionIntent(asrEvent);
@@ -906,7 +1335,15 @@ function handleMicTranscript(transcript) {
   if (!transcript.definite) return;
 
   rememberConversationContext("candidate", text, receivedAt);
-  appendJsonl("microphone-transcript.jsonl", asrEvent);
+  rememberArchivedTranscript({
+    role: "candidate",
+    speaker: "我",
+    text,
+    rawText: text,
+    receivedAt,
+    startMs: transcript.startMs,
+    endMs: transcript.endMs,
+  });
   emitDebugLog("mic_asr_final", {
     raw: snippet(text, 180),
     asrLatencyMs: transcript.asrLatencyMs,
@@ -915,11 +1352,10 @@ function handleMicTranscript(transcript) {
 }
 
 function closeCurrentSession() {
-  if (currentSession?.asr) currentSession.asr.close();
-  if (currentSession?.micAsr) currentSession.micAsr.close();
-  if (currentSession?.audioFile) currentSession.audioFile.end();
-  if (currentSession?.micAudioFile) currentSession.micAudioFile.end();
+  const sessionToClose = currentSession;
   currentSession = null;
+  if (sessionToClose?.asr) sessionToClose.asr.close();
+  if (sessionToClose?.micAsr) sessionToClose.micAsr.close();
   sessionPaused = false;
   recentTranscriptSegments = [];
   recentPartialSegments = [];
@@ -931,6 +1367,18 @@ function closeCurrentSession() {
   arkEnhanceSeq += 1;
   lastArkEnhanceAt = 0;
   fallbackAnswerMatchIds = new Set();
+  if (!sessionToClose) return Promise.resolve();
+
+  const streams = [sessionToClose.audioFile, sessionToClose.micAudioFile].filter(Boolean);
+  return Promise.all(streams.map((stream) => new Promise((resolve) => {
+    try {
+      stream.end(resolve);
+    } catch {
+      resolve();
+    }
+  }))).then(() => {
+    finalizeSessionArchive(sessionToClose);
+  });
 }
 
 function createWindow() {
@@ -1120,11 +1568,12 @@ ipcMain.handle("get_health_status", async (_event, companyId) => {
 });
 
 ipcMain.handle("start_session", async (_event, settings) => {
-  closeCurrentSession();
+  await closeCurrentSession();
   const normalizedCompanyId = normalizeCompanyId(settings?.companyId);
   const matcherBundle = getMatcherBundle(normalizedCompanyId);
   const apiKey = resolveApiKey();
   const sessionId = crypto.randomUUID();
+  const startedAt = new Date();
   const normalizedSettings = {
     resourceId: String(settings?.resourceId || DEFAULT_RESOURCE_ID).trim() || DEFAULT_RESOURCE_ID,
     captureMode: settings?.captureMode || "wasapi_loopback",
@@ -1133,15 +1582,39 @@ ipcMain.handle("start_session", async (_event, settings) => {
     audioOutputDeviceName: String(settings?.audioOutputDeviceName || "").trim(),
     microphoneDeviceId: String(settings?.microphoneDeviceId || "").trim(),
     microphoneDeviceName: String(settings?.microphoneDeviceName || "").trim(),
-    saveAudio: Boolean(settings?.saveAudio),
+    saveAudio: true,
+    requestedSaveAudio: Boolean(settings?.saveAudio),
     companyId: matcherBundle.companyContext?.id || "",
     microphoneContextEnabled: Boolean(settings?.microphoneContextEnabled),
   };
-  const sessionDir = normalizedSettings.saveAudio ? createSessionDir(sessionId) : null;
-  const audioFile = sessionDir ? fs.createWriteStream(path.join(sessionDir, "system-audio.pcm"), { flags: "a" }) : null;
+  const sessionDir = createSessionDir(sessionId, startedAt);
+  const audioFile = fs.createWriteStream(path.join(sessionDir, "system-audio.pcm"), { flags: "a" });
   const micAudioFile = sessionDir && normalizedSettings.microphoneContextEnabled
     ? fs.createWriteStream(path.join(sessionDir, "microphone-audio.pcm"), { flags: "a" })
     : null;
+  const archive = createSessionArchive({ sessionId, startedAt, settings: normalizedSettings, matcherBundle });
+  const sessionMetadata = {
+    sessionId,
+    startedAt: startedAt.toISOString(),
+    startedAtLocal: formatLocalDateTimeForText(startedAt),
+    sessionDir,
+    settings: normalizedSettings,
+    company: archive.company,
+    files: {
+      systemAudioPcm: "system-audio.pcm",
+      systemAudioWav: "system-audio.wav",
+      microphoneAudioPcm: normalizedSettings.microphoneContextEnabled ? "microphone-audio.pcm" : "",
+      microphoneAudioWav: normalizedSettings.microphoneContextEnabled ? "microphone-audio.wav" : "",
+      combinedAudioPcm: "combined-audio.pcm",
+      combinedAudioWav: "combined-audio.wav",
+      systemTranscript: "system-transcript.txt",
+      microphoneTranscript: "microphone-transcript.txt",
+      combinedTranscript: "combined-transcript.txt",
+      questionList: "question-list.txt",
+      questionAnswers: "question-answers.md",
+    },
+  };
+  fs.writeFileSync(path.join(sessionDir, "session-metadata.json"), `${JSON.stringify(sessionMetadata, null, 2)}\n`);
   sessionPaused = false;
   recentTranscriptSegments = [];
   recentPartialSegments = [];
@@ -1170,11 +1643,13 @@ ipcMain.handle("start_session", async (_event, settings) => {
     emitLog,
     onTranscript: handleTranscript,
   });
-  currentSession = { sessionId, settings: normalizedSettings, asr, micAsr: null, sessionDir, audioFile, micAudioFile, matcherBundle };
+  currentSession = { sessionId, settings: normalizedSettings, asr, micAsr: null, sessionDir, audioFile, micAudioFile, matcherBundle, archive };
+  writeTranscriptSnapshots(currentSession);
+  writeQuestionSnapshots(currentSession);
   try {
     await asr.start();
   } catch (error) {
-    closeCurrentSession();
+    await closeCurrentSession();
     throw error;
   }
 
@@ -1226,7 +1701,7 @@ ipcMain.handle("start_session", async (_event, settings) => {
 });
 
 ipcMain.handle("stop_session", async () => {
-  closeCurrentSession();
+  await closeCurrentSession();
   emitAudioStatus({ state: "stopped", deviceName: undefined, volume: 0, message: "面试已结束" });
   emitMicrophoneAudioStatus({ state: "stopped", deviceName: undefined, volume: 0, message: "麦克风上下文已停止" });
 });
@@ -1298,6 +1773,7 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
-  closeCurrentSession();
-  if (process.platform !== "darwin") app.quit();
+  closeCurrentSession().finally(() => {
+    if (process.platform !== "darwin") app.quit();
+  });
 });

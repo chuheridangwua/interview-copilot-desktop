@@ -193,24 +193,51 @@ logs/model-YYYY-MM-DD.jsonl
 
 这些日志用于排查 ASR、问题推断、候选重排、模型口述稿和启动自检。日志不记录 API Key，但可能包含 ASR 文本和面试问题，所以 `logs/` 已加入 `.gitignore`。
 
-## 可选保存
+## 自动保存
 
-默认不保存音频。
-
-手动开启保存后，会写入 Electron 用户数据目录下的会话目录：
+每场面试开始时都会自动创建归档目录，目录名包含实际开始时间和完整面试 ID：
 
 ```text
-sessions/<session-id>/system-audio.pcm
-sessions/<session-id>/microphone-audio.pcm
-sessions/<session-id>/transcript.jsonl
-sessions/<session-id>/microphone-transcript.jsonl
-sessions/<session-id>/matches.jsonl
-sessions/<session-id>/debug.jsonl
-sessions/<session-id>/model-question-updates.jsonl
-sessions/<session-id>/ai-matches.jsonl
+sessions/YYYY-MM-DD_HH-mm-ss_<session-id>/
 ```
 
-`system-audio.pcm` 和 `microphone-audio.pcm` 都是原始 PCM：16 kHz、16-bit、mono。麦克风文件只在麦克风上下文成功启用时产生。
+归档目录位于 Electron 用户数据目录下。目录内当前会自动保存：
+
+```text
+session-metadata.json
+session-summary.json
+session-summary.md
+system-audio.pcm
+system-audio.wav
+microphone-audio.pcm
+microphone-audio.wav
+combined-audio.pcm
+combined-audio.wav
+transcript.jsonl
+system-transcript.jsonl
+system-transcript.json
+system-transcript.txt
+microphone-transcript.jsonl
+microphone-transcript.json
+microphone-transcript.txt
+combined-transcript.jsonl
+combined-transcript.json
+combined-transcript.txt
+matches.jsonl
+question-events.jsonl
+question-list.json
+question-list.txt
+question-answers.json
+question-answers.md
+debug.jsonl
+model-question-updates.jsonl
+ai-matches.jsonl
+model-answers.jsonl
+```
+
+`system-audio.pcm` 和 `microphone-audio.pcm` 都是原始 PCM：16 kHz、16-bit、mono。会话结束时会自动封装为 WAV，并生成 `combined-audio.wav`。麦克风文件只在麦克风上下文成功启用时产生。
+
+`system-transcript.*` 保存面试官系统声音识别结果，`microphone-transcript.*` 保存本人麦克风识别结果，`combined-transcript.*` 按时间合并两路文字。`question-list.*` 保存问题列表，`question-answers.md` 会按问题保存对应题库命中答案和 AI 口述稿，便于复盘。
 
 ## 当前实现说明
 
@@ -219,6 +246,7 @@ sessions/<session-id>/ai-matches.jsonl
 - Electron main process 负责豆包 ASR WebSocket、问题库解析、匹配事件分发。
 - Electron preload 负责调用 `getDisplayMedia` 获取系统音频，并按设置里的麦克风输入调用 `getUserMedia` 获取麦克风音频；两路都转成 `16kHz / 16bit / mono / PCM`，按 200ms 分包发给 main process。
 - Electron main process 使用系统音频 ASR 结果做问题抽取和题库匹配；麦克风 ASR 结果只写入最近对话上下文，最终口述稿生成时截取最近约 2000 字传给方舟。
+- Electron main process 会自动归档每场面试的系统/麦克风录音、两路转写、整合转写、问题列表，以及每个问题对应的题库答案和 AI 答案。
 - Electron main process 会扫描 `resources/company/*`，按当前选择的公司生成会话级 matcher，并把公司 `Introduction.md` 注入最终口述稿生成。
 - 方舟小模型后台执行短 JSON 任务，用于 final 问题确认和候选重排；前排优先使用小模型 Top 3，后面保留本地 Top 10 候选。
 - 每个 final 问题都会触发方舟流式口述稿生成：高分匹配优先复用题库原答案，低分或无匹配时结合 `resources/jianli.md`、当前公司资料和最近对话上下文组织回答。

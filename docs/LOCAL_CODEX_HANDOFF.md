@@ -25,6 +25,7 @@ docs/DEVELOPMENT_LOG.md
 - 空格快捷键：未开始时开始、进行中暂停、暂停中继续。
 - API Key 不写入仓库和文档；当前 ASR Key 仍从环境变量读取。
 - 调试日志固定写入项目根目录 `logs/`，该目录已加入 `.gitignore`。
+- 每场面试都会自动归档到 Electron 用户数据目录的 `sessions/YYYY-MM-DD_HH-mm-ss_<session-id>/`，用于保存音频、转写、问题列表、题库答案和 AI 答案。
 - `resources/jianli.md` 用作模型口述稿上下文，只保留经历、项目、技能和成果，不提交手机号、邮箱、QQ 等个人联系方式。
 - `resources/company/<公司名>/Introduction.md` 用作公司背景和岗位上下文，`question.md` 会在选择公司后追加进本场 matcher。
 
@@ -33,6 +34,7 @@ docs/DEVELOPMENT_LOG.md
 - Electron main process：窗口、IPC、豆包 ASR WebSocket、题库解析、匹配事件分发。
 - Electron preload：调用 `getDisplayMedia` 获取系统音频，并按设置里的麦克风输入调用 `getUserMedia` 获取麦克风音频；两路都转成 `16kHz / 16bit / mono / PCM`，按 200ms 分包发给 main process。
 - Electron main process：系统音频 ASR 结果进入问题抽取和题库匹配；麦克风 ASR 结果只进入最近对话上下文，AI 口述稿生成时传入最近约 2000 字。
+- Electron main process：每场会话创建独立归档目录，结束面试时等待 PCM 写入收尾，生成系统/麦克风 WAV、合并 WAV、两路转写、合并转写、问题列表和问题答案快照。
 - React/Vite/TypeScript：桌面控制台 UI。
 - 火山方舟 Ark Chat API：后台短 JSON 任务用于问题确认和题库候选重排，流式任务用于生成模型口述稿。
 - electron-builder：Windows `.exe` / `.msi` 打包。
@@ -178,7 +180,41 @@ npm ci --dry-run --no-audit --no-fund
 8. 顶部状态胶囊会显示音频、ASR、题库、简历、AI 自检状态；选择公司后题库状态会显示通用题和公司题数量。
 9. 面试官说完一段问题后，左侧问题列表新增记录，左下出候选题，中间出题库原文答案和 AI 口述稿。
 10. 右侧语音识别列同时显示系统实时/系统转写和麦克风实时/麦克风转写。
-11. 按空格可在运行和暂停之间切换；点击 `结束面试` 会停止采集并保留本场结果。运行或暂停时不能切换公司。
+11. 按空格可在运行和暂停之间切换；点击 `结束面试` 会停止采集并写入本场归档。运行或暂停时不能切换公司。
+
+## 自动归档
+
+每场面试开始后都会创建一个会话目录：
+
+```text
+sessions/YYYY-MM-DD_HH-mm-ss_<session-id>/
+```
+
+该目录位于 Electron 用户数据目录下，主要文件包括：
+
+```text
+session-metadata.json
+session-summary.json
+session-summary.md
+system-audio.pcm
+system-audio.wav
+microphone-audio.pcm
+microphone-audio.wav
+combined-audio.pcm
+combined-audio.wav
+system-transcript.txt
+system-transcript.json
+microphone-transcript.txt
+microphone-transcript.json
+combined-transcript.txt
+combined-transcript.json
+question-list.txt
+question-list.json
+question-answers.md
+question-answers.json
+```
+
+其中 `system-transcript.*` 是面试官系统声音识别文字，`microphone-transcript.*` 是本人麦克风文字，`combined-transcript.*` 按时间合并两路文字。`question-answers.md` 按问题保存匹配到的题库答案和 AI 口述稿。
 
 ## 调试日志
 
