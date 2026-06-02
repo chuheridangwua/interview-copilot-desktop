@@ -43,12 +43,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-
 
+      - name: Pin npm 10
+        run: npm install -g npm@10.9.2
+
       - name: Print tool versions
         run: |
           node --version
           npm --version
 
       - name: Install dependencies
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
         run: npm ci --registry=https://registry.npmjs.org/ --no-audit --no-fund
 
       - name: Test question matcher
