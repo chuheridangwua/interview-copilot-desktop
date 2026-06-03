@@ -1,0 +1,1288 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hermes Agent / OpenClaw / Claude Code / Codex 架构对比</title>
+  <style>
+    :root {
+      --ink: #171717;
+      --muted: #5f6368;
+      --line: #d8d7d2;
+      --paper: #f7f8f4;
+      --panel: #ffffff;
+      --night: #101412;
+      --codex: #0a67ff;
+      --claude: #d95328;
+      --hermes: #7a3cff;
+      --openclaw: #07935f;
+      --warn: #e2a700;
+      --soft-blue: #e8f0ff;
+      --soft-red: #fff0ea;
+      --soft-green: #e8f7ef;
+      --soft-purple: #f0eaff;
+      --shadow: 0 18px 45px rgba(17, 17, 17, 0.09);
+      --radius: 8px;
+      font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      letter-spacing: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        linear-gradient(90deg, rgba(23, 23, 23, 0.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(23, 23, 23, 0.045) 1px, transparent 1px),
+        var(--paper);
+      background-size: 24px 24px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .page {
+      width: min(1460px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0 18px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border: 2px solid var(--ink);
+      background:
+        linear-gradient(135deg, var(--codex) 0 24%, transparent 24% 31%, var(--claude) 31% 55%, transparent 55% 62%, var(--openclaw) 62% 78%, var(--hermes) 78%);
+      box-shadow: 3px 3px 0 var(--ink);
+      flex: 0 0 auto;
+    }
+
+    .brand strong {
+      display: block;
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .nav a,
+    .modebar button {
+      border: 1px solid var(--ink);
+      background: var(--panel);
+      color: var(--ink);
+      padding: 8px 10px;
+      font-size: 13px;
+      line-height: 1;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(23, 23, 23, 0.16);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav a:hover,
+    .modebar button:hover,
+    .modebar button.is-active {
+      background: var(--ink);
+      color: var(--panel);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+      gap: 28px;
+      align-items: stretch;
+      min-height: 560px;
+      padding: 34px 0 26px;
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      border: 1px solid var(--ink);
+      background: var(--warn);
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    h1 {
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      margin: 18px 0 16px;
+      font-size: 58px;
+      line-height: 0.98;
+      font-weight: 900;
+      max-width: 840px;
+    }
+
+    .lead {
+      color: #252525;
+      font-size: 18px;
+      line-height: 1.75;
+      max-width: 760px;
+      margin: 0;
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .legend-item {
+      border: 1px solid var(--ink);
+      background: var(--panel);
+      padding: 12px;
+      border-radius: var(--radius);
+      min-height: 80px;
+      box-shadow: 3px 3px 0 rgba(23, 23, 23, 0.12);
+    }
+
+    .legend-item b {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      border-radius: 50%;
+      border: 1px solid var(--ink);
+      flex: 0 0 auto;
+    }
+
+    .dot.hermes { background: var(--hermes); }
+    .dot.openclaw { background: var(--openclaw); }
+    .dot.claude { background: var(--claude); }
+    .dot.codex { background: var(--codex); }
+
+    .legend-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-top: 7px;
+    }
+
+    .system-map {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(10, 103, 255, 0.17), transparent 24%),
+        radial-gradient(circle at 82% 18%, rgba(217, 83, 40, 0.18), transparent 24%),
+        radial-gradient(circle at 18% 84%, rgba(7, 147, 95, 0.16), transparent 24%),
+        radial-gradient(circle at 86% 78%, rgba(122, 60, 255, 0.15), transparent 24%),
+        #fdfdf9;
+      box-shadow: var(--shadow);
+      min-height: 520px;
+    }
+
+    .scan {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent 0%, rgba(23, 23, 23, 0.045) 48%, rgba(255, 255, 255, 0.45) 50%, transparent 52%);
+      background-size: 100% 80px;
+      animation: scan 8s linear infinite;
+    }
+
+    @keyframes scan {
+      from { background-position-y: -80px; }
+      to { background-position-y: 80px; }
+    }
+
+    .map-title {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      z-index: 1;
+    }
+
+    .map-title b {
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 22px;
+    }
+
+    .map-title span {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+      line-height: 1.35;
+      max-width: 210px;
+    }
+
+    .nodes {
+      position: absolute;
+      inset: 78px 24px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 18px;
+      z-index: 1;
+    }
+
+    .node {
+      position: relative;
+      border: 2px solid var(--ink);
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 0;
+    }
+
+    .node:before,
+    .node:after {
+      content: "";
+      position: absolute;
+      background: var(--ink);
+    }
+
+    .node:before {
+      width: 34px;
+      height: 2px;
+      top: 50%;
+    }
+
+    .node:after {
+      width: 2px;
+      height: 34px;
+      left: 50%;
+    }
+
+    .node.hermes { box-shadow: 8px 8px 0 rgba(122, 60, 255, 0.22); }
+    .node.openclaw { box-shadow: 8px 8px 0 rgba(7, 147, 95, 0.22); }
+    .node.claude { box-shadow: 8px 8px 0 rgba(217, 83, 40, 0.22); }
+    .node.codex { box-shadow: 8px 8px 0 rgba(10, 103, 255, 0.22); }
+
+    .node.hermes:before,
+    .node.openclaw:before { right: -18px; }
+    .node.claude:before,
+    .node.codex:before { left: -18px; }
+    .node.hermes:after,
+    .node.claude:after { bottom: -18px; }
+    .node.openclaw:after,
+    .node.codex:after { top: -18px; }
+
+    .node h2 {
+      margin: 0;
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 24px;
+      line-height: 1.05;
+    }
+
+    .node p {
+      margin: 10px 0;
+      color: #303030;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .node small {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .axis {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: 112px;
+      height: 112px;
+      transform: translate(-50%, -50%);
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      z-index: 2;
+      box-shadow: 0 0 0 8px rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 900;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .section {
+      padding: 34px 0 8px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      border-top: 2px solid var(--ink);
+      padding-top: 18px;
+      margin-bottom: 16px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 32px;
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .modebar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0 18px;
+    }
+
+    .modebar span {
+      color: var(--muted);
+      font-size: 13px;
+      margin-right: 4px;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .product {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 5px 5px 0 rgba(23, 23, 23, 0.12);
+      overflow: hidden;
+    }
+
+    .product header {
+      padding: 14px;
+      border-bottom: 2px solid var(--ink);
+      min-height: 132px;
+    }
+
+    .product[data-product="hermes"] header { background: var(--soft-purple); }
+    .product[data-product="openclaw"] header { background: var(--soft-green); }
+    .product[data-product="claude"] header { background: var(--soft-red); }
+    .product[data-product="codex"] header { background: var(--soft-blue); }
+
+    .kicker {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .product h3 {
+      margin: 0 0 10px;
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 25px;
+      line-height: 1.05;
+    }
+
+    .product header p {
+      margin: 0;
+      color: #2d2d2d;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .layers {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .layer {
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--ink);
+      padding: 10px;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .product[data-product="hermes"] .layer { border-left-color: var(--hermes); }
+    .product[data-product="openclaw"] .layer { border-left-color: var(--openclaw); }
+    .product[data-product="claude"] .layer { border-left-color: var(--claude); }
+    .product[data-product="codex"] .layer { border-left-color: var(--codex); }
+
+    .layer b {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .layer span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .matrix-wrap {
+      overflow-x: auto;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      min-width: 1020px;
+      border-collapse: collapse;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      padding: 13px;
+      vertical-align: top;
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #111;
+      color: #fff;
+      z-index: 1;
+      font-size: 13px;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    td:first-child {
+      font-weight: 900;
+      width: 160px;
+      background: #fbfbf8;
+    }
+
+    tbody tr.is-focus td {
+      background: #fff9d9;
+    }
+
+    body[data-mode="coding"] tr[data-mode~="coding"] td,
+    body[data-mode="personal"] tr[data-mode~="personal"] td,
+    body[data-mode="security"] tr[data-mode~="security"] td,
+    body[data-mode="extension"] tr[data-mode~="extension"] td {
+      background: #fff3b0;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .compare-panel {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: 5px 5px 0 rgba(23, 23, 23, 0.10);
+    }
+
+    .compare-panel h3 {
+      margin: 0 0 12px;
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 24px;
+    }
+
+    .compare-panel ul,
+    .choice ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .compare-panel li,
+    .choice li {
+      margin: 9px 0;
+      line-height: 1.6;
+      color: #303030;
+    }
+
+    .radar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .scorecard {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 14px;
+      box-shadow: 5px 5px 0 rgba(23, 23, 23, 0.10);
+    }
+
+    .scorecard h3 {
+      margin: 0 0 10px;
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 23px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .scorecard h3 small {
+      font-family: "Microsoft YaHei", sans-serif;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      align-self: center;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: 118px 1fr 32px;
+      gap: 10px;
+      align-items: center;
+      margin: 9px 0;
+      font-size: 13px;
+    }
+
+    .track {
+      height: 11px;
+      background: #ececea;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      width: calc(var(--score) * 20%);
+      background: var(--ink);
+    }
+
+    .scorecard.hermes .fill { background: var(--hermes); }
+    .scorecard.openclaw .fill { background: var(--openclaw); }
+    .scorecard.claude .fill { background: var(--claude); }
+    .scorecard.codex .fill { background: var(--codex); }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .choice {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 14px;
+      box-shadow: 5px 5px 0 rgba(23, 23, 23, 0.10);
+    }
+
+    .choice h3 {
+      margin: 0 0 10px;
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 22px;
+    }
+
+    .callout {
+      border: 2px solid var(--ink);
+      background: #111;
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 18px;
+      align-items: start;
+      box-shadow: var(--shadow);
+    }
+
+    .callout b {
+      color: var(--warn);
+      font-family: "Bahnschrift", "DIN Condensed", "Microsoft YaHei", sans-serif;
+      font-size: 26px;
+      line-height: 1.05;
+    }
+
+    .callout p {
+      margin: 0;
+      line-height: 1.75;
+      color: #f3f3ee;
+    }
+
+    .sources {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .source-group {
+      border: 1px solid var(--ink);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 13px;
+    }
+
+    .source-group h3 {
+      margin: 0 0 9px;
+      font-size: 16px;
+    }
+
+    .source-group ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .source-group li {
+      margin: 7px 0;
+      line-height: 1.45;
+      font-size: 13px;
+      color: #333;
+      word-break: break-word;
+    }
+
+    .tagline {
+      display: inline-flex;
+      padding: 3px 7px;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 12px;
+      margin: 2px 4px 2px 0;
+      white-space: nowrap;
+    }
+
+    sup a {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--codex);
+      text-decoration: none;
+    }
+
+    footer {
+      margin-top: 34px;
+      padding-top: 16px;
+      border-top: 2px solid var(--ink);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1180px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .system-map {
+        min-height: 600px;
+      }
+
+      .products,
+      .choice-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 18px, 1460px);
+        padding-bottom: 40px;
+      }
+
+      .topbar,
+      .section-head,
+      .callout {
+        display: block;
+      }
+
+      .nav {
+        justify-content: flex-start;
+        margin-top: 14px;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+
+      .lead {
+        font-size: 16px;
+      }
+
+      .legend-row,
+      .products,
+      .compare-grid,
+      .radar,
+      .choice-grid,
+      .sources {
+        grid-template-columns: 1fr;
+      }
+
+      .system-map {
+        min-height: 780px;
+      }
+
+      .nodes {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, minmax(0, 1fr));
+      }
+
+      .axis,
+      .node:before,
+      .node:after {
+        display: none;
+      }
+
+      .node h2 {
+        font-size: 22px;
+      }
+
+      .bar {
+        grid-template-columns: 100px 1fr 28px;
+      }
+    }
+  </style>
+</head>
+<body data-mode="all">
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true"></div>
+        <div>
+          <strong>Agent Architecture Field Guide</strong>
+          <span>联网核对日期：2026-06-03</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="页面导航">
+        <a href="#architecture">架构</a>
+        <a href="#matrix">矩阵</a>
+        <a href="#tradeoffs">优劣势</a>
+        <a href="#choose">选型</a>
+        <a href="#sources">来源</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <div>
+            <span class="eyebrow">四类 Agent 产品横评</span>
+            <h1>Hermes Agent、OpenClaw、Claude Code、Codex 的架构区别</h1>
+            <p class="lead">
+              这四个名字都在做“让模型替你行动”，但产品重心不一样：Claude Code 和 Codex 是面向软件工程的 coding agent；OpenClaw 是消息入口和设备节点驱动的个人 AI 助手；Hermes Agent 更像可自托管、可研究、可接入多平台的通用 agent harness。下面按入口、核心 loop、上下文、工具扩展、执行边界和安全模型拆开看。
+            </p>
+          </div>
+          <div class="legend-row" aria-label="产品定位摘要">
+            <div class="legend-item">
+              <b><span class="dot hermes"></span>Hermes Agent</b>
+              <span>Nous Research 生态的多入口 agent；CLI、消息网关、工具集、MCP、记忆、cron、子代理和研究批处理是重点。</span>
+            </div>
+            <div class="legend-item">
+              <b><span class="dot openclaw"></span>OpenClaw</b>
+              <span>自托管个人助手；长期在线 Gateway 连接 WhatsApp、Telegram、Slack、Discord、节点设备和本地/远程能力。</span>
+            </div>
+            <div class="legend-item">
+              <b><span class="dot claude"></span>Claude Code</b>
+              <span>Anthropic 的 coding agent；终端、IDE、桌面、Web、Agent SDK、Managed Agents、MCP、skills、hooks。</span>
+            </div>
+            <div class="legend-item">
+              <b><span class="dot codex"></span>Codex</b>
+              <span>OpenAI 的 coding agent；App、CLI、IDE、Web/Cloud、AGENTS.md、沙箱审批、MCP、skills、plugins、subagents。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="system-map" aria-label="四个产品的系统定位图">
+          <div class="scan"></div>
+          <div class="map-title">
+            <b>Runtime Map</b>
+            <span>外圈是产品入口，中心是“模型使用工具完成任务”的 agent loop。</span>
+          </div>
+          <div class="nodes">
+            <article class="node hermes">
+              <h2>Hermes Agent</h2>
+              <p>CLI / Gateway / ACP / batch 共用 AIAgent 核心；工具注册表、SQLite 状态、上下文压缩、MCP 和多终端后端组成底座。</p>
+              <small>强项：自托管、多工具、多平台、研究轨迹。</small>
+            </article>
+            <article class="node claude">
+              <h2>Claude Code</h2>
+              <p>Claude Code harness 管理工具循环；Claude 模型调用内置工具、MCP、skills、hooks、subagents，并可通过 Agent SDK 嵌入。</p>
+              <small>强项：代码编辑、终端工作流、Claude 原生能力。</small>
+            </article>
+            <article class="node openclaw">
+              <h2>OpenClaw</h2>
+              <p>长期在线 Gateway 是中心；聊天渠道、控制客户端、移动/桌面节点经 WebSocket 连接，agent runtime 负责会话与工具执行。</p>
+              <small>强项：个人事务自动化、消息入口、设备节点。</small>
+            </article>
+            <article class="node codex">
+              <h2>Codex</h2>
+              <p>Codex agent 读 AGENTS.md 和 config.toml，在沙箱和审批策略下调用 shell、文件、MCP、skills、plugins 与 subagents。</p>
+              <small>强项：代码改动、审查、可控执行、OpenAI 生态。</small>
+            </article>
+          </div>
+          <div class="axis">agent loop<br>tools<br>context</div>
+        </div>
+      </section>
+
+      <section class="section" id="architecture">
+        <div class="section-head">
+          <h2>架构剖面</h2>
+          <p>每个产品都可以抽象成六层：入口、核心循环、上下文、工具扩展、执行边界、安全控制。区别主要不在“能不能调用工具”，而在默认信任边界和产品入口。</p>
+        </div>
+
+        <div class="products">
+          <article class="product" data-product="hermes">
+            <header>
+              <div class="kicker"><span>通用 agent harness</span><span>早期 beta</span></div>
+              <h3>Hermes Agent</h3>
+              <p>Nous Research 文档把它描述为可安装在 Linux、macOS、WSL2、原生 Windows 的 agent，并支持 Nous Portal、OpenRouter、OpenAI 或任意 endpoint。<sup><a href="#src-h2">H2</a></sup></p>
+            </header>
+            <div class="layers">
+              <div class="layer"><b>入口层</b><span>CLI、消息 Gateway、ACP、batch runner、API server 等入口共享一个 AIAgent 核心。<sup><a href="#src-h1">H1</a></sup></span></div>
+              <div class="layer"><b>核心 loop</b><span><code>run_agent.py</code>、prompt builder、context engine、context compressor、prompt caching、辅助 LLM、模型路由共同构成 agent loop。</span></div>
+              <div class="layer"><b>状态与记忆</b><span>SQLite + FTS5 保存 session/state；文档还列出 persistent memory、session search、skills system。<sup><a href="#src-h2">H2</a></sup></span></div>
+              <div class="layer"><b>工具与执行</b><span>中央 tool registry，常见工具集包括 web、terminal、file、browser、vision、memory、cronjob、code_execution、delegation、MCP 等。<sup><a href="#src-h3">H3</a></sup></span></div>
+              <div class="layer"><b>消息与自动化</b><span>Gateway 负责平台适配、会话持久化、出站 delivery、pairing、hooks、mirror；cron 可以把定时任务交付到任意平台。</span></div>
+              <div class="layer"><b>信任边界</b><span>有危险命令检测、审批工具、沙箱/容器和多终端后端，但整体是自托管宽工具面，安全依赖配置与运行环境。</span></div>
+            </div>
+          </article>
+
+          <article class="product" data-product="openclaw">
+            <header>
+              <div class="kicker"><span>个人 AI 助手</span><span>Gateway-first</span></div>
+              <h3>OpenClaw</h3>
+              <p>官网定位是“从 WhatsApp、Telegram 或常用 chat app 完成邮件、日历、航班等个人事务”。<sup><a href="#src-o3">O3</a></sup></p>
+            </header>
+            <div class="layers">
+              <div class="layer"><b>入口层</b><span>WhatsApp、Telegram、Slack、Discord、Signal、iMessage、WebChat、mac app、CLI、web admin、节点设备。</span></div>
+              <div class="layer"><b>核心 Gateway</b><span>单个长期在线 Gateway 维护 provider 连接，提供 typed WebSocket API，并发出 agent、chat、presence、health、heartbeat、cron 事件。<sup><a href="#src-o1">O1</a></sup></span></div>
+              <div class="layer"><b>客户端与节点</b><span>控制端通过 WS 发送 health/status/send/agent 等请求；节点以 <code>role: node</code> 连接并暴露 canvas、camera、screen.record、location.get 等命令。</span></div>
+              <div class="layer"><b>Agent runtime</b><span>内置 runtime 位于 <code>src/agents/</code>，模型/provider helper 位于 <code>src/llm/</code>，插件通过 <code>openclaw/plugin-sdk</code> 暴露稳定入口。<sup><a href="#src-o2">O2</a></sup></span></div>
+              <div class="layer"><b>工具与插件</b><span>技能/插件/渠道/节点能力构成扩展面；长期在线 Gateway 让 agent 更像“个人后台服务”而不是一次性终端会话。</span></div>
+              <div class="layer"><b>信任边界</b><span>设备身份、pairing 审批、challenge 签名、device token、scope 是核心；远程和 tailnet 连接要求显式配对。<sup><a href="#src-o4">O4</a></sup></span></div>
+            </div>
+          </article>
+
+          <article class="product" data-product="claude">
+            <header>
+              <div class="kicker"><span>coding agent</span><span>Anthropic</span></div>
+              <h3>Claude Code</h3>
+              <p>官方文档把它放在 Terminal、VS Code、Desktop app、Web、JetBrains 等 surfaces 中；Terminal CLI 可编辑文件、运行命令、管理项目。<sup><a href="#src-c1">C1</a></sup></p>
+            </header>
+            <div class="layers">
+              <div class="layer"><b>入口层</b><span>CLI、IDE、桌面、Web、JetBrains；CLI 可 pipe、script、CI 化，session 可跨 surface 迁移。</span></div>
+              <div class="layer"><b>核心 harness</b><span>Agent SDK 暴露 Claude Code 的 built-in tools、hooks、subagents、MCP、permissions、sessions；SDK 让 Claude 处理工具循环。<sup><a href="#src-c2">C2</a></sup></span></div>
+              <div class="layer"><b>上下文</b><span><code>CLAUDE.md</code> 在 session 开始加载；自动记忆保存 build commands、debugging insights 等跨 session 信息。<sup><a href="#src-c1">C1</a></sup></span></div>
+              <div class="layer"><b>工具扩展</b><span>MCP 连接外部数据和工具；skills、hooks、plugins、slash commands 和 subagents 扩展工作流。<sup><a href="#src-c3">C3</a></sup></span></div>
+              <div class="layer"><b>执行模型</b><span>Agent SDK 在你的进程/基础设施中运行并处理本地文件；Managed Agents 在 Anthropic 托管基础设施中运行，每个 session 有 managed sandbox。<sup><a href="#src-c2">C2</a></sup></span></div>
+              <div class="layer"><b>信任边界</b><span>settings、allowed/disallowed tools、permissionMode、hooks、托管设置和 WebFetch 预检查共同限制工具使用。<sup><a href="#src-c5">C5</a></sup></span></div>
+            </div>
+          </article>
+
+          <article class="product" data-product="codex">
+            <header>
+              <div class="kicker"><span>coding agent</span><span>OpenAI</span></div>
+              <h3>Codex</h3>
+              <p>OpenAI 文档覆盖 App、IDE Extension、CLI、Web、GitHub/Slack/Linear 集成、自动化、SDK、App Server、MCP Server、GitHub Action 等面向软件工程的 surfaces。<sup><a href="#src-d1">D1</a></sup></p>
+            </header>
+            <div class="layers">
+              <div class="layer"><b>入口层</b><span>App、CLI、IDE、Web/cloud、GitHub/Slack/Linear integrations、non-interactive mode、SDK、MCP server。</span></div>
+              <div class="layer"><b>核心配置</b><span><code>AGENTS.md</code> 自动进上下文，用于 repo layout、构建/测试命令、工程规范、验证标准；<code>config.toml</code> 管模型、sandbox、approval、MCP、profiles。<sup><a href="#src-d1">D1</a></sup></span></div>
+              <div class="layer"><b>工具扩展</b><span>CLI 和 IDE 共享 MCP 配置；Codex 可接入第三方 docs、browser、Figma 等工具，也能把自身作为 MCP server 交给 Agents SDK 编排。<sup><a href="#src-d4">D4</a></sup></span></div>
+              <div class="layer"><b>Skills 与 plugins</b><span>skills 是 reusable workflow 的 authoring format，progressive disclosure 控制上下文；plugins 是可安装分发单元，可打包 skills、apps、MCP servers、hooks。<sup><a href="#src-d5">D5</a></sup></span></div>
+              <div class="layer"><b>Subagents</b><span>Codex 只有在明确要求时才 spawn subagents；父会话的 sandbox 与 approval runtime overrides 会传给子代理，成本高于单代理。<sup><a href="#src-d6">D6</a></sup></span></div>
+              <div class="layer"><b>信任边界</b><span>本地 Codex 使用 OS-enforced sandbox 限制可写目录和网络；approval policy 决定何时停下请求许可，命令也继承同一沙箱边界。<sup><a href="#src-d2">D2</a></sup></span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="matrix">
+        <div class="section-head">
+          <h2>横向矩阵</h2>
+          <p>这些维度更适合做选型判断。上面的来源是产品文档事实；矩阵里的“偏强/偏弱”是基于公开文档定位和默认架构做的相对判断，不是 benchmark。</p>
+        </div>
+        <div class="modebar" aria-label="高亮维度">
+          <span>高亮：</span>
+          <button type="button" class="is-active" data-mode="all">全部</button>
+          <button type="button" data-mode="coding">代码工程</button>
+          <button type="button" data-mode="personal">个人自动化</button>
+          <button type="button" data-mode="security">安全边界</button>
+          <button type="button" data-mode="extension">扩展生态</button>
+        </div>
+        <div class="matrix-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>维度</th>
+                <th>Hermes Agent</th>
+                <th>OpenClaw</th>
+                <th>Claude Code</th>
+                <th>Codex</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-mode="coding personal">
+                <td>产品中心</td>
+                <td>通用自托管 agent：CLI、消息、工具、研究、自动化并重。</td>
+                <td>自托管个人助手：长期在线 Gateway 加聊天渠道和设备节点。</td>
+                <td>代码工程 agent：终端、IDE、桌面、Web 的软件开发工作流。</td>
+                <td>代码工程 agent：App、CLI、IDE、Web/cloud 和团队/自动化场景。</td>
+              </tr>
+              <tr data-mode="coding">
+                <td>核心 loop</td>
+                <td>AIAgent + prompt/context/compression/caching + tool registry。</td>
+                <td>Gateway 调度 session/queue/agent runtime，再连接渠道和节点工具。</td>
+                <td>Claude Code harness 管工具循环，Claude 选择内置/MCP/skills/subagents。</td>
+                <td>Codex agent 读 repo 指令，按 config/sandbox/approval 调工具和 shell。</td>
+              </tr>
+              <tr data-mode="coding personal">
+                <td>入口和 surface</td>
+                <td>CLI、Gateway、ACP、batch、API server，消息平台广。</td>
+                <td>WhatsApp/Telegram/Slack/Discord/iMessage/WebChat、CLI、mac app、web admin、nodes。</td>
+                <td>Terminal、VS Code、Desktop app、Web、JetBrains，session 可跨 surface。</td>
+                <td>Codex app、CLI、IDE Extension、Web、GitHub/Slack/Linear、SDK、MCP server、GitHub Action。</td>
+              </tr>
+              <tr data-mode="extension">
+                <td>工具扩展</td>
+                <td>60+ built-in tools/toolsets、MCP、skills、cron、delegate_task、browser、media。</td>
+                <td>插件/技能、channel、nodes、device commands、agent runtime SDK contracts。</td>
+                <td>MCP、skills、hooks、plugins、subagents、Agent SDK、自定义工具。</td>
+                <td>MCP、skills、plugins、hooks、subagents、Agents SDK 编排、app/connectors。</td>
+              </tr>
+              <tr data-mode="coding extension">
+                <td>代码能力</td>
+                <td>有 terminal/file/search/browser/code execution/delegation，适合工程任务，但不是纯 coding 产品。</td>
+                <td>可接 ACP/Codex/Claude 类 agent，也有 runtime，但默认目标是个人事务执行。</td>
+                <td>强：代码阅读、编辑、命令、CI、worktree、subagents、SDK。</td>
+                <td>强：代码修改、审查、测试、sandbox、patch、MCP、subagents、团队流程。</td>
+              </tr>
+              <tr data-mode="personal">
+                <td>个人助理能力</td>
+                <td>强：消息 gateway、cron、send_message、memory、web/media/Home Assistant 等。</td>
+                <td>很强：从常用 chat app 触发邮件、日历、渠道、设备节点和后台任务。</td>
+                <td>中：有 scheduled routines、MCP、Slack/Jira 等，但核心仍是代码工作流。</td>
+                <td>中：有 app integrations 和 automations，但定位仍是软件工程 agent。</td>
+              </tr>
+              <tr data-mode="security">
+                <td>默认信任边界</td>
+                <td>自托管主机和启用工具是边界；Docker/SSH/本地后端取决于配置。</td>
+                <td>Gateway host 是边界；设备 pairing、token、scope 和 node allowlists 很关键。</td>
+                <td>本地/托管两种；permission policies、allowed/disallowed tools、managed settings 约束工具。</td>
+                <td>本地 OS sandbox + approval policy 是核心；网络默认关闭，命令继承 sandbox。</td>
+              </tr>
+              <tr data-mode="extension security">
+                <td>可观测和控制</td>
+                <td>工具调用可见、可中断；SQLite/session search 支撑回放和检索。</td>
+                <td>Gateway health、heartbeat、protocol events、device pairing 审批、logs。</td>
+                <td>hooks、OpenTelemetry、cost/usage、checkpointing、permission callbacks。</td>
+                <td>approval overlay、auto-review、sandbox settings、config precedence、plugin permissions。</td>
+              </tr>
+              <tr data-mode="coding personal extension">
+                <td>适合部署</td>
+                <td>个人/团队自托管 agent、研究、工具密集型工作流、跨消息平台自动化。</td>
+                <td>家用/个人 VPS/Mac mini 长期在线助手，尤其是 chat-first 事务处理。</td>
+                <td>本地开发、IDE/终端 pair programming、企业 Claude 生态、SDK 产品原型。</td>
+                <td>本地/云端软件工程任务、代码审查、自动化修复、OpenAI 生态工作流。</td>
+              </tr>
+              <tr data-mode="security extension">
+                <td>主要风险</td>
+                <td>功能面很宽，beta 快速迭代；工具/容器/凭据配置不严会扩大风险。</td>
+                <td>Gateway 暴露、节点配对、system.run、消息渠道权限都需要硬化。</td>
+                <td>依赖 Anthropic/Claude 生态；权限、hooks、MCP 配置复杂时需治理。</td>
+                <td>依赖 OpenAI/Codex 生态；沙箱/approval 配置不当会影响效率或安全。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="tradeoffs">
+        <div class="section-head">
+          <h2>优劣势</h2>
+          <p>把它们分成两组更容易理解：Claude Code/Codex 是“代码工作台”，Hermes/OpenClaw 是“自托管行动入口”。</p>
+        </div>
+
+        <div class="compare-grid">
+          <article class="compare-panel">
+            <h3>Hermes Agent：宽工具面，研究味更重</h3>
+            <ul>
+              <li><b>优势：</b>多 provider、多入口、多 toolset、MCP、cron、memory、batch trajectory、RL/Atropos 等研究能力，适合把 agent 当成可改造平台。</li>
+              <li><b>优势：</b>一个 AIAgent 核心服务 CLI、Gateway、ACP、batch 和 API，平台差异尽量留在入口层，架构上比较清晰。</li>
+              <li><b>短板：</b>功能面越宽，部署、凭据、工具白名单、容器边界越需要自己管；beta 状态意味着文档和接口变化可能快。</li>
+              <li><b>适合：</b>想要本地/自托管、多模型、消息平台、自动化、研究轨迹和技能生态的人。</li>
+            </ul>
+          </article>
+
+          <article class="compare-panel">
+            <h3>OpenClaw：聊天入口和设备节点最突出</h3>
+            <ul>
+              <li><b>优势：</b>Gateway-first 架构让它天然适合长期在线个人助手，从 chat app 触发真实世界任务。</li>
+              <li><b>优势：</b>clients 和 nodes 都通过 Gateway WS 连接，节点可以把设备能力暴露给 agent，适合“远程主机 + 本地设备”的组合。</li>
+              <li><b>短板：</b>它不是默认围绕代码仓库/IDE 设计的，复杂代码任务通常要接 ACP/Codex/Claude 类 agent 或外部工具。</li>
+              <li><b>适合：</b>个人运营、邮件/日历/消息流、家庭服务器、Mac mini/VPS 常驻 agent。</li>
+            </ul>
+          </article>
+
+          <article class="compare-panel">
+            <h3>Claude Code：Claude 原生 coding loop</h3>
+            <ul>
+              <li><b>优势：</b>终端、IDE、桌面、Web、Agent SDK 和 Managed Agents 形成一套完整 coding agent 产品线。</li>
+              <li><b>优势：</b>CLAUDE.md、auto memory、skills、hooks、MCP、subagents、permissions 都围绕软件工程任务设计。</li>
+              <li><b>短板：</b>相比 Hermes/OpenClaw，它不是消息网关或个人设备节点平台；通用个人助理需要额外 MCP/集成。</li>
+              <li><b>适合：</b>重度 Claude 用户、代码修复/重构/审查/CI 自动化、想用 Agent SDK 做 Claude-powered agent 的团队。</li>
+            </ul>
+          </article>
+
+          <article class="compare-panel">
+            <h3>Codex：沙箱审批和 OpenAI 工程生态</h3>
+            <ul>
+              <li><b>优势：</b>AGENTS.md、config.toml、OS sandbox、approval policy、MCP、skills、plugins、subagents 的组合很适合受控代码执行。</li>
+              <li><b>优势：</b>App/CLI/IDE/Web/cloud 加 GitHub/Slack/Linear/automation，使它更像软件工程协作环境，而不仅是一个 CLI。</li>
+              <li><b>短板：</b>不是 chat-first 个人助手；OpenAI 官方手册和功能矩阵变化快，跨 surface 能力要以当前文档/环境为准。</li>
+              <li><b>适合：</b>希望在本地沙箱、云端任务、代码审查、自动修复、团队插件/技能之间切换的 OpenAI 用户。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="radar">
+        <div class="section-head">
+          <h2>能力雷达</h2>
+          <p>分值是相对定位，1 到 5 代表“公开文档显示的默认产品重心”。它不代表模型聪明程度，也不代表同一任务的实际质量。</p>
+        </div>
+
+        <div class="radar">
+          <article class="scorecard hermes">
+            <h3>Hermes Agent <small>platform / research</small></h3>
+            <div class="bar"><span>代码工程</span><div class="track"><div class="fill" style="--score:4"></div></div><b>4</b></div>
+            <div class="bar"><span>个人自动化</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+            <div class="bar"><span>自托管自由度</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+            <div class="bar"><span>默认安全边界</span><div class="track"><div class="fill" style="--score:3"></div></div><b>3</b></div>
+            <div class="bar"><span>扩展生态</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+          </article>
+
+          <article class="scorecard openclaw">
+            <h3>OpenClaw <small>personal gateway</small></h3>
+            <div class="bar"><span>代码工程</span><div class="track"><div class="fill" style="--score:3"></div></div><b>3</b></div>
+            <div class="bar"><span>个人自动化</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+            <div class="bar"><span>自托管自由度</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+            <div class="bar"><span>默认安全边界</span><div class="track"><div class="fill" style="--score:3"></div></div><b>3</b></div>
+            <div class="bar"><span>扩展生态</span><div class="track"><div class="fill" style="--score:4"></div></div><b>4</b></div>
+          </article>
+
+          <article class="scorecard claude">
+            <h3>Claude Code <small>Claude coding</small></h3>
+            <div class="bar"><span>代码工程</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+            <div class="bar"><span>个人自动化</span><div class="track"><div class="fill" style="--score:3"></div></div><b>3</b></div>
+            <div class="bar"><span>自托管自由度</span><div class="track"><div class="fill" style="--score:2"></div></div><b>2</b></div>
+            <div class="bar"><span>默认安全边界</span><div class="track"><div class="fill" style="--score:4"></div></div><b>4</b></div>
+            <div class="bar"><span>扩展生态</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+          </article>
+
+          <article class="scorecard codex">
+            <h3>Codex <small>OpenAI coding</small></h3>
+            <div class="bar"><span>代码工程</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+            <div class="bar"><span>个人自动化</span><div class="track"><div class="fill" style="--score:3"></div></div><b>3</b></div>
+            <div class="bar"><span>自托管自由度</span><div class="track"><div class="fill" style="--score:2"></div></div><b>2</b></div>
+            <div class="bar"><span>默认安全边界</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+            <div class="bar"><span>扩展生态</span><div class="track"><div class="fill" style="--score:5"></div></div><b>5</b></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="choose">
+        <div class="section-head">
+          <h2>怎么选</h2>
+          <p>不要按“谁最强”选，按默认架构是否贴合你的信任边界和入口选择。</p>
+        </div>
+
+        <div class="choice-grid">
+          <article class="choice">
+            <h3>主要写代码</h3>
+            <ul>
+              <li><b>优先：</b>Claude Code 或 Codex。</li>
+              <li><b>选 Claude Code：</b>你偏 Claude 模型、终端/IDE 体验、Agent SDK/Managed Agents。</li>
+              <li><b>选 Codex：</b>你偏 OpenAI 生态、沙箱审批、App/CLI/IDE/Web/cloud 协同。</li>
+            </ul>
+          </article>
+
+          <article class="choice">
+            <h3>主要做个人助手</h3>
+            <ul>
+              <li><b>优先：</b>OpenClaw。</li>
+              <li>它的中心不是代码仓库，而是长期在线 Gateway、聊天渠道、节点设备和真实事务。</li>
+              <li>如果还要研究/多模型/多工具，可以看 Hermes Agent。</li>
+            </ul>
+          </article>
+
+          <article class="choice">
+            <h3>想折腾平台</h3>
+            <ul>
+              <li><b>优先：</b>Hermes Agent。</li>
+              <li>它的工具、gateway、MCP、skills、batch、RL 方向更适合改造成自己的 agent lab。</li>
+              <li>代价是你要负责部署、安全、凭据和工具边界。</li>
+            </ul>
+          </article>
+
+          <article class="choice">
+            <h3>团队可控执行</h3>
+            <ul>
+              <li><b>优先：</b>Codex 或 Claude Code。</li>
+              <li>Codex 的 OS sandbox + approval policy 更明确；Claude Code 的 managed settings、permissions、hooks 和 SDK 也适合治理。</li>
+              <li>OpenClaw/Hermes 更像自托管平台，需要额外运维硬化。</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="section">
+          <div class="callout">
+            <b>一句话结论</b>
+            <p>
+              Claude Code 和 Codex 是“让模型在代码库里可控行动”的产品；OpenClaw 是“让模型通过消息和设备节点在你的生活/工作流里长期行动”的产品；Hermes Agent 是“让你自己搭一个多模型、多工具、多入口 agent 平台”的产品。实际选型时，先问入口在哪里、工具边界在哪里、谁来承担安全责任，再问模型能力。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="sources">
+        <div class="section-head">
+          <h2>来源</h2>
+          <p>以下为本页使用的主要公开来源。OpenAI Codex 官方手册链接在本机抓取时返回 403，因此 Codex 部分改用 developers.openai.com 上可访问的官方 Codex 页面。</p>
+        </div>
+
+        <div class="sources">
+          <div class="source-group">
+            <h3>Hermes Agent</h3>
+            <ol>
+              <li id="src-h1"><a href="https://hermes-agent.nousresearch.com/docs/developer-guide/architecture">Architecture | Hermes Agent</a></li>
+              <li id="src-h2"><a href="https://hermes-agent.nousresearch.com/docs">Hermes Agent Documentation</a></li>
+              <li id="src-h3"><a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/tools">Tools &amp; Toolsets | Hermes Agent</a></li>
+              <li id="src-h4"><a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp">MCP | Hermes Agent</a></li>
+            </ol>
+          </div>
+
+          <div class="source-group">
+            <h3>OpenClaw</h3>
+            <ol>
+              <li id="src-o1"><a href="https://docs.openclaw.ai/concepts/architecture">Gateway architecture | OpenClaw Docs</a></li>
+              <li id="src-o2"><a href="https://docs.openclaw.ai/agent-runtime-architecture">Agent runtime architecture | OpenClaw Docs</a></li>
+              <li id="src-o3"><a href="https://openclaw.ai">OpenClaw official site</a></li>
+              <li id="src-o4"><a href="https://docs.openclaw.ai/gateway/protocol">Gateway protocol | OpenClaw Docs</a></li>
+            </ol>
+          </div>
+
+          <div class="source-group">
+            <h3>Claude Code</h3>
+            <ol>
+              <li id="src-c1"><a href="https://docs.anthropic.com/en/docs/claude-code/overview">Overview | Claude Code Docs</a></li>
+              <li id="src-c2"><a href="https://docs.anthropic.com/en/docs/claude-code/sdk">Agent SDK overview | Claude Code Docs</a></li>
+              <li id="src-c3"><a href="https://docs.anthropic.com/en/docs/claude-code/mcp">Connect Claude Code to tools via MCP</a></li>
+              <li id="src-c4"><a href="https://docs.anthropic.com/en/docs/claude-code/sub-agents">Create custom subagents | Claude Code Docs</a></li>
+              <li id="src-c5"><a href="https://docs.anthropic.com/en/docs/claude-code/settings">Claude Code settings</a>、<a href="https://docs.anthropic.com/en/docs/claude-code/hooks">Hooks reference</a>、<a href="https://docs.anthropic.com/en/docs/claude-code/skills">Skills</a></li>
+            </ol>
+          </div>
+
+          <div class="source-group">
+            <h3>Codex</h3>
+            <ol>
+              <li id="src-d1"><a href="https://developers.openai.com/codex/learn/best-practices">Best practices | Codex</a></li>
+              <li id="src-d2"><a href="https://developers.openai.com/codex/concepts/sandboxing">Sandbox | Codex</a></li>
+              <li id="src-d3"><a href="https://developers.openai.com/codex/agent-approvals-security">Agent approvals &amp; security | Codex</a></li>
+              <li id="src-d4"><a href="https://developers.openai.com/codex/mcp">Model Context Protocol | Codex</a>、<a href="https://developers.openai.com/codex/guides/agents-sdk">Use Codex with the Agents SDK</a></li>
+              <li id="src-d5"><a href="https://developers.openai.com/codex/skills">Agent Skills | Codex</a>、<a href="https://developers.openai.com/codex/plugins">Plugins | Codex</a></li>
+              <li id="src-d6"><a href="https://developers.openai.com/codex/subagents">Subagents | Codex</a>、<a href="https://developers.openai.com/codex/concepts/subagents">Subagent concepts | Codex</a></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      本页为静态 HTML 可视化报告，内容基于 2026-06-03 的公开文档检索结果。若这些产品在之后改名、调整默认模型、调整沙箱策略或发布新 surface，请以对应官方文档为准。
+    </footer>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll("[data-mode]");
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const mode = button.getAttribute("data-mode");
+        document.body.setAttribute("data-mode", mode);
+        buttons.forEach((item) => item.classList.toggle("is-active", item === button));
+      });
+    });
+  </script>
+</body>
+</html>
