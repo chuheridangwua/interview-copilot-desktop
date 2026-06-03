@@ -198,15 +198,23 @@ button {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  flex: 1 1 auto;
   gap: 6px;
   min-width: 0;
 }
 
 .command-strip {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.command-strip > * {
+  flex-shrink: 0;
 }
 
 .settings-command {
@@ -402,6 +410,9 @@ button:disabled {
 
 .primary-command,
 .danger-command,
+.manual-marker-command,
+.manual-cancel-command,
+.undo-command,
 .icon-button,
 .icon-only {
   display: inline-flex;
@@ -421,6 +432,9 @@ button:disabled {
 
 .primary-command:hover,
 .danger-command:hover,
+.manual-marker-command:hover,
+.manual-cancel-command:hover,
+.undo-command:hover,
 .icon-button:hover,
 .icon-only:hover {
   transform: translateY(-1px);
@@ -433,10 +447,52 @@ button:disabled {
   font-weight: 720;
 }
 
+.session-command {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .danger-command {
   color: var(--red-strong);
   background: var(--red-soft);
   border-color: var(--red-border);
+}
+
+.manual-marker-command {
+  flex: 0 0 auto;
+  min-width: 116px;
+  color: var(--green-strong);
+  background: var(--green-soft);
+  border-color: var(--green-border);
+  font-weight: 760;
+}
+
+.manual-marker-command.active {
+  color: var(--amber-strong);
+  background: var(--amber-soft);
+  border-color: var(--amber-border);
+}
+
+.manual-marker-command.submitting svg {
+  animation: spin 950ms linear infinite;
+}
+
+.manual-cancel-command {
+  color: var(--muted);
+  background: var(--field-raised);
+  border-color: var(--line);
+}
+
+.undo-command {
+  flex: 0 0 auto;
+  height: 26px;
+  gap: 5px;
+  padding: 0 7px;
+  color: var(--amber-strong);
+  background: var(--amber-soft);
+  border-color: var(--amber-border);
+  box-shadow: none;
+  font-size: 11px;
 }
 
 .icon-button.active {
@@ -603,7 +659,7 @@ button:disabled {
 .panel-title-button {
   display: flex;
   align-items: center;
-  width: 100%;
+  flex: 1 1 auto;
   min-width: 0;
   padding: 0;
   color: inherit;
@@ -748,6 +804,11 @@ button:disabled {
   border-color: var(--blue);
 }
 
+.question-record.manual {
+  border-color: var(--green-border);
+  box-shadow: inset 3px 0 0 var(--green-strong);
+}
+
 .record-query {
   margin: 0;
 }
@@ -758,6 +819,21 @@ button:disabled {
   color: var(--subtle);
   font-size: 10.5px;
   line-height: 1;
+}
+
+.manual-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 16px;
+  margin-left: 6px;
+  padding: 0 5px;
+  color: var(--green-strong);
+  background: var(--green-soft);
+  border: 1px solid var(--green-border);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 760;
+  vertical-align: middle;
 }
 
 .record-query {

@@ -20,12 +20,14 @@ docs/DEVELOPMENT_LOG.md
 
 - 系统声音用于识别面试官问题；麦克风只作为模型口述稿的最近对话上下文，不生成题目、不参与 matcher。
 - 通用问题库内置到客户端；面试前可选 `resources/company/<公司名>` 下的公司资料和公司题库。
-- 系统 ASR final 会进入最近约 2 分钟问题上下文窗口，只抽取最新一个完整面试官问题；小模型后台确认问题、重排候选，并为每个 final 问题生成流式口述稿。
+- 手动标记是当前推荐主路径：运行中点击 `标记问题` 或按 `M` 开始，再次点击或按 `M` 结束；提交时会取开始前 10 秒到结束之间的系统 ASR 文本，重组问题、匹配题库并生成流式口述稿。
+- 自动抽题作为实时预览和未手动时的兜底；手动标记期间自动 final/update 不写入历史、不触发答案，结束后仍会按标记窗口屏蔽晚到的自动 final。
 - 面试会话流程：开始面试 -> 暂停面试 -> 继续面试 -> 结束面试。
 - 空格快捷键：未开始时开始、进行中暂停、暂停中继续。
+- `M` 快捷键：运行中开始/结束手动标记；输入框、select、textarea、contenteditable 聚焦时不触发。
 - API Key 不写入仓库和文档；当前 ASR Key 仍从环境变量读取。
 - 调试日志固定写入项目根目录 `logs/`，该目录已加入 `.gitignore`。
-- 每场面试都会自动归档到 Electron 用户数据目录的 `sessions/YYYY-MM-DD_HH-mm-ss_<session-id>/`，用于保存音频、转写、问题列表、题库答案和 AI 答案。
+- 每场面试都会自动归档到项目根目录的 `sessions/YYYY-MM-DD_HH-mm-ss_<session-id>/`，用于保存音频、转写、问题列表、题库答案和 AI 答案；该目录已加入 `.gitignore`。
 - `resources/jianli.md` 用作模型口述稿上下文，只保留经历、项目、技能和成果，不提交手机号、邮箱、QQ 等个人联系方式。
 - `resources/company/<公司名>/Introduction.md` 用作公司背景和岗位上下文，`question.md` 会在选择公司后追加进本场 matcher。
 
@@ -33,11 +35,12 @@ docs/DEVELOPMENT_LOG.md
 
 - Electron main process：窗口、IPC、豆包 ASR WebSocket、题库解析、匹配事件分发。
 - Electron preload：调用 `getDisplayMedia` 获取系统音频，并按设置里的麦克风输入调用 `getUserMedia` 获取麦克风音频；两路都转成 `16kHz / 16bit / mono / PCM`，按 200ms 分包发给 main process。
-- Electron main process：系统音频 ASR 结果进入最近约 2 分钟的问题抽取窗口和题库匹配；麦克风 ASR 结果只进入最近对话上下文，AI 口述稿生成时传入最近约 2000 字。
-- Electron main process：问题抽取只把最新一个完整问题发到左侧列表，方舟问题抽取/校准会收到最近几个已确认问题，避免同一长问题被拆成多条。
+- Electron main process：手动标记通过 `submit_manual_question_segment` IPC 提交系统 ASR 片段，后端只做段内问题整理，不把麦克风内容放进问题正文。
+- Electron main process：共享 `InterviewQuestionEngine` 提供自动抽题兜底，系统音频 ASR 结果进入最近约 180 秒的问题上下文窗口，麦克风 ASR 结果只进入最近对话上下文，AI 口述稿生成时传入最近约 2000 字。
+- Electron main process：自动问题抽取支持弱追问 pending/吸收、主题级合并、重复压缩和证据约束确认，避免长问题被拆成多条。
 - Electron main process：每场会话创建独立归档目录，结束面试时等待 PCM 写入收尾，生成系统/麦克风 WAV、合并 WAV、两路转写、合并转写、问题列表和问题答案快照。
 - React/Vite/TypeScript：桌面控制台 UI。
-- 火山方舟 Ark Chat API：后台短 JSON 任务用于问题确认和题库候选重排，流式任务用于生成模型口述稿。
+- 火山方舟 Ark Chat API：后台短 JSON 任务用于手动问题整理、自动问题确认、主题合并边界判断和题库候选重排，流式任务用于生成模型口述稿。当前文本任务默认使用 `doubao-seed-2-0-mini-260428`。
 - electron-builder：Windows `.exe` / `.msi` 打包。
 
 ## 关键文件
@@ -53,9 +56,13 @@ resources/icon.ico
 electron/main.cjs
 electron/preload.cjs
 electron/backend/doubaoAsr.cjs
+electron/backend/interviewQuestionEngine.cjs
 electron/backend/questionMatcher.cjs
 electron/backend/arkQuestionEnhancer.cjs
 scripts/electron-dev.cjs
+scripts/replay-interview-session.mjs
+scripts/replay-audio-session.mjs
+scripts/replay-interview-utils.mjs
 scripts/test-question-matcher.mjs
 scripts/test-asr-config.mjs
 scripts/test-ark-speed.cjs
@@ -130,6 +137,7 @@ npm run dev
 npm run test:matcher
 npm run test:ark-speed
 npm run build
+node scripts/replay-interview-session.mjs
 ```
 
 `npm run dev` 只是 Vite 前端，不是桌面端。浏览器里提示“未检测到 Electron 桌面端后端”是正常的。
@@ -149,6 +157,7 @@ npm run client
 ```bash
 npm run test:matcher
 npm run build
+node scripts\replay-interview-session.mjs
 npx electron-builder --dir --linux dir
 npm ci --dry-run --no-audit --no-fund
 ```
@@ -167,6 +176,8 @@ npm ci --dry-run --no-audit --no-fund
 - 开始/暂停/继续/结束面试流程是否符合真实面试节奏。
 - 面试前选择公司后，题库健康状态、候选来源徽标和模型口述稿是否正确结合公司资料。
 - 小模型后台确认/重排是否在真实音频下能稳定 1 秒级返回。
+- 手动标记是否能在真实会议中稳定捕获开始前 10 秒上下文，并在 1 秒左右进入问题列表/候选/AI 答案区域。
+- `取消` 和 `撤销手动` 是否能在真实会话中正确更新 UI 与 `question-list.*` / `question-answers.*` 快照。
 - `.exe` / `.msi` 安装包运行是否能读取环境变量。
 
 ## 使用流程
@@ -179,9 +190,11 @@ npm ci --dry-run --no-audit --no-fund
 6. Electron 会请求屏幕/系统音频捕获权限，选择屏幕并允许系统音频；随后会按设置选择的麦克风请求权限作为回答上下文。
 7. 顶部系统声音和麦克风音量不是 0%，说明对应音频已采到。
 8. 顶部状态胶囊会显示音频、ASR、题库、简历、AI 自检状态；选择公司后题库状态会显示通用题和公司题数量。
-9. 面试官说完一段问题后，系统会结合最近约 2 分钟面试官转写和前面几个已确认问题抽取最新完整问题；左侧问题列表新增记录，左下出候选题，中间出题库原文答案和 AI 口述稿。
-10. 右侧语音识别列同时显示系统实时/系统转写和麦克风实时/麦克风转写。
-11. 按空格可在运行和暂停之间切换；点击 `结束面试` 会停止采集并写入本场归档。运行或暂停时不能切换公司。
+9. 推荐在面试官开始问问题时点击 `标记问题` 或按 `M`，问题结束后再次点击或按 `M`。系统会补入开始前 10 秒系统 ASR，并立即整理问题、匹配候选、生成 AI 口述稿。
+10. 标记中可点 `取消`；最近一条手动问题可点 `撤销手动`。撤销会从当前 UI 和快照文件中移除，并追加审计事件。
+11. 未手动标记时，自动抽题仍会作为兜底结合最近面试官转写和候选人上下文抽取问题；手动标记期间自动 final 不进入历史。
+12. 右侧语音识别列同时显示系统实时/系统转写和麦克风实时/麦克风转写。
+13. 按空格可在运行和暂停之间切换；点击 `结束面试` 会停止采集并写入本场归档。运行或暂停时不能切换公司。
 
 ## 自动归档
 
@@ -191,7 +204,7 @@ npm ci --dry-run --no-audit --no-fund
 sessions/YYYY-MM-DD_HH-mm-ss_<session-id>/
 ```
 
-该目录位于 Electron 用户数据目录下，主要文件包括：
+该目录位于项目根目录 `sessions/` 下，主要文件包括：
 
 ```text
 session-metadata.json
@@ -213,9 +226,27 @@ question-list.txt
 question-list.json
 question-answers.md
 question-answers.json
+question-events.jsonl
 ```
 
-其中 `system-transcript.*` 是面试官系统声音识别文字，`microphone-transcript.*` 是本人麦克风文字，`combined-transcript.*` 按时间合并两路文字。`question-answers.md` 按问题保存匹配到的题库答案和 AI 口述稿。
+其中 `system-transcript.*` 是面试官系统声音识别文字，`microphone-transcript.*` 是本人麦克风文字，`combined-transcript.*` 按时间合并两路文字。`question-answers.md` 按问题保存匹配到的题库答案和 AI 口述稿。手动问题会记录 `source: "manual_marker"`、标记起止时间和手动片段；撤销手动问题会追加 `manual_question_undone` 事件。
+
+## 私有回放
+
+真实面试回放基准和报告放在已忽略的目录：
+
+```text
+sessions/replay/
+```
+
+常用命令：
+
+```powershell
+node scripts\replay-interview-session.mjs
+node scripts\replay-audio-session.mjs --speed 16
+```
+
+转写回放用于快速回归自动问题引擎；音频回放用于端到端验证 ASR + 问题引擎。不要提交 `sessions/replay/` 下的真实转写、音频或报告。
 
 ## 调试日志
 

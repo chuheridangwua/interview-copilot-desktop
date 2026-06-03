@@ -10,6 +10,10 @@ const {
   parseQuestionBank,
   rewriteTranscriptText,
 } = require("../electron/backend/questionMatcher.cjs");
+const {
+  InterviewQuestionEngine,
+  isNoiseText,
+} = require("../electron/backend/interviewQuestionEngine.cjs");
 
 const embeddedQuestionBankPath = new URL("../resources/question_bank_embedded.md", import.meta.url);
 const fixtureQuestionBankPath = new URL("./fixtures/interview-questions.sample.md", import.meta.url);
@@ -185,6 +189,227 @@ assert.equal(nonQuestion, null, "plain process chatter should not create a quest
 
 const badcaseHits = matcher.search("你们 badcase 怎么反馈和迭代").map((item) => item.id);
 assert.ok(badcaseHits.includes(9) || badcaseHits.includes(17), `badcase query should include #9 or #17, got ${badcaseHits.join(", ")}`);
+
+assert.equal(isNoiseText("能听到吗？"), true, "hearing check should be treated as noise");
+assert.equal(isNoiseText("我们开始啊，可以吗？"), true, "process chatter should be treated as noise");
+assert.equal(isNoiseText("后面有什么消息？"), true, "closing chatter should be treated as noise");
+
+const replayBaseTime = 1780398031000;
+
+const noiseEngine = new InterviewQuestionEngine();
+const noiseOutputs = await noiseEngine.processEvent({
+  type: "interviewer_final",
+  text: "能听到吗？",
+  receivedAt: replayBaseTime,
+});
+assert.equal(noiseOutputs[0]?.type, "question_rejected", "noise final should not create a question");
+assert.equal(noiseEngine.finalQuestions.length, 0, "noise should not enter final history");
+
+const partialEngine = new InterviewQuestionEngine();
+const partialOutputs = await partialEngine.processEvent({
+  type: "interviewer_partial",
+  text: "你们这个合同评审流程是怎么设计的",
+  receivedAt: replayBaseTime + 1000,
+});
+assert.equal(partialOutputs[0]?.type, "partial_preview", "partial should produce only a live preview");
+assert.equal(partialEngine.finalQuestions.length, 0, "partial preview should not enter final history");
+
+const confirmingEngine = new InterviewQuestionEngine({
+  confirmQuestion: async ({ localQuestion, sourceText }) => ({
+    questionText: sourceText.includes("两类客户")
+      ? "两类客户的需求差异是什么，分别想解决什么问题？"
+      : localQuestion,
+    confidence: 0.9,
+    reason: "测试确认",
+  }),
+});
+const firstCareer = await confirmingEngine.processEvent({
+  type: "interviewer_final",
+  text: "你未来三年的职业规划是什么？",
+  receivedAt: replayBaseTime + 2000,
+});
+const duplicateCareer = await confirmingEngine.processEvent({
+  type: "interviewer_final",
+  text: "你未来三年的职业规划是什么？",
+  receivedAt: replayBaseTime + 3000,
+});
+assert.equal(firstCareer[0]?.type, "question_finalized", "first career question should finalize");
+assert.equal(duplicateCareer[0]?.type, "question_updated", "duplicate career question should update the existing item");
+assert.equal(duplicateCareer[0]?.question.questionId, firstCareer[0]?.question.questionId);
+assert.equal(confirmingEngine.finalQuestions.length, 1, "duplicate career question should not append a second history item");
+
+const longContextEngine = new InterviewQuestionEngine({
+  confirmQuestion: async ({ sourceText }) => ({
+    questionText: sourceText.includes("两类客户")
+      ? "两类客户的需求差异是什么，分别想解决什么问题？"
+      : "候选问题是什么？",
+    sourceText,
+    confidence: 0.91,
+    reason: "测试长上下文合并",
+  }),
+});
+await longContextEngine.processEvent({
+  type: "interviewer_final",
+  text: "我们这边有两类客户，一类是品牌客户，一类是平台客户。",
+  receivedAt: replayBaseTime + 4000,
+});
+const longContextOutputs = await longContextEngine.processEvent({
+  type: "interviewer_final",
+  text: "你觉得他们的需求差异是什么？分别想解决什么问题？",
+  receivedAt: replayBaseTime + 5000,
+});
+assert.equal(longContextOutputs[0]?.type, "question_finalized", "long business context should finalize once the trigger arrives");
+assert.equal(
+  longContextOutputs[0]?.question.questionText,
+  "两类客户的需求差异是什么，分别想解决什么问题？",
+  "confirmed full question should win over the local fragment",
+);
+assert.ok(longContextOutputs[0]?.question.sourceText.includes("两类客户"), "source text should retain business context");
+
+const followupEngine = new InterviewQuestionEngine({
+  confirmQuestion: async ({ localQuestion, candidateContext }) => {
+    if (localQuestion.includes("主要原因") && candidateContext.includes("模型效果不好")) {
+      return {
+        questionText: "模型效果不好的主要原因有哪些？",
+        confidence: 0.88,
+        reason: "测试候选人上下文补全",
+      };
+    }
+    return null;
+  },
+});
+await followupEngine.processEvent({
+  type: "candidate_final",
+  text: "刚才我提到模型效果不好，可能和数据质量、标签一致性、样本覆盖有关。",
+  receivedAt: replayBaseTime + 6000,
+});
+const followupOutputs = await followupEngine.processEvent({
+  type: "interviewer_final",
+  text: "主要原因有哪些呢？",
+  receivedAt: replayBaseTime + 7000,
+});
+assert.equal(followupOutputs[0]?.type, "question_finalized", "confirmed short follow-up should finalize");
+assert.equal(followupOutputs[0]?.question.questionText, "识别类模型效果不好的主要原因有哪些？");
+assert.equal(followupOutputs[0]?.question.localQuestionText, "主要原因有哪些呢？");
+assert.equal(followupOutputs[0]?.question.confirmedQuestionText, "");
+
+const weakProductEngine = new InterviewQuestionEngine({
+  confirmQuestion: async ({ localQuestion }) => ({
+    questionText: localQuestion,
+    confidence: 0.9,
+    reason: "测试确认",
+  }),
+});
+const weakProductPending = await weakProductEngine.processEvent({
+  type: "interviewer_final",
+  text: "你对外设计的产品是不是？",
+  receivedAt: replayBaseTime + 8000,
+});
+assert.equal(weakProductPending[0]?.type, "question_rejected", "weak product follow-up should not finalize immediately");
+assert.equal(weakProductPending[0]?.reason, "pending_weak");
+const weakProductAbsorbed = await weakProductEngine.processEvent({
+  type: "interviewer_final",
+  text: "最终产品形态是什么，用户具体怎么用？",
+  receivedAt: replayBaseTime + 12000,
+});
+assert.equal(weakProductAbsorbed[0]?.type, "question_finalized", "later complete product usage question should finalize");
+assert.equal(weakProductAbsorbed.some((item) => item.type === "question_absorbed"), true, "weak product follow-up should be absorbed");
+assert.equal(weakProductEngine.finalQuestions.length, 1, "absorbed weak product follow-up should not create its own history item");
+assert.equal(
+  weakProductEngine.finalQuestions.some((item) => item.questionText.includes("你对外设计的产品是不是")),
+  false,
+  "weak product follow-up must not appear as final question",
+);
+
+const processAbsorbEngine = new InterviewQuestionEngine({
+  confirmQuestion: async ({ localQuestion }) => ({
+    questionText: localQuestion,
+    confidence: 0.9,
+    reason: "测试确认",
+  }),
+});
+await processAbsorbEngine.processEvent({
+  type: "interviewer_final",
+  text: "审完就出去了是吧？",
+  receivedAt: replayBaseTime + 13000,
+});
+const processAbsorbOutputs = await processAbsorbEngine.processEvent({
+  type: "interviewer_final",
+  text: "合同评审的完整流程具体是怎么设计的？",
+  receivedAt: replayBaseTime + 15000,
+});
+assert.equal(processAbsorbOutputs[0]?.type, "question_finalized", "process flow question should finalize");
+assert.equal(processAbsorbOutputs.some((item) => item.type === "question_absorbed"), true, "short process confirmation should be absorbed");
+assert.equal(processAbsorbEngine.finalQuestions.length, 1, "absorbed process weak question should not create a second final item");
+
+const hallucinationGuardEngine = new InterviewQuestionEngine({
+  confirmQuestion: async () => ({
+    questionText: "大模型如何判断合同信息是否正确？",
+    confidence: 0.94,
+    reason: "测试错误扩写",
+    evidenceTerms: ["大模型", "合同", "判断"],
+    questionType: "model_judgement",
+  }),
+});
+const hallucinationGuardOutputs = await hallucinationGuardEngine.processEvent({
+  type: "interviewer_final",
+  text: "开发那个平台是吗？",
+  receivedAt: replayBaseTime + 16000,
+});
+assert.equal(hallucinationGuardOutputs[0]?.type, "question_rejected", "short source hallucination should be rejected");
+assert.equal(hallucinationGuardOutputs[0]?.reason, "model_evidence_mismatch");
+assert.equal(hallucinationGuardEngine.finalQuestions.length, 0, "hallucinated Ark question should not enter final history");
+
+const recognitionMergeEngine = new InterviewQuestionEngine({
+  confirmQuestion: async ({ localQuestion }) => ({
+    questionText: localQuestion,
+    confidence: 0.9,
+    reason: "测试确认",
+  }),
+});
+const recognitionFirst = await recognitionMergeEngine.processEvent({
+  type: "interviewer_final",
+  text: "你刚才说识别不出来，具体指的是什么场景下识别不出来？",
+  receivedAt: replayBaseTime + 17000,
+});
+const recognitionSecond = await recognitionMergeEngine.processEvent({
+  type: "interviewer_final",
+  text: "这里说的识别不出来具体指什么？",
+  receivedAt: replayBaseTime + 17000 + 210000,
+});
+assert.equal(recognitionFirst[0]?.type, "question_finalized", "first recognition clarification should finalize");
+assert.equal(recognitionSecond[0]?.type, "question_updated", "repeated recognition clarification should merge/update");
+assert.equal(recognitionMergeEngine.finalQuestions.length, 1, "recognition clarification duplicate should keep one final question");
+
+const contractMergeEngine = new InterviewQuestionEngine({
+  confirmQuestion: async ({ localQuestion }) => ({
+    questionText: localQuestion,
+    confidence: 0.9,
+    reason: "测试确认",
+  }),
+});
+await contractMergeEngine.processEvent({
+  type: "interviewer_final",
+  text: "大模型怎么判断合同金额和合同方信息是否正确？",
+  receivedAt: replayBaseTime + 18000,
+});
+const contractMergeOutputs = await contractMergeEngine.processEvent({
+  type: "interviewer_final",
+  text: "这个模型是如何判断标书里的合同方信息、金额这些内容是否正确的？",
+  receivedAt: replayBaseTime + 18000 + 312000,
+});
+assert.equal(contractMergeOutputs[0]?.type, "question_updated", "contract model judgement should merge across the topic window");
+assert.equal(contractMergeEngine.finalQuestions.length, 1, "contract model judgement duplicate should keep one final question");
+assert.equal(contractMergeEngine.finalQuestions[0]?.mergedFrom?.length, 1, "merged question should keep source metadata");
+
+const labelFollowupEngine = new InterviewQuestionEngine();
+const labelFollowupOutputs = await labelFollowupEngine.processEvent({
+  type: "interviewer_final",
+  text: "只是说这个标签的效果是吧？",
+  receivedAt: replayBaseTime + 400000,
+});
+assert.equal(labelFollowupOutputs[0]?.type, "question_finalized", "label short follow-up should still complete locally");
+assert.equal(labelFollowupOutputs[0]?.question.questionText, "标签能力的效果应该从哪些维度评价？");
 
 console.log("Question parser, inference, and matcher tests passed.");
 console.table(matchCases.map(([query]) => {

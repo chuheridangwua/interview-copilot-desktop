@@ -58,6 +58,33 @@ export interface AsrTextEvent {
   receivedAt: number;
 }
 
+export interface ManualQuestionSegment {
+  text: string;
+  rewrittenText?: string;
+  receivedAt: number;
+}
+
+export interface ManualQuestionSegmentPayload {
+  sourceText: string;
+  segments: ManualQuestionSegment[];
+  startedAt: number;
+  endedAt: number;
+  companyId?: string;
+}
+
+export interface ManualQuestionSubmitResult {
+  matchId: string;
+  questionText: string;
+  sourceText: string;
+  receivedAt: number;
+}
+
+export interface ManualQuestionUndoResult {
+  ok: boolean;
+  removed: boolean;
+  matchId?: string;
+}
+
 export interface MatchCandidate {
   id: number;
   question: string;
@@ -86,6 +113,10 @@ export interface MatchCandidatesEvent {
   reason?: string;
   provisional?: boolean;
   enhanced?: boolean;
+  source?: string;
+  manualStartedAt?: number;
+  manualEndedAt?: number;
+  manualSegments?: ManualQuestionSegment[];
 }
 
 export interface ModelQuestionUpdateEvent {
@@ -96,6 +127,10 @@ export interface ModelQuestionUpdateEvent {
   reason?: string;
   candidates: MatchCandidate[];
   receivedAt: number;
+  source?: string;
+  manualStartedAt?: number;
+  manualEndedAt?: number;
+  manualSegments?: ManualQuestionSegment[];
 }
 
 export interface AiMatchUpdateEvent {
@@ -153,6 +188,9 @@ export interface DesktopBridge {
   stopSession: () => Promise<void>;
   pauseSession: () => Promise<void>;
   resumeSession: () => Promise<void>;
+  setManualQuestionMarking: (active: boolean) => Promise<{ active: boolean }>;
+  submitManualQuestionSegment: (payload: ManualQuestionSegmentPayload) => Promise<ManualQuestionSubmitResult>;
+  undoManualQuestion: (matchId: string) => Promise<ManualQuestionUndoResult>;
   searchQuestions: (query: string, companyId?: string) => Promise<MatchCandidate[]>;
   getHealthStatus: (companyId?: string) => Promise<HealthStatusEvent>;
   listen: <T>(event: string, handler: (payload: T) => void) => () => void;
@@ -188,6 +226,9 @@ export const api = {
   stopSession: () => bridge().stopSession(),
   pauseSession: () => bridge().pauseSession(),
   resumeSession: () => bridge().resumeSession(),
+  setManualQuestionMarking: (active: boolean) => bridge().setManualQuestionMarking(active),
+  submitManualQuestionSegment: (payload: ManualQuestionSegmentPayload) => bridge().submitManualQuestionSegment(payload),
+  undoManualQuestion: (matchId: string) => bridge().undoManualQuestion(matchId),
   searchQuestions: (query: string, companyId?: string) => bridge().searchQuestions(query, companyId),
   getHealthStatus: (companyId?: string) => bridge().getHealthStatus(companyId),
 };

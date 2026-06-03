@@ -2,7 +2,7 @@ const { execFileSync } = require("node:child_process");
 
 const DEFAULT_ARK_BASE_URL = "https://ark.cn-beijing.volces.com/api/v3";
 const DEFAULT_ARK_MODEL = "doubao-seed-2-0-mini-260428";
-const DEFAULT_ARK_FAST_MODEL = "doubao-1-5-lite-32k-250115";
+const DEFAULT_ARK_FAST_MODEL = DEFAULT_ARK_MODEL;
 const WINDOWS_ENV_REGISTRY_KEYS = [
   "HKCU\\Environment",
   "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
@@ -61,11 +61,12 @@ function resolveArkApiKey() {
 
 function resolveArkConfig() {
   const apiKey = resolveArkApiKey();
+  const model = String(getEnv("ARK_MODEL") || getEnv("DOUBAO_ARK_MODEL") || DEFAULT_ARK_MODEL).trim();
   return {
     apiKey,
     baseUrl: String(getEnv("ARK_BASE_URL") || DEFAULT_ARK_BASE_URL).replace(/\/+$/, ""),
-    model: String(getEnv("ARK_MODEL") || getEnv("DOUBAO_ARK_MODEL") || DEFAULT_ARK_MODEL).trim(),
-    fastModel: String(getEnv("ARK_FAST_MODEL") || getEnv("DOUBAO_ARK_FAST_MODEL") || "").trim(),
+    model,
+    fastModel: model,
     enabled: String(getEnv("ARK_QUESTION_ENHANCER") || "1") !== "0",
   };
 }
@@ -73,7 +74,7 @@ function resolveArkConfig() {
 function resolveArkFastModel(model) {
   if (model) return String(model).trim();
   const config = resolveArkConfig();
-  return config.fastModel || config.model || DEFAULT_ARK_FAST_MODEL;
+  return config.model || DEFAULT_ARK_FAST_MODEL;
 }
 
 function supportsThinkingControl(model) {
@@ -277,19 +278,23 @@ async function inferQuestionWithArk({ text, previousQuestions = [], signal, time
   };
 }
 
-async function confirmQuestionWithArk({ sourceText, localQuestion, previousQuestions = [], signal, timeoutMs = 2500, model }) {
+async function confirmQuestionWithArk({ sourceText, localQuestion, previousQuestions = [], candidateContext = "", signal, timeoutMs = 2500, model }) {
   const content = await callArkChat({
     signal,
     timeoutMs,
     model: resolveArkFastModel(model),
-    maxTokens: 120,
+    maxTokens: 180,
     messages: [
       {
         role: "system",
         content: [
-          "校准AI产品经理面试问题，输出最新一个完整面试官问题。",
-          "修正ASR截断/错字/误拼接；同一追问合并；如果只是重复前面已记录的问题、候选人回答或寒暄，返回否。",
-          "只输出JSON:{\"ok\":boolean,\"q\":\"\",\"c\":0-1,\"r\":\"\"}。",
+          "你是AI产品经理面试实时辅助系统的问题确认器，只做证据约束确认。",
+          "任务：根据local_question、asr_context和candidate_context，确认最新一个面试官问题是否成立，并修正成自包含问题。",
+          "约束：q必须能从输入中找到至少2个业务证据词；如果证据不足、寒暄、流程话、候选人回答或重复前题，ok=false。",
+          "短source限制：如果local_question/asr_context里最新问题少于12个汉字，只能补全上下文明确承接的主题，不得凭candidate_context生成新的业务问题。",
+          "禁止把“开发那个平台是吗”这类短确认句改写成合同信息/大模型判断等没有证据的新问题。",
+          "type只能从这些值选择：intro,company,role,demand_source,demand_discovery,process_flow,product_usage,model_judgement,hallucination,knowledge_base,career,customer_scenario,metric,root_cause,data_quality,tag_evaluation,unknown。",
+          "只输出JSON:{\"ok\":boolean,\"q\":\"\",\"c\":0-1,\"type\":\"\",\"evidence_terms\":[\"\"],\"merge_action\":\"new|merge|reject\",\"reject_reason\":\"\",\"r\":\"\"}。",
         ].join(""),
       },
       {
@@ -298,6 +303,7 @@ async function confirmQuestionWithArk({ sourceText, localQuestion, previousQuest
           local_question: String(localQuestion ?? "").slice(0, 180),
           previous_questions: previousQuestions.slice(-5),
           asr_context: String(sourceText ?? "").slice(-1800),
+          candidate_context: String(candidateContext ?? "").slice(-1600),
           target_role: "AI产品经理",
         }),
       },
@@ -308,11 +314,128 @@ async function confirmQuestionWithArk({ sourceText, localQuestion, previousQuest
   if (!parsed || (parsed.ok !== true && parsed.is_question !== true)) return null;
   const questionText = normalizeQuestion(parsed.q || parsed.question);
   if (!questionText || questionText.length < 4) return null;
+  const evidenceTerms = Array.isArray(parsed.evidence_terms)
+    ? parsed.evidence_terms
+    : Array.isArray(parsed.evidenceTerms)
+      ? parsed.evidenceTerms
+      : [];
   return {
     questionText,
     sourceText: String(sourceText ?? "").trim(),
     confidence: Math.max(0, Math.min(0.98, Number(parsed.c ?? parsed.confidence) || 0.78)),
     reason: parsed.r || parsed.reason ? `方舟确认：${String(parsed.r || parsed.reason).slice(0, 60)}` : "方舟确认",
+    questionType: String(parsed.type || parsed.question_type || "unknown").trim() || "unknown",
+    evidenceTerms: evidenceTerms.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 12),
+    mergeAction: String(parsed.merge_action || parsed.mergeAction || "new").trim(),
+    rejectReason: String(parsed.reject_reason || parsed.rejectReason || "").trim(),
+  };
+}
+
+async function confirmManualQuestionWithArk({ sourceText, signal, timeoutMs = 2800, model }) {
+  const text = String(sourceText ?? "").trim();
+  if (!text) return null;
+  const content = await callArkChat({
+    signal,
+    timeoutMs,
+    model: resolveArkFastModel(model),
+    maxTokens: 180,
+    messages: [
+      {
+        role: "system",
+        content: [
+          "你是AI产品经理面试实时辅助系统的问题整理器。",
+          "用户已经手动标记了一个面试官问题的开始和结束，你只能根据这段标记范围内的ASR文本整理问题。",
+          "任务：修正ASR错字、断句和口语重复，输出一个自包含的面试官问题。",
+          "禁止使用标记范围之外的上下文扩写；禁止编造文本里没有证据的业务对象、流程或指标。",
+          "如果这段文本没有明确问题、只是寒暄/流程话/候选人回答，返回ok=false。",
+          "type只能从这些值选择：intro,company,role,demand_source,demand_discovery,process_flow,product_usage,model_judgement,hallucination,knowledge_base,career,customer_scenario,metric,root_cause,data_quality,tag_evaluation,unknown。",
+          "只输出JSON:{\"ok\":boolean,\"q\":\"\",\"c\":0-1,\"type\":\"\",\"evidence_terms\":[\"\"],\"reject_reason\":\"\",\"r\":\"\"}。",
+        ].join(""),
+      },
+      {
+        role: "user",
+        content: JSON.stringify({
+          manual_marked_source: text.slice(-2200),
+          target_role: "AI产品经理",
+        }),
+      },
+    ],
+  });
+  if (!content) return null;
+  const parsed = extractJsonObject(content);
+  if (!parsed || parsed.ok !== true) return null;
+  const questionText = normalizeQuestion(parsed.q || parsed.question);
+  if (!questionText || questionText.length < 4) return null;
+  const evidenceTerms = Array.isArray(parsed.evidence_terms)
+    ? parsed.evidence_terms
+    : Array.isArray(parsed.evidenceTerms)
+      ? parsed.evidenceTerms
+      : [];
+  return {
+    questionText,
+    sourceText: text,
+    confidence: Math.max(0, Math.min(0.98, Number(parsed.c ?? parsed.confidence) || 0.82)),
+    reason: parsed.r || parsed.reason ? `手动标记方舟整理：${String(parsed.r || parsed.reason).slice(0, 60)}` : "手动标记方舟整理",
+    questionType: String(parsed.type || parsed.question_type || "unknown").trim() || "unknown",
+    evidenceTerms: evidenceTerms.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 12),
+    rejectReason: String(parsed.reject_reason || parsed.rejectReason || "").trim(),
+  };
+}
+
+async function decideQuestionMergeWithArk({
+  question,
+  existingQuestion,
+  sourceText = "",
+  existingSourceText = "",
+  candidateContext = "",
+  questionType = "",
+  domainAnchors = [],
+  existingQuestionType = "",
+  existingDomainAnchors = [],
+  signal,
+  timeoutMs = 1800,
+  model,
+}) {
+  if (!String(question ?? "").trim() || !String(existingQuestion ?? "").trim()) return null;
+  const content = await callArkChat({
+    signal,
+    timeoutMs,
+    model: resolveArkFastModel(model),
+    maxTokens: 90,
+    messages: [
+      {
+        role: "system",
+        content: [
+          "判断两个AI产品经理面试问题是否是同一个语义问题。",
+          "只有当二者询问目标相同、业务证据重叠，并且可以合并到同一历史问题时，same_question=true。",
+          "不要因为都属于同一大主题就合并；流程、指标、原因、产品使用等必须问法目标一致。",
+          "只输出JSON:{\"same_question\":boolean,\"c\":0-1,\"r\":\"\",\"canonical_q\":\"\"}。",
+        ].join(""),
+      },
+      {
+        role: "user",
+        content: JSON.stringify({
+          question: String(question ?? "").slice(0, 240),
+          existing_question: String(existingQuestion ?? "").slice(0, 240),
+          question_type: questionType,
+          existing_question_type: existingQuestionType,
+          domain_anchors: domainAnchors,
+          existing_domain_anchors: existingDomainAnchors,
+          source: String(sourceText ?? "").slice(-700),
+          existing_source: String(existingSourceText ?? "").slice(-700),
+          candidate_context: String(candidateContext ?? "").slice(-700),
+        }),
+      },
+    ],
+  });
+  if (!content) return null;
+  const parsed = extractJsonObject(content);
+  if (!parsed) return null;
+  return {
+    sameQuestion: parsed.same_question === true || parsed.sameQuestion === true,
+    confidence: Math.max(0, Math.min(0.98, Number(parsed.c ?? parsed.confidence) || 0)),
+    reason: String(parsed.r || parsed.reason || "").slice(0, 120),
+    canonicalQuestion: normalizeQuestion(parsed.canonical_q || parsed.canonicalQuestion || ""),
   };
 }
 
@@ -504,6 +627,8 @@ async function rerankCandidateIdsWithArk({ question, candidates, signal, timeout
 module.exports = {
   callArkChat,
   confirmQuestionWithArk,
+  confirmManualQuestionWithArk,
+  decideQuestionMergeWithArk,
   generateFallbackAnswerStreamWithArk,
   inferQuestionWithArk,
   rerankCandidateIdsWithArk,

@@ -277,6 +277,9 @@ const api = {
     capturePaused = false;
     return ipcRenderer.invoke("resume_session");
   },
+  setManualQuestionMarking: (active) => ipcRenderer.invoke("set_manual_question_marking", Boolean(active)),
+  submitManualQuestionSegment: (payload) => ipcRenderer.invoke("submit_manual_question_segment", payload),
+  undoManualQuestion: (matchId) => ipcRenderer.invoke("undo_manual_question", matchId),
   searchQuestions: (query, companyId) => ipcRenderer.invoke("search_questions", query, companyId),
   getHealthStatus: (companyId) => ipcRenderer.invoke("get_health_status", companyId),
   listen: (channel, handler) => {

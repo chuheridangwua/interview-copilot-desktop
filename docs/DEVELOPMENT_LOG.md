@@ -11,6 +11,102 @@
 - 如果改了启动方式、环境变量、端口、脚本或用户操作流程，必须同步更新 `README.md` 和 `docs/LOCAL_CODEX_HANDOFF.md`。
 - 如果发现线上或本机真实表现和本文档不一致，以本机实测为准，并立刻追加修正记录。
 
+## 2026-06-03 13:37 +08:00
+
+### 目标
+
+把问题生成主路径从“自动抽题”为主升级为“手动标记优先”：运行中点击 `标记问题` 或按 `M` 标记面试官问题区间，结束后立即用该区间系统 ASR 重组问题、匹配题库并生成 AI 口述稿；自动抽题只保留为预览和兜底。
+
+### 已完成
+
+- 新增共享问题引擎 `electron/backend/interviewQuestionEngine.cjs`，自动抽题支持：
+  - 约 180 秒面试官上下文。
+  - 约 2000 字候选人回答上下文。
+  - 弱追问 pending/吸收。
+  - 主题级合并和重复问题压缩。
+  - 方舟证据约束确认和边界 merge decision。
+- 统一方舟文本任务模型为 `doubao-seed-2-0-mini-260428`，用于问题确认、手动问题整理、候选重排、语义合并裁决和 AI 口述稿生成。
+- 新增手动标记前端状态：
+  - `idle` / `marking` / `submitting`。
+  - 顶部按钮 `标记问题`，运行中可用。
+  - `M` 快捷键开始/结束标记，输入框、select、textarea、contenteditable 聚焦时不触发。
+  - 标记中可 `取消`。
+  - 最近一条手动问题可 `撤销手动`。
+- 手动问题提交只使用系统 ASR，不使用麦克风转写做问题正文；麦克风仍只作为 AI 答案上下文。
+- 结束标记时收集 `[开始点击前 10 秒, 结束点击]` 的系统 ASR 文本，并允许当前系统 live partial 补尾句，避免刚点慢时漏掉题干开头。
+- 后端新增 IPC：
+  - `set_manual_question_marking`
+  - `submit_manual_question_segment`
+  - `undo_manual_question`
+- 手动问题不进入自动边界判断；后端只让方舟做段内问题纠错、自包含化和重组，随后复用同一套题库匹配、候选重排和 AI 口述稿生成链路。
+- 手动标记期间自动问题引擎的 `question_finalized` / `question_updated` 不进入历史、不触发答案；结束后按标记窗口屏蔽晚到的自动 final，避免与手动问题重复。
+- 归档字段新增：
+  - `source: "manual_marker"`
+  - `manualStartedAt`
+  - `manualEndedAt`
+  - `manualSegments`
+  - `questionType`
+  - `topicId`
+  - `mergedFrom`
+  - `absorbedFrom`
+  - `evidenceTerms`
+  - `mergeReason`
+- 撤销手动问题会从当前会话内存和 `question-list.*` / `question-answers.*` 快照移除该 `matchId`，并在 `question-events.jsonl` 追加 `manual_question_undone` 审计事件，不改写历史 jsonl。
+- 新增私有回放脚本：
+  - `scripts/replay-interview-session.mjs`
+  - `scripts/replay-audio-session.mjs`
+  - `scripts/replay-interview-utils.mjs`
+- 回放基准和报告放在已忽略的 `sessions/replay/`，不提交真实面试音频或转写。
+- README 和 `docs/LOCAL_CODEX_HANDOFF.md` 已同步手动标记操作、归档字段、回放脚本和项目根目录 `sessions/` 归档路径。
+
+### 验证结果
+
+已通过：
+
+```powershell
+node --check electron\backend\arkQuestionEnhancer.cjs
+node --check electron\main.cjs
+node --check electron\preload.cjs
+npm run test:matcher
+npm run build
+node scripts\replay-interview-session.mjs
+git diff --check
+curl.exe -fsS http://127.0.0.1:1421/
+```
+
+最近一次转写回放结果：
+
+```text
+ok: true
+mode: transcript
+arkModel: doubao-seed-2-0-mini-260428
+finalQuestionCount: 36
+target: 35-48
+requiredHits: 18/18
+forbiddenHitCount: 0
+archivedPartialCount: 0
+exactDuplicateCount: 0
+semanticDuplicateCount: 0
+absorbedQuestionCount: 7
+mergedQuestionCount: 5
+```
+
+`git diff --check` 仅提示 Windows 工作区 LF/CRLF 转换，没有 whitespace 错误。
+
+### 已知问题
+
+- 手动标记 IPC 需要在 Windows Electron 客户端中继续手工验收；Vite 页面只能验证前端渲染和布局，不能真实调用桌面桥接。
+- 当前撤销保证当前会话内存和快照文件正确；jsonl 历史只追加审计事件，不做物理删除。
+- 音频端到端回放会受 ASR 波动影响，建议作为发布前验收，不作为每次快速调试首选。
+
+### 下一步
+
+- Windows 本机真实会议中验证：
+  - `M` 开始/结束标记。
+  - 前 10 秒系统 ASR 是否能补齐题干开头。
+  - 取消和撤销是否符合预期。
+  - 手动问题是否 1 秒左右进入问题列表、候选和 AI 答案区域。
+
 ## 2026-06-02 17:47 +08:00
 
 ### 目标

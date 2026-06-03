@@ -4,7 +4,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const {
   callArkChat,
+  confirmManualQuestionWithArk,
   confirmQuestionWithArk,
+  decideQuestionMergeWithArk,
   generateFallbackAnswerStreamWithArk,
   inferQuestionWithArk,
   readWindowsEnv,
@@ -12,6 +14,7 @@ const {
   resolveArkConfig,
 } = require("./backend/arkQuestionEnhancer.cjs");
 const { DoubaoAsrSession } = require("./backend/doubaoAsr.cjs");
+const { InterviewQuestionEngine } = require("./backend/interviewQuestionEngine.cjs");
 const {
   Matcher,
   inferQuestionsFromSegments,
@@ -27,6 +30,7 @@ const QUESTION_CONTEXT_WINDOW_MS = 2 * 60 * 1000;
 const QUESTION_CONTEXT_MAX_SEGMENTS = 80;
 const QUESTION_CONTEXT_MAX_CHARS = 2400;
 const PARTIAL_QUESTION_MIN_CONFIDENCE = 0.72;
+const MANUAL_QUESTION_SUPPRESSION_TAIL_MS = 1200;
 const isDev = Boolean(process.env.ELECTRON_DEV || process.env.ELECTRON_RENDERER_URL);
 
 let mainWindow = null;
@@ -34,7 +38,12 @@ let baseQuestionBank = [];
 const matcherBundleCache = new Map();
 let resumeText = "";
 let currentSession = null;
+let questionEngine = null;
 let sessionPaused = false;
+let manualQuestionMarking = false;
+let manualQuestionMarkingStartedAt = 0;
+let manualQuestionSuppressionWindows = [];
+let removedQuestionMatchIds = new Set();
 let recentTranscriptSegments = [];
 let recentPartialSegments = [];
 let pendingQuestionSegments = [];
@@ -97,6 +106,10 @@ function projectLogDir() {
   return path.join(process.cwd(), "logs");
 }
 
+function projectSessionsDir() {
+  return path.join(process.cwd(), "sessions");
+}
+
 function appendProjectJsonl(filename, payload) {
   try {
     const dir = projectLogDir();
@@ -149,6 +162,57 @@ function emitLog(payload) {
 function snippet(value, maxLength = 88) {
   const text = String(value ?? "").replace(/\s+/g, " ").trim();
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+}
+
+function shortHash(value, length = 8) {
+  return crypto.createHash("sha1").update(String(value ?? "")).digest("hex").slice(0, length);
+}
+
+function addManualQuestionSuppressionWindow(startedAt, endedAt, reason = "") {
+  const start = Number(startedAt || 0);
+  const end = Number(endedAt || nowMs());
+  if (!Number.isFinite(start) || !Number.isFinite(end) || start <= 0) return;
+  const window = {
+    startedAt: Math.min(start, end),
+    endedAt: Math.max(start, end) + MANUAL_QUESTION_SUPPRESSION_TAIL_MS,
+    reason,
+  };
+  const current = nowMs();
+  manualQuestionSuppressionWindows = [...manualQuestionSuppressionWindows, window]
+    .filter((item) => current - Number(item.endedAt || current) <= 5 * 60 * 1000)
+    .slice(-20);
+}
+
+function setManualQuestionMarkingState(active) {
+  const shouldActivate = Boolean(active) && Boolean(currentSession) && !sessionPaused;
+  if (shouldActivate) {
+    manualQuestionMarking = true;
+    manualQuestionMarkingStartedAt = nowMs();
+    return true;
+  }
+  if (manualQuestionMarkingStartedAt) {
+    addManualQuestionSuppressionWindow(manualQuestionMarkingStartedAt, nowMs(), "manual_marker_stopped");
+  }
+  manualQuestionMarking = false;
+  manualQuestionMarkingStartedAt = 0;
+  return false;
+}
+
+function resetManualQuestionMarkingState() {
+  manualQuestionMarking = false;
+  manualQuestionMarkingStartedAt = 0;
+  manualQuestionSuppressionWindows = [];
+}
+
+function isWithinManualQuestionSuppressionWindow(receivedAt) {
+  const time = Number(receivedAt || 0);
+  const current = nowMs();
+  manualQuestionSuppressionWindows = manualQuestionSuppressionWindows
+    .filter((item) => current - Number(item.endedAt || current) <= 5 * 60 * 1000);
+  if (!Number.isFinite(time) || time <= 0) return false;
+  return manualQuestionSuppressionWindows.some((item) => (
+    time >= Number(item.startedAt || 0) && time <= Number(item.endedAt || 0)
+  ));
 }
 
 function emitDebugLog(type, payload = {}) {
@@ -312,6 +376,30 @@ function activeMatcherBundle() {
   return currentSession?.matcherBundle || getMatcherBundle("");
 }
 
+function createQuestionEngine() {
+  return new InterviewQuestionEngine({
+    confirmQuestion: ({ sourceText, localQuestion, previousQuestions, candidateContext }) => confirmQuestionWithArk({
+      sourceText,
+      localQuestion,
+      previousQuestions,
+      candidateContext,
+      timeoutMs: 2800,
+    }),
+    mergeDecider: ({ question, existingQuestion, sourceText, existingSourceText, candidateContext, questionType, domainAnchors, existingQuestionType, existingDomainAnchors }) => decideQuestionMergeWithArk({
+      question,
+      existingQuestion,
+      sourceText,
+      existingSourceText,
+      candidateContext,
+      questionType,
+      domainAnchors,
+      existingQuestionType,
+      existingDomainAnchors,
+      timeoutMs: 1800,
+    }),
+  });
+}
+
 function loadResumeText() {
   if (resumeText) return resumeText;
   const resumePath = resolveResourceFile("jianli.md");
@@ -345,7 +433,7 @@ function resolveApiKey() {
 
 function createSessionDir(sessionId, startedAt = new Date()) {
   const dirName = `${formatLocalDateTimeForFilename(startedAt)}_${safeFilenamePart(sessionId, "session")}`;
-  const dir = path.join(app.getPath("userData"), "sessions", dirName);
+  const dir = path.join(projectSessionsDir(), dirName);
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -470,12 +558,19 @@ function questionMarkdownBlock(question, index) {
   const candidates = question.candidates || [];
   const topCandidate = candidates[0] || null;
   const aiAnswer = String(question.aiAnswer || "").trim();
+  const displayQuestionText = question.confirmedQuestionText || question.questionText || question.localQuestionText || "未命名问题";
   return [
-    `## ${index + 1}. ${question.questionText || question.localQuestionText || "未命名问题"}`,
+    `## ${index + 1}. ${displayQuestionText}`,
     "",
     `- matchId: ${question.matchId}`,
     `- 时间: ${formatLocalDateTimeForText(question.receivedAt || question.updatedAt)}`,
     `- 状态: ${question.provisional ? "临时" : "稳定"}${question.enhanced ? " · 方舟增强" : ""}`,
+    question.source === "manual_marker" ? `- 来源: 手动标记` : "",
+    question.manualStartedAt && question.manualEndedAt ? `- 标记区间: ${formatLocalDateTimeForText(question.manualStartedAt)} - ${formatLocalDateTimeForText(question.manualEndedAt)}` : "",
+    question.questionType ? `- 类型: ${question.questionType}${question.topicId ? ` · ${question.topicId}` : ""}` : "",
+    question.localQuestionText && question.localQuestionText !== displayQuestionText ? `- 本地问题: ${question.localQuestionText}` : "",
+    question.mergedFrom?.length ? `- 合并来源: ${question.mergedFrom.length} 条` : "",
+    question.absorbedFrom?.length ? `- 吸收追问: ${question.absorbedFrom.length} 条` : "",
     question.reason ? `- 推断原因: ${question.reason}` : "",
     question.sourceText ? `- ASR 原文: ${question.sourceText}` : "",
     "",
@@ -510,17 +605,30 @@ function writeQuestionSnapshots(session) {
   writeSessionJsonFile(session, "question-list.json", questions.map((question, index) => ({
     index: index + 1,
     matchId: question.matchId,
-    questionText: question.questionText,
+    questionText: question.confirmedQuestionText || question.questionText,
+    localQuestionText: question.localQuestionText,
+    confirmedQuestionText: question.confirmedQuestionText,
     sourceText: question.sourceText,
     confidence: question.confidence,
     reason: question.reason,
+    questionType: question.questionType,
+    topicId: question.topicId,
+    domainAnchors: question.domainAnchors || [],
+    mergedFrom: question.mergedFrom || [],
+    absorbedFrom: question.absorbedFrom || [],
+    evidenceTerms: question.evidenceTerms || [],
+    mergeReason: question.mergeReason || "",
+    source: question.source || "",
+    manualStartedAt: question.manualStartedAt,
+    manualEndedAt: question.manualEndedAt,
+    manualSegments: question.manualSegments || [],
     provisional: question.provisional,
     enhanced: question.enhanced,
     receivedAt: question.receivedAt,
     receivedAtLocal: formatLocalDateTimeForText(question.receivedAt || question.updatedAt),
   })));
   writeSessionTextFile(session, "question-list.txt", questions.map((question, index) => (
-    `${index + 1}. [${formatLocalDateTimeForText(question.receivedAt || question.updatedAt)}] ${question.questionText}`
+    `${index + 1}. [${formatLocalDateTimeForText(question.receivedAt || question.updatedAt)}] ${question.confirmedQuestionText || question.questionText}`
   )).join("\n") + (questions.length ? "\n" : ""));
   writeSessionJsonFile(session, "question-answers.json", questions);
   writeSessionTextFile(session, "question-answers.md", [
@@ -537,6 +645,7 @@ function writeQuestionSnapshots(session) {
 function upsertArchivedQuestion(matchId, updater) {
   const session = currentSession;
   if (!session?.archive || !matchId) return;
+  if (removedQuestionMatchIds.has(matchId)) return;
   const existing = session.archive.questionsByMatchId.get(matchId) || {
     matchId,
     receivedAt: nowMs(),
@@ -557,13 +666,26 @@ function archiveMatchEvent(event) {
   const matchId = event?.matchId;
   if (!matchId) return;
   const candidates = (event.candidates || []).map(compactArchivedCandidate).filter(Boolean);
+  const displayQuestionText = event.confirmedQuestionText || event.query;
   upsertArchivedQuestion(matchId, () => ({
     matchId,
-    questionText: event.query,
-    localQuestionText: event.query,
+    questionText: displayQuestionText,
+    localQuestionText: event.localQuestionText || event.query,
+    confirmedQuestionText: event.confirmedQuestionText || (event.definite && event.enhanced ? displayQuestionText : ""),
     sourceText: event.sourceText || event.query,
     confidence: event.confidence,
     reason: event.reason,
+    questionType: event.questionType,
+    topicId: event.topicId,
+    domainAnchors: event.domainAnchors || [],
+    mergedFrom: event.mergedFrom || [],
+    absorbedFrom: event.absorbedFrom || [],
+    evidenceTerms: event.evidenceTerms || [],
+    mergeReason: event.mergeReason || "",
+    source: event.source || "",
+    manualStartedAt: event.manualStartedAt,
+    manualEndedAt: event.manualEndedAt,
+    manualSegments: event.manualSegments || [],
     provisional: Boolean(event.provisional),
     enhanced: Boolean(event.enhanced),
     receivedAt: event.receivedAt || nowMs(),
@@ -576,10 +698,22 @@ function archiveModelQuestionUpdate(payload) {
   const candidates = (payload.candidates || []).map(compactArchivedCandidate).filter(Boolean);
   upsertArchivedQuestion(payload.matchId, (existing) => ({
     questionText: payload.questionText || existing.questionText,
+    localQuestionText: existing.localQuestionText || existing.questionText,
     confirmedQuestionText: payload.questionText,
     sourceText: payload.sourceText || existing.sourceText,
     confidence: payload.confidence ?? existing.confidence,
     reason: payload.reason || existing.reason,
+    questionType: payload.questionType || existing.questionType,
+    topicId: payload.topicId || existing.topicId,
+    domainAnchors: payload.domainAnchors || existing.domainAnchors || [],
+    mergedFrom: payload.mergedFrom || existing.mergedFrom || [],
+    absorbedFrom: payload.absorbedFrom || existing.absorbedFrom || [],
+    evidenceTerms: payload.evidenceTerms || existing.evidenceTerms || [],
+    mergeReason: payload.mergeReason || existing.mergeReason || "",
+    source: payload.source || existing.source || "",
+    manualStartedAt: payload.manualStartedAt || existing.manualStartedAt,
+    manualEndedAt: payload.manualEndedAt || existing.manualEndedAt,
+    manualSegments: payload.manualSegments || existing.manualSegments || [],
     enhanced: true,
     candidates: candidates.length ? candidates : existing.candidates,
     receivedAt: existing.receivedAt || payload.receivedAt || nowMs(),
@@ -589,7 +723,7 @@ function archiveModelQuestionUpdate(payload) {
 function archiveAiMatchUpdate(payload) {
   const candidates = (payload.candidates || []).map(compactArchivedCandidate).filter(Boolean);
   upsertArchivedQuestion(payload.matchId, (existing) => ({
-    questionText: payload.questionText || existing.questionText,
+    questionText: existing.confirmedQuestionText || existing.questionText || payload.questionText,
     aiRerankedCandidates: candidates,
     candidates: candidates.length ? candidates : existing.candidates,
     receivedAt: existing.receivedAt || payload.receivedAt || nowMs(),
@@ -598,7 +732,7 @@ function archiveAiMatchUpdate(payload) {
 
 function archiveModelAnswerUpdate(payload) {
   upsertArchivedQuestion(payload.matchId, (existing) => ({
-    questionText: payload.questionText || existing.questionText,
+    questionText: existing.confirmedQuestionText || existing.questionText || payload.questionText,
     aiAnswerStatus: payload.status,
     aiAnswer: typeof payload.answer === "string" ? payload.answer : existing.aiAnswer,
     aiAnswerError: payload.status === "error" ? payload.message : existing.aiAnswerError,
@@ -1068,6 +1202,7 @@ function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transc
       sourceText,
       localQuestion: originalQuestion,
       previousQuestions: recentStableQuestionTexts(5),
+      candidateContext: inferred.candidateContext || buildConversationContextText(2000),
       timeoutMs: 2800,
     });
 
@@ -1132,6 +1267,10 @@ function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transc
         sourceText: confirmed.sourceText || sourceText,
         confidence: confirmed.confidence,
         reason: confirmed.reason,
+        source: inferred.source || event.source || "",
+        manualStartedAt: inferred.manualStartedAt,
+        manualEndedAt: inferred.manualEndedAt,
+        manualSegments: inferred.manualSegments || [],
         candidates: confirmedCandidates,
         receivedAt: nowMs(),
       });
@@ -1184,21 +1323,78 @@ function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transc
     });
 }
 
-function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enhanced = false }) {
+function emitPreviewForQuestion({ inferred, receivedAt, transcript }) {
   const activeMatcher = activeMatcherBundle().matcher;
   const event = activeMatcher.searchWithEvent(inferred.questionText, 10);
-  const matchId = createMatchId(receivedAt, definite, enhanced);
-  const rerankPool = activeMatcher.search(inferred.questionText, 10);
+  const matchId = inferred.questionId || "question-live";
   event.matchId = matchId;
+  event.definite = false;
+  event.receivedAt = receivedAt;
+  event.sourceText = inferred.sourceText;
+  event.localQuestionText = inferred.localQuestionText || inferred.questionText;
+  event.confirmedQuestionText = inferred.confirmedQuestionText || "";
+  event.confidence = inferred.confidence;
+  event.reason = inferred.reason;
+  event.questionType = inferred.questionType;
+  event.topicId = inferred.topicId;
+  event.domainAnchors = inferred.domainAnchors || [];
+  event.mergedFrom = inferred.mergedFrom || [];
+  event.absorbedFrom = inferred.absorbedFrom || [];
+  event.evidenceTerms = inferred.evidenceTerms || [];
+  event.mergeReason = inferred.mergeReason || "";
+  event.source = inferred.source || "";
+  event.manualStartedAt = inferred.manualStartedAt;
+  event.manualEndedAt = inferred.manualEndedAt;
+  event.manualSegments = inferred.manualSegments || [];
+  event.provisional = true;
+  event.enhanced = false;
+  emit("match_candidates", event);
+  emitDebugLog("question_emit", {
+    definite: false,
+    enhanced: false,
+    question: snippet(inferred.questionText, 120),
+    source: snippet(inferred.sourceText, 160),
+    confidence: inferred.confidence,
+    reason: inferred.reason,
+    top: event.candidates[0] ? `#${event.candidates[0].id} ${snippet(event.candidates[0].question, 80)} (${event.candidates[0].score}%)` : "none",
+  });
+  emitLog({
+    message: "流式中间结果已生成临时问题预览",
+    asrLatencyMs: transcript.asrLatencyMs,
+    matchLatencyMs: event.latencyMs,
+  });
+}
+
+function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enhanced = false, matchId, skipQuestionConfirm = false }) {
+  const activeMatcher = activeMatcherBundle().matcher;
+  const event = activeMatcher.searchWithEvent(inferred.questionText, 10);
+  const resolvedMatchId = matchId || inferred.questionId || createMatchId(receivedAt, definite, enhanced);
+  const rerankPool = activeMatcher.search(inferred.questionText, 10);
+  event.matchId = resolvedMatchId;
   event.definite = definite;
   event.receivedAt = receivedAt;
   event.sourceText = inferred.sourceText;
+  event.localQuestionText = inferred.localQuestionText || inferred.questionText;
+  event.confirmedQuestionText = inferred.confirmedQuestionText || (enhanced ? inferred.questionText : "");
   event.confidence = inferred.confidence;
   event.reason = inferred.reason;
+  event.questionType = inferred.questionType;
+  event.topicId = inferred.topicId;
+  event.domainAnchors = inferred.domainAnchors || [];
+  event.mergedFrom = inferred.mergedFrom || [];
+  event.absorbedFrom = inferred.absorbedFrom || [];
+  event.evidenceTerms = inferred.evidenceTerms || [];
+  event.mergeReason = inferred.mergeReason || "";
+  event.source = inferred.source || "";
+  event.manualStartedAt = inferred.manualStartedAt;
+  event.manualEndedAt = inferred.manualEndedAt;
+  event.manualSegments = inferred.manualSegments || [];
   event.provisional = !definite;
   event.enhanced = enhanced;
-  appendJsonl("matches.jsonl", event);
-  archiveMatchEvent(event);
+  if (definite) {
+    appendJsonl("matches.jsonl", event);
+    archiveMatchEvent(event);
+  }
   if (definite) rememberStableQuestion(inferred.questionText, receivedAt);
   emit("match_candidates", event);
   emitDebugLog("question_emit", {
@@ -1211,21 +1407,13 @@ function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enha
     top: event.candidates[0] ? `#${event.candidates[0].id} ${snippet(event.candidates[0].question, 80)} (${event.candidates[0].score}%)` : "none",
   });
   scheduleModelMatchReview({
-    matchId,
+    matchId: resolvedMatchId,
     inferred,
     event,
     rerankPool,
     transcript,
-    skipQuestionConfirm: enhanced,
+    skipQuestionConfirm,
   });
-  if (definite) {
-    maybeGenerateFallbackAnswer({
-      matchId,
-      questionText: inferred.questionText,
-      candidates: event.candidates,
-      reason: event.candidates.length ? "local_answer_guided" : "local_no_match",
-    });
-  }
   emitLog({
     message: enhanced
       ? "方舟小模型已增强问题推断并触发匹配"
@@ -1235,6 +1423,199 @@ function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enha
     asrLatencyMs: transcript.asrLatencyMs,
     matchLatencyMs: event.latencyMs,
   });
+}
+
+function normalizeQuestionTextForManual(text) {
+  const value = String(text ?? "").replace(/\s+/g, "").trim();
+  if (!value) return "";
+  return /[？?]$/.test(value) ? value : `${value}？`;
+}
+
+function normalizeManualSegments(segments = []) {
+  const seen = new Set();
+  return (Array.isArray(segments) ? segments : [])
+    .map((item) => {
+      const text = String(item?.rewrittenText || item?.text || "").trim();
+      const receivedAt = Number(item?.receivedAt || 0);
+      if (!text || !Number.isFinite(receivedAt)) return null;
+      const key = `${receivedAt}:${compactQuestionKey(text)}`;
+      if (seen.has(key)) return null;
+      seen.add(key);
+      return {
+        text: String(item?.text || text).trim(),
+        rewrittenText: text,
+        receivedAt,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => Number(a.receivedAt || 0) - Number(b.receivedAt || 0));
+}
+
+function buildManualQuestionSource(payload = {}) {
+  const segments = normalizeManualSegments(payload.segments);
+  const explicitSourceText = String(payload.sourceText || "").trim();
+  const segmentText = segments
+    .map((item) => item.rewrittenText || item.text)
+    .filter(Boolean)
+    .join("。")
+    .replace(/。+/g, "。")
+    .trim();
+  const sourceText = (explicitSourceText || segmentText).replace(/\s+/g, " ").trim();
+  return { sourceText, segments };
+}
+
+function inferManualQuestionLocally(sourceText, segments) {
+  const inferenceSegments = segments.length
+    ? segments.map((item) => ({
+      text: item.text,
+      rewrittenText: item.rewrittenText || item.text,
+      receivedAt: item.receivedAt,
+    }))
+    : [{ text: sourceText, rewrittenText: sourceText, receivedAt: nowMs() }];
+  const inferredList = inferQuestionsFromSegments(inferenceSegments, {
+    maxSegments: 80,
+    maxChars: QUESTION_CONTEXT_MAX_CHARS,
+  }) || [];
+  const latest = inferredList.at(-1);
+  if (latest?.questionText) {
+    return {
+      questionText: normalizeQuestionTextForManual(latest.questionText),
+      confidence: latest.confidence ?? 0.78,
+      reason: latest.reason || "手动标记本地推断",
+    };
+  }
+  if (hasQuestionIntent({ text: sourceText, rewrittenText: sourceText })) {
+    return {
+      questionText: normalizeQuestionTextForManual(sourceText.slice(-220)),
+      confidence: 0.72,
+      reason: "手动标记原文兜底",
+    };
+  }
+  return null;
+}
+
+async function resolveManualQuestion(payload = {}) {
+  const { sourceText, segments } = buildManualQuestionSource(payload);
+  const compactSource = compactQuestionKey(sourceText);
+  if (compactSource.length < 4) {
+    throw new Error("标记区间内没有可用面试官转写");
+  }
+  const local = inferManualQuestionLocally(sourceText, segments);
+  let confirmed = null;
+  try {
+    confirmed = await confirmManualQuestionWithArk({
+      sourceText,
+      timeoutMs: 2800,
+    });
+  } catch (error) {
+    emitDebugLog("manual_question_confirm_error", {
+      source: snippet(sourceText, 160),
+      message: error.message,
+    });
+  }
+  const resolvedQuestion = confirmed?.questionText
+    ? {
+      questionText: normalizeQuestionTextForManual(confirmed.questionText),
+      localQuestionText: local?.questionText || normalizeQuestionTextForManual(confirmed.questionText),
+      confirmedQuestionText: normalizeQuestionTextForManual(confirmed.questionText),
+      confidence: confirmed.confidence ?? local?.confidence ?? 0.82,
+      reason: confirmed.reason || "手动标记方舟整理",
+      confirmed: true,
+      questionType: confirmed.questionType,
+      evidenceTerms: confirmed.evidenceTerms || [],
+    }
+    : local
+      ? {
+        questionText: normalizeQuestionTextForManual(local.questionText),
+        localQuestionText: normalizeQuestionTextForManual(local.questionText),
+        confirmedQuestionText: "",
+        confidence: local.confidence ?? 0.72,
+        reason: local.reason || "手动标记本地推断",
+        confirmed: false,
+        questionType: "",
+        evidenceTerms: [],
+      }
+      : null;
+  if (!resolvedQuestion?.questionText || compactQuestionKey(resolvedQuestion.questionText).length < 4) {
+    throw new Error("标记区间内没有可用面试官转写");
+  }
+  return {
+    ...resolvedQuestion,
+    sourceText,
+    segments,
+  };
+}
+
+async function submitManualQuestionSegment(payload = {}) {
+  if (!currentSession) throw new Error("当前没有正在进行的面试会话");
+  if (sessionPaused) throw new Error("面试暂停中，不能提交手动问题");
+  const startedAt = Number(payload.startedAt || nowMs());
+  const endedAt = Number(payload.endedAt || nowMs());
+  const receivedAt = Number.isFinite(endedAt) ? endedAt : nowMs();
+  addManualQuestionSuppressionWindow(startedAt || manualQuestionMarkingStartedAt, receivedAt, "manual_question_submit");
+  manualQuestionMarking = false;
+  manualQuestionMarkingStartedAt = 0;
+  const resolved = await resolveManualQuestion(payload);
+  const matchId = `manual-${receivedAt}-${shortHash(`${resolved.questionText}\n${resolved.sourceText}`)}`;
+  removedQuestionMatchIds.delete(matchId);
+  const inferred = {
+    questionId: matchId,
+    questionText: resolved.questionText,
+    localQuestionText: resolved.localQuestionText || resolved.questionText,
+    confirmedQuestionText: resolved.confirmedQuestionText || "",
+    sourceText: resolved.sourceText,
+    confidence: resolved.confidence,
+    reason: resolved.reason,
+    questionType: resolved.questionType,
+    evidenceTerms: resolved.evidenceTerms || [],
+    source: "manual_marker",
+    manualStartedAt: startedAt,
+    manualEndedAt: receivedAt,
+    manualSegments: resolved.segments,
+  };
+  emitDebugLog("manual_question_submit", {
+    matchId,
+    question: snippet(resolved.questionText, 140),
+    source: snippet(resolved.sourceText, 180),
+    segmentCount: resolved.segments.length,
+  });
+  emitMatchForQuestion({
+    inferred,
+    receivedAt,
+    transcript: { asrLatencyMs: 0 },
+    definite: true,
+    enhanced: Boolean(resolved.confirmed),
+    matchId,
+    skipQuestionConfirm: true,
+  });
+  return {
+    matchId,
+    questionText: resolved.questionText,
+    sourceText: resolved.sourceText,
+    receivedAt,
+  };
+}
+
+function undoManualQuestion(matchId) {
+  const session = currentSession;
+  const id = String(matchId || "").trim();
+  if (!session?.archive || !id) return { ok: false, removed: false };
+  const existing = session.archive.questionsByMatchId.get(id);
+  if (!existing || existing.source !== "manual_marker") return { ok: false, removed: false };
+  session.archive.questionsByMatchId.delete(id);
+  removedQuestionMatchIds.add(id);
+  fallbackAnswerMatchIds.delete(id);
+  writeQuestionSnapshots(session);
+  appendJsonl("question-events.jsonl", {
+    type: "manual_question_undone",
+    matchId: id,
+    receivedAt: nowMs(),
+  });
+  emitDebugLog("manual_question_undone", {
+    matchId: id,
+    question: snippet(existing.questionText || existing.confirmedQuestionText || "", 140),
+  });
+  return { ok: true, removed: true, matchId: id };
 }
 
 function maybeEnhanceQuestionWithArk({ segments, receivedAt, transcript, definite, localConfidence = 0 }) {
@@ -1275,6 +1656,109 @@ function maybeEnhanceQuestionWithArk({ segments, receivedAt, transcript, definit
     });
 }
 
+function handleQuestionEngineOutputs(outputs, transcript) {
+  for (const output of outputs || []) {
+    if (output.type === "partial_preview") {
+      emitPreviewForQuestion({
+        inferred: output.question,
+        receivedAt: output.question.receivedAt || nowMs(),
+        transcript,
+      });
+      continue;
+    }
+    if (output.type === "question_finalized" || output.type === "question_updated") {
+      const outputReceivedAt = Number(
+        output.question?.updatedAt
+        || output.question?.receivedAt
+        || output.receivedAt
+        || transcript?.receivedAt
+        || 0
+      );
+      const suppressedByManualWindow = isWithinManualQuestionSuppressionWindow(outputReceivedAt);
+      if (manualQuestionMarking || suppressedByManualWindow) {
+        emitDebugLog("question_skip", {
+          reason: suppressedByManualWindow ? "manual_marker_window" : "manual_marker_active",
+          outputReceivedAt,
+          question: snippet(output.question?.questionText || "", 120),
+          source: snippet(output.question?.sourceText || "", 160),
+        });
+        continue;
+      }
+      const question = output.question;
+      emitMatchForQuestion({
+        inferred: {
+          questionId: question.questionId,
+          questionText: question.questionText,
+          localQuestionText: question.localQuestionText,
+          confirmedQuestionText: question.confirmedQuestionText,
+          sourceText: question.sourceText,
+          candidateContext: question.candidateContext,
+          confidence: question.confidence,
+          reason: question.reason,
+          questionType: question.questionType,
+          topicId: question.topicId,
+          domainAnchors: question.domainAnchors || [],
+          mergedFrom: question.mergedFrom || [],
+          absorbedFrom: question.absorbedFrom || [],
+          evidenceTerms: question.evidenceTerms || [],
+          mergeReason: question.mergeReason || "",
+        },
+        receivedAt: question.updatedAt || question.receivedAt || nowMs(),
+        transcript,
+        definite: true,
+        enhanced: Boolean(question.confirmed),
+        matchId: question.questionId,
+        skipQuestionConfirm: true,
+      });
+      continue;
+    }
+    if (output.type === "question_absorbed") {
+      const event = {
+        type: "question_absorbed",
+        pendingId: output.pendingId,
+        questionText: output.questionText,
+        sourceText: output.sourceText,
+        targetQuestionId: output.targetQuestionId,
+        targetQuestionText: output.targetQuestionText,
+        reason: output.reason,
+        receivedAt: output.receivedAt || nowMs(),
+      };
+      appendJsonl("question-events.jsonl", event);
+      emitDebugLog("question_absorbed", {
+        question: snippet(output.questionText || "", 120),
+        target: snippet(output.targetQuestionText || "", 120),
+        reason: output.reason || "",
+      });
+      continue;
+    }
+    if (output.type === "question_rejected") {
+      emitDebugLog("question_skip", {
+        reason: output.reason || "engine_rejected",
+        question: snippet(output.questionText || output.localQuestion || output.confirmedQuestion || "", 120),
+        source: snippet(output.sourceText || "", 160),
+      });
+    }
+  }
+}
+
+function processQuestionEngineEvent(event, transcript) {
+  const engine = questionEngine;
+  if (!engine) return;
+  const requestSessionSeq = arkEnhanceSeq;
+  Promise.resolve(engine.processEvent(event))
+    .then((outputs) => {
+      if (!currentSession || requestSessionSeq !== arkEnhanceSeq || sessionPaused) return;
+      handleQuestionEngineOutputs(outputs, transcript);
+    })
+    .catch((error) => {
+      emitDebugLog("question_engine_error", {
+        type: event.type,
+        message: error.message,
+      });
+      emitLog({ message: `问题抽取引擎跳过：${error.message}` });
+    });
+}
+
 function handleTranscript(transcript) {
   if (sessionPaused) return;
   const receivedAt = nowMs();
@@ -1309,95 +1793,25 @@ function handleTranscript(transcript) {
       startMs: transcript.startMs,
       endMs: transcript.endMs,
     });
-    recentTranscriptSegments = pruneQuestionContextSegments([...recentTranscriptSegments, asrEvent], receivedAt);
-    recentPartialSegments = [];
-    const currentQuestionish = hasQuestionIntent(asrEvent) || hasSoftQuestionCue(rewrittenText || transcript.text);
-    if (currentQuestionish) {
-      pendingQuestionSegments = recentTranscriptSegments;
-    } else if (rewrittenText) {
-      pendingQuestionSegments = [];
-    }
-
-    const { inferredList, latest } = currentQuestionish
-      ? inferLatestQuestionFromContext(recentTranscriptSegments)
-      : { inferredList: [], latest: null };
-    emitDebugLog("question_infer_final", {
-      contextWindowMs: QUESTION_CONTEXT_WINDOW_MS,
-      contextSegments: recentTranscriptSegments.length,
-      count: inferredList.length,
-      questions: inferredList.map((item) => snippet(item.questionText, 100)),
-      latest: snippet(latest?.questionText, 120),
-      current: snippet(rewrittenText || transcript.text, 120),
-    });
-    if (!latest) {
-      if (currentQuestionish) {
-        maybeEnhanceQuestionWithArk({ segments: recentTranscriptSegments, receivedAt, transcript, definite: true });
-      }
-      return;
-    }
-    if (latest.confidence < 0.78) {
-      maybeEnhanceQuestionWithArk({
-        segments: recentTranscriptSegments,
-        receivedAt,
-        transcript,
-        definite: true,
-        localConfidence: latest.confidence,
-      });
-    }
-    if (isIncompleteQuestion(latest.questionText)) {
-      emitDebugLog("question_skip", { reason: "incomplete_final", question: snippet(latest.questionText) });
-      return;
-    }
-    if (rememberQuestionKey(latest.questionText)) {
-      emitDebugLog("question_skip", { reason: "duplicate_final", question: snippet(latest.questionText) });
-      maybeEnhanceQuestionWithArk({
-        segments: recentTranscriptSegments,
-        receivedAt,
-        transcript,
-        definite: true,
-        localConfidence: latest.confidence,
-      });
-      return;
-    }
-    emitMatchForQuestion({ inferred: latest, receivedAt, transcript, definite: true });
-    return;
-  }
-
-  recentPartialSegments = pruneQuestionContextSegments([...recentTranscriptSegments, asrEvent], receivedAt);
-  const { latest: inferred } = inferLatestQuestionFromContext(recentPartialSegments);
-  if (!inferred) {
-    if (hasSoftQuestionCue(rewrittenText || transcript.text)) {
-      maybeEnhanceQuestionWithArk({ segments: recentPartialSegments, receivedAt, transcript, definite: false });
-    }
-    return;
-  }
-  if (inferred.confidence < 0.8) {
-    maybeEnhanceQuestionWithArk({
-      segments: recentPartialSegments,
+    processQuestionEngineEvent({
+      type: "interviewer_final",
+      text: transcript.text,
+      rewrittenText,
       receivedAt,
-      transcript,
-      definite: false,
-      localConfidence: inferred.confidence,
-    });
-  }
-  if (inferred.confidence < PARTIAL_QUESTION_MIN_CONFIDENCE) {
-    emitDebugLog("question_skip", { reason: "partial_low_confidence", question: snippet(inferred.questionText), confidence: inferred.confidence });
+      startMs: transcript.startMs,
+      endMs: transcript.endMs,
+    }, transcript);
     return;
   }
-  if (isIncompleteQuestion(inferred.questionText)) {
-    emitDebugLog("question_skip", { reason: "partial_incomplete", question: snippet(inferred.questionText), confidence: inferred.confidence });
-    return;
-  }
-  if (!shouldEmitPartialQuestion(inferred.questionText, receivedAt)) {
-    emitDebugLog("question_skip", { reason: "partial_throttle", question: snippet(inferred.questionText), confidence: inferred.confidence });
-    return;
-  }
-  emitDebugLog("question_infer_partial", {
-    question: snippet(inferred.questionText, 110),
-    confidence: inferred.confidence,
-    source: snippet(inferred.sourceText, 160),
-  });
-  emitMatchForQuestion({ inferred, receivedAt, transcript, definite: false });
+
+  processQuestionEngineEvent({
+    type: "interviewer_partial",
+    text: transcript.text,
+    rewrittenText,
+    receivedAt,
+    startMs: transcript.startMs,
+    endMs: transcript.endMs,
+  }, transcript);
 }
 
 function handleMicTranscript(transcript) {
@@ -1430,6 +1844,13 @@ function handleMicTranscript(transcript) {
     asrLatencyMs: transcript.asrLatencyMs,
     conversationContextLength: buildConversationContextText(2000).length,
   });
+  processQuestionEngineEvent({
+    type: "candidate_final",
+    text,
+    receivedAt,
+    startMs: transcript.startMs,
+    endMs: transcript.endMs,
+  }, transcript);
 }
 
 function closeCurrentSession() {
@@ -1444,6 +1865,8 @@ function closeCurrentSession() {
   conversationContextSegments = [];
   recentQuestionKeys = [];
   recentStableQuestions = [];
+  questionEngine = null;
+  resetManualQuestionMarkingState();
   lastPartialQuestion = null;
   lastPartialMatchedAt = 0;
   arkEnhanceSeq += 1;
@@ -1704,11 +2127,14 @@ ipcMain.handle("start_session", async (_event, settings) => {
   conversationContextSegments = [];
   recentQuestionKeys = [];
   recentStableQuestions = [];
+  resetManualQuestionMarkingState();
+  removedQuestionMatchIds = new Set();
   lastPartialQuestion = null;
   lastPartialMatchedAt = 0;
   arkEnhanceSeq += 1;
   lastArkEnhanceAt = 0;
   fallbackAnswerMatchIds = new Set();
+  questionEngine = createQuestionEngine();
 
   emitAudioStatus({
     state: "starting",
@@ -1790,7 +2216,12 @@ ipcMain.handle("stop_session", async () => {
 });
 
 ipcMain.handle("pause_session", async () => {
+  if (manualQuestionMarkingStartedAt) {
+    addManualQuestionSuppressionWindow(manualQuestionMarkingStartedAt, nowMs(), "manual_marker_pause");
+  }
   sessionPaused = true;
+  manualQuestionMarking = false;
+  manualQuestionMarkingStartedAt = 0;
   emitAudioStatus({ state: "paused", deviceName: currentSession?.settings?.audioOutputDeviceName || "Electron loopback", volume: 0, message: "面试已暂停" });
   if (currentSession?.settings?.microphoneContextEnabled) {
     emitMicrophoneAudioStatus({ state: "paused", deviceName: currentSession.settings.microphoneDeviceName || "麦克风", volume: 0, message: "麦克风上下文已暂停" });
@@ -1807,6 +2238,20 @@ ipcMain.handle("resume_session", async () => {
 
 ipcMain.handle("search_questions", async (_event, query, companyId) => (
   getMatcherBundle(companyId).matcher.search(String(query ?? ""))
+));
+
+ipcMain.handle("set_manual_question_marking", async (_event, active) => {
+  manualQuestionMarking = setManualQuestionMarkingState(active);
+  emitDebugLog("manual_question_marking", { active: manualQuestionMarking });
+  return { active: manualQuestionMarking };
+});
+
+ipcMain.handle("submit_manual_question_segment", async (_event, payload) => (
+  submitManualQuestionSegment(payload)
+));
+
+ipcMain.handle("undo_manual_question", async (_event, matchId) => (
+  undoManualQuestion(matchId)
 ));
 
 ipcMain.handle("audio_capture_error", async (_event, message) => {

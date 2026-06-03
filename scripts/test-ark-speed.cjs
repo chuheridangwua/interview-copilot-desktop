@@ -54,7 +54,7 @@ async function main() {
     fastModel: config.fastModel,
   }));
 
-  const models = unique((process.env.ARK_SPEED_MODELS || `${config.fastModel || "doubao-1-5-lite-32k-250115"},${config.model}`)
+  const models = unique((process.env.ARK_SPEED_MODELS || `${config.model},${config.fastModel}`)
     .split(","));
 
   const matcher = new Matcher(loadQuestionBank(process.cwd()));

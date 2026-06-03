@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   CircleStop,
   FileText,
+  Flag,
   LoaderCircle,
   Mic,
   Moon,
@@ -13,6 +14,7 @@ import {
   Save,
   Settings,
   Sun,
+  Undo2,
   X,
 } from "lucide-react";
 import {
@@ -27,6 +29,7 @@ import {
   HealthStatusItem,
   isDesktopRuntime,
   listenEvent,
+  ManualQuestionSegment,
   MatchCandidate,
   MatchCandidatesEvent,
   MediaDeviceOptions,
@@ -38,9 +41,11 @@ import {
 const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
 const THEME_STORAGE_KEY = "interview-copilot-theme";
 const CANDIDATE_DISPLAY_LIMIT = 3;
+const MANUAL_MARKER_PREROLL_MS = 10_000;
 
 type SessionState = "idle" | "running" | "paused" | "ended";
 type ThemeMode = "dark" | "light";
+type ManualMarkerState = "idle" | "marking" | "submitting";
 
 interface TranscriptSegment {
   id: string;
@@ -56,6 +61,10 @@ interface QuestionRecord {
   sourceText: string;
   confidence: number;
   reason?: string;
+  source?: string;
+  manualStartedAt?: number;
+  manualEndedAt?: number;
+  manualSegments?: ManualQuestionSegment[];
   provisional: boolean;
   enhanced: boolean;
   receivedAt: number;
@@ -105,6 +114,13 @@ function getInitialTheme(): ThemeMode {
 
 function formatTime(value: number) {
   return new Date(value || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+function formatDuration(value: number) {
+  const totalSeconds = Math.max(0, Math.floor(value / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
 function isTextInputTarget(target: EventTarget | null) {
@@ -228,8 +244,16 @@ export default function App() {
   const saveAudio = true;
   const [sessionState, setSessionState] = useState<SessionState>("idle");
   const sessionStateRef = useRef<SessionState>("idle");
+  const [manualMarkerState, setManualMarkerState] = useState<ManualMarkerState>("idle");
+  const manualMarkerStateRef = useRef<ManualMarkerState>("idle");
+  const [manualStartAt, setManualStartAt] = useState<number | null>(null);
+  const manualStartAtRef = useRef<number | null>(null);
+  const [manualElapsedMs, setManualElapsedMs] = useState(0);
+  const [lastManualMatchId, setLastManualMatchId] = useState<string | null>(null);
   const [liveTranscript, setLiveTranscript] = useState<TranscriptSegment | null>(null);
   const [transcriptSegments, setTranscriptSegments] = useState<TranscriptSegment[]>([]);
+  const transcriptSegmentsRef = useRef<TranscriptSegment[]>([]);
+  const liveTranscriptRef = useRef<TranscriptSegment | null>(null);
   const [microphoneLiveTranscript, setMicrophoneLiveTranscript] = useState<TranscriptSegment | null>(null);
   const [microphoneTranscriptSegments, setMicrophoneTranscriptSegments] = useState<TranscriptSegment[]>([]);
   const [questionRecords, setQuestionRecords] = useState<QuestionRecord[]>([]);
@@ -260,6 +284,33 @@ export default function App() {
   useEffect(() => {
     sessionStateRef.current = sessionState;
   }, [sessionState]);
+
+  useEffect(() => {
+    manualMarkerStateRef.current = manualMarkerState;
+  }, [manualMarkerState]);
+
+  useEffect(() => {
+    manualStartAtRef.current = manualStartAt;
+  }, [manualStartAt]);
+
+  useEffect(() => {
+    transcriptSegmentsRef.current = transcriptSegments;
+  }, [transcriptSegments]);
+
+  useEffect(() => {
+    liveTranscriptRef.current = liveTranscript;
+  }, [liveTranscript]);
+
+  useEffect(() => {
+    if (manualMarkerState !== "marking" || !manualStartAt) {
+      setManualElapsedMs(0);
+      return undefined;
+    }
+    const timer = window.setInterval(() => {
+      setManualElapsedMs(Date.now() - manualStartAt);
+    }, 250);
+    return () => window.clearInterval(timer);
+  }, [manualMarkerState, manualStartAt]);
 
   useEffect(() => {
     selectedRecordIdRef.current = selectedRecordId;
@@ -300,6 +351,8 @@ export default function App() {
   function clearInterviewResults() {
     setLiveTranscript(null);
     setTranscriptSegments([]);
+    transcriptSegmentsRef.current = [];
+    liveTranscriptRef.current = null;
     setMicrophoneLiveTranscript(null);
     setMicrophoneTranscriptSegments([]);
     setQuestionRecords([]);
@@ -308,6 +361,12 @@ export default function App() {
     autoFollowLatestQuestionRef.current = true;
     setCandidates([]);
     setSelectedCandidate(null);
+    setManualMarkerState("idle");
+    manualMarkerStateRef.current = "idle";
+    setManualStartAt(null);
+    manualStartAtRef.current = null;
+    setManualElapsedMs(0);
+    setLastManualMatchId(null);
   }
 
   async function refreshHealthStatus() {
@@ -501,6 +560,7 @@ export default function App() {
 
       unlisteners.push(await listenEvent<MatchCandidatesEvent>("match_candidates", (payload) => {
         if (sessionStateRef.current !== "running") return;
+        if (manualMarkerStateRef.current === "marking" && payload.definite && payload.source !== "manual_marker") return;
         const topCandidate = payload.candidates[0] ?? null;
         const questionText = payload.query.trim();
         if (!questionText) return;
@@ -515,6 +575,10 @@ export default function App() {
           sourceText: payload.sourceText || questionText,
           confidence: payload.confidence ?? 0.72,
           reason: payload.reason,
+          source: payload.source,
+          manualStartedAt: payload.manualStartedAt,
+          manualEndedAt: payload.manualEndedAt,
+          manualSegments: payload.manualSegments,
           provisional: Boolean(payload.provisional),
           enhanced: Boolean(payload.enhanced),
           receivedAt: payload.receivedAt || Date.now(),
@@ -560,6 +624,10 @@ export default function App() {
               sourceText: payload.sourceText || record.sourceText,
               confidence: payload.confidence,
               reason: payload.reason || record.reason,
+              source: payload.source || record.source,
+              manualStartedAt: payload.manualStartedAt || record.manualStartedAt,
+              manualEndedAt: payload.manualEndedAt || record.manualEndedAt,
+              manualSegments: payload.manualSegments || record.manualSegments,
               enhanced: true,
               candidates: payload.candidates.length ? payload.candidates : record.candidates,
               selectedCandidate: selected,
@@ -644,7 +712,9 @@ export default function App() {
       sessionStateRef.current = "running";
       setSessionState("running");
       setLiveTranscript(null);
+      liveTranscriptRef.current = null;
       setTranscriptSegments([]);
+      transcriptSegmentsRef.current = [];
       setMicrophoneLiveTranscript(null);
       setMicrophoneTranscriptSegments([]);
       setQuestionRecords([]);
@@ -653,6 +723,12 @@ export default function App() {
       autoFollowLatestQuestionRef.current = true;
       setCandidates([]);
       setSelectedCandidate(null);
+      setManualMarkerState("idle");
+      manualMarkerStateRef.current = "idle";
+      setManualStartAt(null);
+      manualStartAtRef.current = null;
+      setManualElapsedMs(0);
+      setLastManualMatchId(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -660,6 +736,7 @@ export default function App() {
 
   async function pauseInterview() {
     try {
+      if (manualMarkerStateRef.current !== "idle") await cancelManualQuestionMark();
       await api.pauseSession();
       sessionStateRef.current = "paused";
       setSessionState("paused");
@@ -680,6 +757,7 @@ export default function App() {
 
   async function endInterview() {
     try {
+      if (manualMarkerStateRef.current !== "idle") await cancelManualQuestionMark();
       await api.stopSession();
       sessionStateRef.current = "ended";
       setSessionState("ended");
@@ -722,9 +800,170 @@ export default function App() {
     clearInterviewResults();
   }
 
+  function collectManualQuestionSegments(startedAt: number, endedAt: number) {
+    const captureStartedAt = Math.max(0, startedAt - MANUAL_MARKER_PREROLL_MS);
+    const selectedSegments = transcriptSegmentsRef.current
+      .filter((segment) => segment.receivedAt >= captureStartedAt && segment.receivedAt <= endedAt)
+      .sort((a, b) => a.receivedAt - b.receivedAt);
+    const live = liveTranscriptRef.current;
+    const liveText = String(live?.rewrittenText || live?.text || "").trim();
+    const shouldAppendLive = Boolean(
+      live
+      && liveText
+      && live.receivedAt >= captureStartedAt
+      && live.receivedAt <= endedAt + 800
+      && !selectedSegments.some((segment) => isNearDuplicate(segment.rewrittenText || segment.text, liveText)),
+    );
+    const segments = shouldAppendLive ? [...selectedSegments, live as TranscriptSegment] : selectedSegments;
+    return segments.map<ManualQuestionSegment>((segment) => ({
+      text: segment.text,
+      rewrittenText: segment.rewrittenText,
+      receivedAt: segment.receivedAt,
+    }));
+  }
+
+  function buildManualSourceText(segments: ManualQuestionSegment[]) {
+    return segments
+      .map((segment) => String(segment.rewrittenText || segment.text || "").trim())
+      .filter(Boolean)
+      .reduce<string[]>((items, text) => {
+        if (items.some((item) => isNearDuplicate(item, text))) return items;
+        return [...items, text];
+      }, [])
+      .join("。")
+      .replace(/。+/g, "。")
+      .trim();
+  }
+
+  async function beginManualQuestionMark() {
+    if (sessionStateRef.current !== "running" || manualMarkerStateRef.current !== "idle") return;
+    const startedAt = Date.now();
+    setError(null);
+    setManualMarkerState("marking");
+    manualMarkerStateRef.current = "marking";
+    setManualStartAt(startedAt);
+    manualStartAtRef.current = startedAt;
+    setManualElapsedMs(0);
+    try {
+      const result = await api.setManualQuestionMarking(true);
+      if (!result.active) {
+        setManualMarkerState("idle");
+        manualMarkerStateRef.current = "idle";
+        setManualStartAt(null);
+        manualStartAtRef.current = null;
+        setManualElapsedMs(0);
+        setError("当前没有正在进行的面试会话，不能标记问题");
+      }
+    } catch (err) {
+      setManualMarkerState("idle");
+      manualMarkerStateRef.current = "idle";
+      setManualStartAt(null);
+      manualStartAtRef.current = null;
+      setManualElapsedMs(0);
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  async function cancelManualQuestionMark() {
+    if (manualMarkerStateRef.current === "idle") return;
+    setManualMarkerState("idle");
+    manualMarkerStateRef.current = "idle";
+    setManualStartAt(null);
+    manualStartAtRef.current = null;
+    setManualElapsedMs(0);
+    try {
+      await api.setManualQuestionMarking(false);
+    } catch {
+      // Marker cancellation should keep the UI responsive even if the backend session has ended.
+    }
+  }
+
+  async function finishManualQuestionMark() {
+    const startedAt = manualStartAtRef.current;
+    if (sessionStateRef.current !== "running" || manualMarkerStateRef.current !== "marking" || !startedAt) return;
+    const endedAt = Date.now();
+    const segments = collectManualQuestionSegments(startedAt, endedAt);
+    const sourceText = buildManualSourceText(segments);
+    if (!sourceText.trim()) {
+      setError("标记区间内没有可用面试官转写");
+      await cancelManualQuestionMark();
+      return;
+    }
+    setManualMarkerState("submitting");
+    manualMarkerStateRef.current = "submitting";
+    try {
+      const result = await api.submitManualQuestionSegment({
+        sourceText,
+        segments,
+        startedAt,
+        endedAt,
+        companyId: selectedCompanyId || undefined,
+      });
+      setLastManualMatchId(result.matchId);
+      setManualMarkerState("idle");
+      manualMarkerStateRef.current = "idle";
+      setManualStartAt(null);
+      manualStartAtRef.current = null;
+      setManualElapsedMs(0);
+    } catch (err) {
+      await api.setManualQuestionMarking(false).catch(() => undefined);
+      setManualMarkerState("idle");
+      manualMarkerStateRef.current = "idle";
+      setManualStartAt(null);
+      manualStartAtRef.current = null;
+      setManualElapsedMs(0);
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  function toggleManualQuestionMark() {
+    if (manualMarkerStateRef.current === "marking") {
+      void finishManualQuestionMark();
+      return;
+    }
+    if (manualMarkerStateRef.current === "idle") {
+      void beginManualQuestionMark();
+    }
+  }
+
+  async function undoLatestManualQuestion() {
+    const latestManualRecord = questionRecords
+      .filter((record) => record.source === "manual_marker" && !record.provisional)
+      .sort((a, b) => b.receivedAt - a.receivedAt)[0];
+    const matchId = latestManualRecord?.matchId || lastManualMatchId;
+    if (!matchId) return;
+    try {
+      const result = await api.undoManualQuestion(matchId);
+      if (!result.ok || !result.removed) {
+        setError("未能撤销手动问题：当前会话归档中未找到这条手动问题");
+        return;
+      }
+      const removingSelectedRecord = Boolean(
+        selectedRecordIdRef.current
+        && questionRecords.some((record) => record.matchId === matchId && record.id === selectedRecordIdRef.current),
+      );
+      setQuestionRecords((records) => records.filter((record) => record.matchId !== matchId));
+      if (removingSelectedRecord) {
+        selectedRecordIdRef.current = null;
+        setSelectedRecordId(null);
+        setCandidates([]);
+        setSelectedCandidate(null);
+      }
+      setLastManualMatchId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.code !== "Space" || event.repeat || isTextInputTarget(event.target)) return;
+      if (event.repeat || isTextInputTarget(event.target)) return;
+      if (event.code === "KeyM") {
+        event.preventDefault();
+        toggleManualQuestionMark();
+        return;
+      }
+      if (event.code !== "Space") return;
       event.preventDefault();
       if (sessionStateRef.current === "running") {
         void pauseInterview();
@@ -749,12 +988,21 @@ export default function App() {
     selectedAudioOutput,
     selectedMicrophone,
     sources,
+    manualMarkerState,
+    manualStartAt,
+    transcriptSegments,
+    liveTranscript,
+    questionRecords,
+    lastManualMatchId,
   ]);
 
   const answerTerms = selectedCandidate?.highlightTerms ?? selectedCandidate?.hitTerms ?? [];
   const answerLogic = selectedCandidate?.answerLogic?.trim() ?? "";
   const answerDetail = selectedCandidate?.answerDetail?.trim() || selectedCandidate?.answer || "";
   const selectedRecord = questionRecords.find((record) => record.id === selectedRecordId) ?? null;
+  const latestManualRecord = questionRecords
+    .filter((record) => record.source === "manual_marker" && !record.provisional)
+    .sort((a, b) => b.receivedAt - a.receivedAt)[0] ?? null;
   const modelAnswer = selectedRecord?.modelAnswer?.trim() ?? "";
   const parsedModelAnswer = parseModelAnswer(modelAnswer);
   const modelAnswerDetail = parsedModelAnswer.detail || (!parsedModelAnswer.logic ? modelAnswer : "");
@@ -764,6 +1012,12 @@ export default function App() {
   const displayedCandidates = candidates.slice(0, CANDIDATE_DISPLAY_LIMIT);
   const displayedTranscriptSegments = [...transcriptSegments].reverse();
   const displayedMicrophoneTranscriptSegments = [...microphoneTranscriptSegments].reverse();
+  const manualMarkerDisabled = sessionState !== "running" || manualMarkerState === "submitting";
+  const manualMarkerLabel = manualMarkerState === "marking"
+    ? `结束标记 ${formatDuration(manualElapsedMs)}`
+    : manualMarkerState === "submitting"
+      ? "提交中"
+      : "标记问题";
   return (
     <main className="shell">
       <header className="topbar">
@@ -842,21 +1096,37 @@ export default function App() {
               <span>{themeMode === "dark" ? "深色" : "浅色"}</span>
             </button>
             {sessionState === "running" ? (
-              <button className="icon-button" type="button" onClick={pauseInterview}>
+              <button className="icon-button session-command" type="button" onClick={pauseInterview}>
                 <Pause size={17} />
                 <span>暂停面试</span>
               </button>
             ) : sessionState === "paused" ? (
-              <button className="primary-command" type="button" onClick={resumeInterview}>
+              <button className="primary-command session-command" type="button" onClick={resumeInterview}>
                 <Play size={17} />
                 <span>继续面试</span>
               </button>
             ) : (
-              <button className="primary-command" type="button" onClick={startInterview}>
+              <button className="primary-command session-command" type="button" onClick={startInterview}>
                 <Play size={17} />
                 <span>开始面试</span>
               </button>
             )}
+            <button
+              className={cls("manual-marker-command", manualMarkerState === "marking" && "active", manualMarkerState === "submitting" && "submitting")}
+              type="button"
+              disabled={manualMarkerDisabled}
+              onClick={toggleManualQuestionMark}
+              title="按 M 开始或结束手动标记问题"
+            >
+              {manualMarkerState === "submitting" ? <LoaderCircle size={16} /> : <Flag size={16} />}
+              <span>{manualMarkerLabel}</span>
+            </button>
+            {manualMarkerState === "marking" ? (
+              <button className="manual-cancel-command" type="button" onClick={cancelManualQuestionMark} title="取消当前标记">
+                <X size={16} />
+                <span>取消</span>
+              </button>
+            ) : null}
             {(sessionState === "running" || sessionState === "paused") ? (
               <button className="danger-command" type="button" onClick={endInterview}>
                 <CircleStop size={17} />
@@ -953,6 +1223,17 @@ export default function App() {
               >
                 <h2>面试官问题列表</h2>
               </button>
+              {latestManualRecord && (sessionState === "running" || sessionState === "paused") ? (
+                <button
+                  className="undo-command"
+                  type="button"
+                  onClick={undoLatestManualQuestion}
+                  title="撤销最近一条手动标记问题"
+                >
+                  <Undo2 size={14} />
+                  <span>撤销手动</span>
+                </button>
+              ) : null}
             </div>
             <div className="question-list">
               {questionRecords.length === 0 ? (
@@ -970,10 +1251,14 @@ export default function App() {
                     selectedRecordId === record.id && "selected",
                     record.provisional && "provisional",
                     record.enhanced && "enhanced",
+                    record.source === "manual_marker" && "manual",
                   )}
                   onClick={() => selectRecord(record)}
                 >
-                  <span className="record-time">{formatTime(record.receivedAt)}</span>
+                  <span className="record-time">
+                    {formatTime(record.receivedAt)}
+                    {record.source === "manual_marker" ? <span className="manual-badge">手动</span> : null}
+                  </span>
                   <p className="record-query">{record.questionText}</p>
                 </button>
               ))}
