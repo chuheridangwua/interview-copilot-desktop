@@ -139,6 +139,19 @@ assert.deepEqual(
   ],
 );
 
+const inferredLongWindowQuestion = inferQuestionFromSegments([
+  { rewrittenText: "先看一下你简历里提到的风控项目。" },
+  { rewrittenText: "风险域业务面会考察简历里面标签的理解。" },
+  { rewrittenText: "比如一个需求怎么转化为标签。" },
+  { rewrittenText: "笔试可能会给你类目和文本样本。" },
+  { rewrittenText: "让你进行标注，你会为什么这么设计？" },
+], { maxSegments: 80, maxChars: 1200 });
+assert.equal(inferredLongWindowQuestion?.questionText, "你会为什么这么设计？");
+assert.ok(
+  inferredLongWindowQuestion.sourceText.includes("先看一下你简历里提到的风控项目"),
+  "expanded question context should keep older segments when requested",
+);
+
 assert.deepEqual(
   inferQuestionsFromSegments([
     { rewrittenText: "面试官您好，我叫陈乐祥，之前是在这家公司做的一个自我介绍。" },

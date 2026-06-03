@@ -23,6 +23,10 @@ const {
 
 const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
 const COMPANY_QUESTION_ID_OFFSET = 10000;
+const QUESTION_CONTEXT_WINDOW_MS = 2 * 60 * 1000;
+const QUESTION_CONTEXT_MAX_SEGMENTS = 80;
+const QUESTION_CONTEXT_MAX_CHARS = 2400;
+const PARTIAL_QUESTION_MIN_CONFIDENCE = 0.72;
 const isDev = Boolean(process.env.ELECTRON_DEV || process.env.ELECTRON_RENDERER_URL);
 
 let mainWindow = null;
@@ -36,6 +40,7 @@ let recentPartialSegments = [];
 let pendingQuestionSegments = [];
 let conversationContextSegments = [];
 let recentQuestionKeys = [];
+let recentStableQuestions = [];
 let lastPartialQuestion = null;
 let lastPartialMatchedAt = 0;
 let arkEnhanceSeq = 0;
@@ -769,27 +774,93 @@ function buildConversationContextText(maxChars = 2000) {
   return selected.reverse().join("\n").slice(-maxChars);
 }
 
+function compactQuestionKey(questionText) {
+  return normalize(questionText).replace(/\s+/g, "");
+}
+
+function pruneQuestionContextSegments(segments, receivedAt = nowMs()) {
+  return (segments ?? [])
+    .filter((item) => {
+      const itemReceivedAt = Number(item?.receivedAt || receivedAt);
+      return receivedAt - itemReceivedAt <= QUESTION_CONTEXT_WINDOW_MS;
+    })
+    .slice(-QUESTION_CONTEXT_MAX_SEGMENTS);
+}
+
+function inferLatestQuestionFromContext(segments) {
+  const inferredList = inferQuestionsFromSegments(segments, {
+    maxSegments: QUESTION_CONTEXT_MAX_SEGMENTS,
+    maxChars: QUESTION_CONTEXT_MAX_CHARS,
+  }) || [];
+  return {
+    inferredList,
+    latest: inferredList.at(-1) ?? null,
+  };
+}
+
+function buildQuestionSourceText(segments, maxChars = QUESTION_CONTEXT_MAX_CHARS) {
+  const text = (segments ?? [])
+    .map((item) => String(item?.rewrittenText || item?.text || "").trim())
+    .filter(Boolean)
+    .join("。");
+  return text.length > maxChars ? text.slice(-maxChars) : text;
+}
+
+function hasSoftQuestionCue(text) {
+  return /(？|\?|为什么|怎么|如何|什么|哪些|哪种|能不能|可不可以|介绍|讲一下|说一下|聊一下|负责|角色|构成|设计|策略|标签|标注|评估|指标|效果|原因|流程|方案|风险|难点|挑战)/.test(String(text ?? ""));
+}
+
+function rememberStableQuestion(questionText, receivedAt = nowMs()) {
+  const key = compactQuestionKey(questionText);
+  if (!key) return;
+  const existingIndex = recentStableQuestions.findIndex((item) => (
+    item.key === key || key.includes(item.key) || item.key.includes(key)
+  ));
+  if (existingIndex >= 0) {
+    const existing = recentStableQuestions[existingIndex];
+    if (key.length >= existing.key.length) {
+      recentStableQuestions[existingIndex] = { questionText, key, receivedAt };
+    }
+  } else {
+    recentStableQuestions.push({ questionText, key, receivedAt });
+  }
+  recentStableQuestions = recentStableQuestions
+    .filter((item) => receivedAt - Number(item.receivedAt || receivedAt) <= 10 * 60 * 1000)
+    .slice(-12);
+}
+
+function recentStableQuestionTexts(maxCount = 5) {
+  return recentStableQuestions.slice(-maxCount).map((item) => item.questionText);
+}
+
 function rememberQuestionKey(questionText) {
-  const key = normalize(questionText);
+  const key = compactQuestionKey(questionText);
   if (!key) return false;
-  if (recentQuestionKeys.includes(key)) return true;
+  for (const existingKey of recentQuestionKeys) {
+    if (existingKey === key) return true;
+    if (existingKey.includes(key) && key.length < existingKey.length * 0.9) return true;
+  }
+  recentQuestionKeys = recentQuestionKeys.filter((existingKey) => (
+    !(key.includes(existingKey) && key.length > existingKey.length * 1.08)
+  ));
   recentQuestionKeys.push(key);
   recentQuestionKeys = recentQuestionKeys.slice(-12);
   return false;
 }
 
 function shouldEmitPartialQuestion(questionText, receivedAt) {
-  const key = normalize(questionText);
+  const key = compactQuestionKey(questionText);
   if (!key) return false;
-  if (lastPartialQuestion?.key === key && receivedAt - lastPartialQuestion.receivedAt < 1200) return false;
-  if (receivedAt - lastPartialMatchedAt < 240) return false;
+  if (lastPartialQuestion?.key === key && receivedAt - lastPartialQuestion.receivedAt < 2000) return false;
+  if (receivedAt - lastPartialMatchedAt < 1000) return false;
   lastPartialQuestion = { key, receivedAt };
   lastPartialMatchedAt = receivedAt;
   return true;
 }
 
-function shouldCallArkEnhancer(receivedAt) {
-  if (receivedAt - lastArkEnhanceAt < 900) return false;
+function shouldCallArkEnhancer(receivedAt, definite = false) {
+  const minIntervalMs = definite ? 450 : 1200;
+  if (receivedAt - lastArkEnhanceAt < minIntervalMs) return false;
   lastArkEnhanceAt = receivedAt;
   return true;
 }
@@ -996,6 +1067,7 @@ function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transc
     : confirmQuestionWithArk({
       sourceText,
       localQuestion: originalQuestion,
+      previousQuestions: recentStableQuestionTexts(5),
       timeoutMs: 2800,
     });
 
@@ -1127,6 +1199,7 @@ function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enha
   event.enhanced = enhanced;
   appendJsonl("matches.jsonl", event);
   archiveMatchEvent(event);
+  if (definite) rememberStableQuestion(inferred.questionText, receivedAt);
   emit("match_candidates", event);
   emitDebugLog("question_emit", {
     definite,
@@ -1165,21 +1238,19 @@ function emitMatchForQuestion({ inferred, receivedAt, transcript, definite, enha
 }
 
 function maybeEnhanceQuestionWithArk({ segments, receivedAt, transcript, definite, localConfidence = 0 }) {
-  if (!shouldCallArkEnhancer(receivedAt)) return;
-  const sourceText = (segments ?? [])
-    .map((item) => (typeof item?.rewrittenText === "string" ? item.rewrittenText : item?.text || item))
-    .map((text) => String(text ?? "").trim())
-    .filter(Boolean)
-    .join("。");
+  if (!shouldCallArkEnhancer(receivedAt, definite)) return;
+  const sourceText = buildQuestionSourceText(segments);
   if (sourceText.length < 6) return;
+  const previousQuestions = recentStableQuestionTexts(5);
 
   const requestSeq = ++arkEnhanceSeq;
   emitDebugLog("ark_request", {
     definite,
     localConfidence,
     source: snippet(sourceText, 180),
+    previousQuestions,
   });
-  inferQuestionWithArk({ text: sourceText })
+  inferQuestionWithArk({ text: sourceText, previousQuestions })
     .then((inferred) => {
       if (!inferred || sessionPaused || !currentSession || requestSeq < arkEnhanceSeq - 2) {
         emitDebugLog("ark_skip", { reason: "stale_or_empty", definite });
@@ -1238,59 +1309,69 @@ function handleTranscript(transcript) {
       startMs: transcript.startMs,
       endMs: transcript.endMs,
     });
-    recentTranscriptSegments = [...recentTranscriptSegments, asrEvent].slice(-6);
+    recentTranscriptSegments = pruneQuestionContextSegments([...recentTranscriptSegments, asrEvent], receivedAt);
     recentPartialSegments = [];
-    const currentQuestionish = hasQuestionIntent(asrEvent);
+    const currentQuestionish = hasQuestionIntent(asrEvent) || hasSoftQuestionCue(rewrittenText || transcript.text);
     if (currentQuestionish) {
-      pendingQuestionSegments = [...pendingQuestionSegments, asrEvent].slice(-4);
+      pendingQuestionSegments = recentTranscriptSegments;
     } else if (rewrittenText) {
       pendingQuestionSegments = [];
     }
 
-    const inferredList = currentQuestionish ? inferQuestionsFromSegments(pendingQuestionSegments) : [];
+    const { inferredList, latest } = currentQuestionish
+      ? inferLatestQuestionFromContext(recentTranscriptSegments)
+      : { inferredList: [], latest: null };
     emitDebugLog("question_infer_final", {
+      contextWindowMs: QUESTION_CONTEXT_WINDOW_MS,
+      contextSegments: recentTranscriptSegments.length,
       count: inferredList.length,
       questions: inferredList.map((item) => snippet(item.questionText, 100)),
-      pending: pendingQuestionSegments.map((item) => snippet(item.rewrittenText || item.text, 80)),
+      latest: snippet(latest?.questionText, 120),
+      current: snippet(rewrittenText || transcript.text, 120),
     });
-    if (!inferredList.length) {
+    if (!latest) {
       if (currentQuestionish) {
-        maybeEnhanceQuestionWithArk({ segments: pendingQuestionSegments, receivedAt, transcript, definite: true });
+        maybeEnhanceQuestionWithArk({ segments: recentTranscriptSegments, receivedAt, transcript, definite: true });
       }
       return;
     }
-    const maxLocalConfidence = Math.max(...inferredList.map((item) => item.confidence));
-    if (maxLocalConfidence < 0.74) {
+    if (latest.confidence < 0.78) {
       maybeEnhanceQuestionWithArk({
-        segments: pendingQuestionSegments,
+        segments: recentTranscriptSegments,
         receivedAt,
         transcript,
         definite: true,
-        localConfidence: maxLocalConfidence,
+        localConfidence: latest.confidence,
       });
     }
-    for (const inferred of inferredList) {
-      if (isIncompleteQuestion(inferred.questionText)) {
-        emitDebugLog("question_skip", { reason: "incomplete_final", question: snippet(inferred.questionText) });
-        continue;
-      }
-      if (rememberQuestionKey(inferred.questionText)) {
-        emitDebugLog("question_skip", { reason: "duplicate_final", question: snippet(inferred.questionText) });
-        continue;
-      }
-      emitMatchForQuestion({ inferred, receivedAt, transcript, definite: true });
+    if (isIncompleteQuestion(latest.questionText)) {
+      emitDebugLog("question_skip", { reason: "incomplete_final", question: snippet(latest.questionText) });
+      return;
     }
+    if (rememberQuestionKey(latest.questionText)) {
+      emitDebugLog("question_skip", { reason: "duplicate_final", question: snippet(latest.questionText) });
+      maybeEnhanceQuestionWithArk({
+        segments: recentTranscriptSegments,
+        receivedAt,
+        transcript,
+        definite: true,
+        localConfidence: latest.confidence,
+      });
+      return;
+    }
+    emitMatchForQuestion({ inferred: latest, receivedAt, transcript, definite: true });
     return;
   }
 
-  recentPartialSegments = [...pendingQuestionSegments.slice(-2), asrEvent].slice(-3);
-  const inferredList = inferQuestionsFromSegments(recentPartialSegments);
-  const inferred = inferredList.at(-1) ?? null;
+  recentPartialSegments = pruneQuestionContextSegments([...recentTranscriptSegments, asrEvent], receivedAt);
+  const { latest: inferred } = inferLatestQuestionFromContext(recentPartialSegments);
   if (!inferred) {
-    maybeEnhanceQuestionWithArk({ segments: recentPartialSegments, receivedAt, transcript, definite: false });
+    if (hasSoftQuestionCue(rewrittenText || transcript.text)) {
+      maybeEnhanceQuestionWithArk({ segments: recentPartialSegments, receivedAt, transcript, definite: false });
+    }
     return;
   }
-  if (inferred.confidence < 0.76) {
+  if (inferred.confidence < 0.8) {
     maybeEnhanceQuestionWithArk({
       segments: recentPartialSegments,
       receivedAt,
@@ -1299,7 +1380,7 @@ function handleTranscript(transcript) {
       localConfidence: inferred.confidence,
     });
   }
-  if (inferred.confidence < 0.58) {
+  if (inferred.confidence < PARTIAL_QUESTION_MIN_CONFIDENCE) {
     emitDebugLog("question_skip", { reason: "partial_low_confidence", question: snippet(inferred.questionText), confidence: inferred.confidence });
     return;
   }
@@ -1362,6 +1443,7 @@ function closeCurrentSession() {
   pendingQuestionSegments = [];
   conversationContextSegments = [];
   recentQuestionKeys = [];
+  recentStableQuestions = [];
   lastPartialQuestion = null;
   lastPartialMatchedAt = 0;
   arkEnhanceSeq += 1;
@@ -1621,6 +1703,7 @@ ipcMain.handle("start_session", async (_event, settings) => {
   pendingQuestionSegments = [];
   conversationContextSegments = [];
   recentQuestionKeys = [];
+  recentStableQuestions = [];
   lastPartialQuestion = null;
   lastPartialMatchedAt = 0;
   arkEnhanceSeq += 1;

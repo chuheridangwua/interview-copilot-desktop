@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Interview Copilot</title>
+    <script>
+      (() => {
+        const defaultTheme = "dark";
+        try {
+          const storedTheme = window.localStorage.getItem("interview-copilot-theme");
+          const theme = storedTheme === "light" ? "light" : defaultTheme;
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+        } catch {
+          document.documentElement.dataset.theme = defaultTheme;
+          document.documentElement.style.colorScheme = defaultTheme;
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

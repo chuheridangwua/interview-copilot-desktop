@@ -11,6 +11,47 @@
 - 如果改了启动方式、环境变量、端口、脚本或用户操作流程，必须同步更新 `README.md` 和 `docs/LOCAL_CODEX_HANDOFF.md`。
 - 如果发现线上或本机真实表现和本文档不一致，以本机实测为准，并立刻追加修正记录。
 
+## 2026-06-02 17:47 +08:00
+
+### 目标
+
+修正左侧 `面试官问题列表` 容易把长问题截断成多条的问题。问题生成要使用最近约 2 分钟系统声音 ASR 上下文，并带上前面几个已确认问题，避免同一问题被拆碎或重复记录。
+
+### 已完成
+
+- `inferQuestionsFromSegments()` 新增 `maxSegments` / `maxChars` 参数，默认仍保持旧的最近 4 段行为，面试主流程显式使用 2 分钟滚动窗口。
+- Electron main process 新增系统 ASR 问题上下文窗口：
+  - 最近 2 分钟。
+  - 最多 80 段。
+  - 最多约 2400 字。
+- final 稳定转写不再把窗口内推断出的所有问题都发到左侧列表，只取最新一个问题，避免旧问题被重复刷新出来。
+- partial 临时问题提高置信度门槛，并把刷新节流从亚秒级放慢到约 1 秒以上，减少半句话抢跑造成的截断问题。
+- 后端记录最近已确认问题，方舟问题抽取和问题校准会收到 `previous_questions`，用于识别重复问题和补全最新完整问题。
+- 重复问题判断支持“长问题覆盖短截断”：后续更完整的问题可以替换短片段，短片段重复完整问题会被跳过。
+- `scripts/test-question-matcher.mjs` 新增长上下文测试，验证扩展窗口能保留旧段落作为问题上下文。
+
+### 验证结果
+
+待本次收尾后执行：
+
+```powershell
+node -c electron/main.cjs
+node -c electron/backend/questionMatcher.cjs
+node -c electron/backend/arkQuestionEnhancer.cjs
+npm run test:matcher
+npm run build
+git diff --check
+```
+
+### 已知问题
+
+- 真实效果仍依赖 ASR 分段质量；如果 ASR 把一个长问题拆得很碎，方舟校准会比本地规则更可靠。
+- partial 现在更保守，左侧临时问题可能比之前慢一点出现，但 final 问题会更完整。
+
+### 下一步
+
+- 用真实面试音频验证：长问题、追问、笔试类说明是否只生成一条完整问题。
+
 ## 2026-06-02 17:31 +08:00
 
 ### 目标

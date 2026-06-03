@@ -245,7 +245,8 @@ model-answers.jsonl
 - React UI 和本地匹配逻辑保留。
 - Electron main process 负责豆包 ASR WebSocket、问题库解析、匹配事件分发。
 - Electron preload 负责调用 `getDisplayMedia` 获取系统音频，并按设置里的麦克风输入调用 `getUserMedia` 获取麦克风音频；两路都转成 `16kHz / 16bit / mono / PCM`，按 200ms 分包发给 main process。
-- Electron main process 使用系统音频 ASR 结果做问题抽取和题库匹配；麦克风 ASR 结果只写入最近对话上下文，最终口述稿生成时截取最近约 2000 字传给方舟。
+- Electron main process 使用系统音频 ASR 结果做问题抽取和题库匹配；问题抽取会结合最近约 2 分钟系统转写，只把最新一个完整问题发到左侧列表，避免长问题被拆成多条。
+- 麦克风 ASR 结果只写入最近对话上下文，最终口述稿生成时截取最近约 2000 字传给方舟。
 - Electron main process 会自动归档每场面试的系统/麦克风录音、两路转写、整合转写、问题列表，以及每个问题对应的题库答案和 AI 答案。
 - Electron main process 会扫描 `resources/company/*`，按当前选择的公司生成会话级 matcher，并把公司 `Introduction.md` 注入最终口述稿生成。
 - 方舟小模型后台执行短 JSON 任务，用于 final 问题确认和候选重排；前排优先使用小模型 Top 3，后面保留本地 Top 10 候选。

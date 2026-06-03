@@ -604,15 +604,20 @@ function mergeClauseFragments(clauses) {
   return result;
 }
 
-function inferQuestionsFromSegments(segments) {
+function inferQuestionsFromSegments(segments, options = {}) {
+  const maxSegments = Math.max(1, Number(options.maxSegments || 4));
+  const maxChars = Math.max(80, Number(options.maxChars || 0));
   const sourceItems = (segments ?? [])
     .map(segmentText)
     .map((text) => String(text ?? "").trim())
     .filter(Boolean)
-    .slice(-4);
+    .slice(-maxSegments);
   if (!sourceItems.length) return null;
 
-  const sourceText = sourceItems.join("。");
+  const joinedSourceText = sourceItems.join("。");
+  const sourceText = maxChars > 0 && joinedSourceText.length > maxChars
+    ? joinedSourceText.slice(-maxChars)
+    : joinedSourceText;
   const clauses = mergeClauseFragments(sourceText
     .split(/(?<=[。！？?；;])|[，,、]/)
     .map((item) => item.trim())
@@ -659,8 +664,8 @@ function inferQuestionsFromSegments(segments) {
     });
 }
 
-function inferQuestionFromSegments(segments) {
-  return inferQuestionsFromSegments(segments).at(-1) ?? null;
+function inferQuestionFromSegments(segments, options = {}) {
+  return (inferQuestionsFromSegments(segments, options) || []).at(-1) ?? null;
 }
 
 function resolveQuestionBankPath(appPath = process.cwd()) {

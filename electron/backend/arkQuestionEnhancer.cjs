@@ -238,24 +238,28 @@ async function streamArkChat({
   }
 }
 
-async function inferQuestionWithArk({ text, signal, timeoutMs = 2500, model }) {
+async function inferQuestionWithArk({ text, previousQuestions = [], signal, timeoutMs = 2500, model }) {
   const content = await callArkChat({
     signal,
     timeoutMs,
     model: resolveArkFastModel(model),
-    maxTokens: 80,
+    maxTokens: 120,
     messages: [
       {
         role: "system",
         content: [
-          "从实时ASR里抽取最新面试官问题。",
-          "同一追问合并，不拆小问；候选人回答/寒暄返回否。",
+          "从最近两分钟实时ASR里抽取最新一个完整面试官问题。",
+          "如果最新内容是同一问题的后半段，要结合上下文补全成完整问题，不要截断。",
+          "同一追问合并，不拆小问；如果只是重复前面已记录的问题、候选人回答或寒暄，返回否。",
           "只输出JSON:{\"ok\":boolean,\"q\":\"\",\"c\":0-1}。",
         ].join(""),
       },
       {
         role: "user",
-        content: String(text ?? "").slice(-480),
+        content: JSON.stringify({
+          previous_questions: previousQuestions.slice(-5),
+          asr_context: String(text ?? "").slice(-1800),
+        }),
       },
     ],
   });
@@ -273,18 +277,18 @@ async function inferQuestionWithArk({ text, signal, timeoutMs = 2500, model }) {
   };
 }
 
-async function confirmQuestionWithArk({ sourceText, localQuestion, signal, timeoutMs = 2500, model }) {
+async function confirmQuestionWithArk({ sourceText, localQuestion, previousQuestions = [], signal, timeoutMs = 2500, model }) {
   const content = await callArkChat({
     signal,
     timeoutMs,
     model: resolveArkFastModel(model),
-    maxTokens: 96,
+    maxTokens: 120,
     messages: [
       {
         role: "system",
         content: [
-          "校准AI产品经理面试问题。",
-          "修正ASR截断/错字/误拼接；同一追问合并；候选人回答或寒暄返回否。",
+          "校准AI产品经理面试问题，输出最新一个完整面试官问题。",
+          "修正ASR截断/错字/误拼接；同一追问合并；如果只是重复前面已记录的问题、候选人回答或寒暄，返回否。",
           "只输出JSON:{\"ok\":boolean,\"q\":\"\",\"c\":0-1,\"r\":\"\"}。",
         ].join(""),
       },
@@ -292,7 +296,8 @@ async function confirmQuestionWithArk({ sourceText, localQuestion, signal, timeo
         role: "user",
         content: JSON.stringify({
           local_question: String(localQuestion ?? "").slice(0, 180),
-          asr_context: String(sourceText ?? "").slice(-700),
+          previous_questions: previousQuestions.slice(-5),
+          asr_context: String(sourceText ?? "").slice(-1800),
           target_role: "AI产品经理",
         }),
       },

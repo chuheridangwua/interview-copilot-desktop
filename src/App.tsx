@@ -6,11 +6,13 @@ import {
   FileText,
   LoaderCircle,
   Mic,
+  Moon,
   OctagonAlert,
   Pause,
   Play,
   Save,
   Settings,
+  Sun,
   X,
 } from "lucide-react";
 import {
@@ -34,8 +36,11 @@ import {
 } from "./desktopClient";
 
 const DEFAULT_RESOURCE_ID = "volc.seedasr.sauc.duration";
+const THEME_STORAGE_KEY = "interview-copilot-theme";
+const CANDIDATE_DISPLAY_LIMIT = 3;
 
 type SessionState = "idle" | "running" | "paused" | "ended";
+type ThemeMode = "dark" | "light";
 
 interface TranscriptSegment {
   id: string;
@@ -63,6 +68,12 @@ interface QuestionRecord {
   modelAnswerLatencyMs?: number;
 }
 
+function getLatestQuestionRecord(records: QuestionRecord[]) {
+  return records.reduce<QuestionRecord | null>((latest, record) => (
+    !latest || record.receivedAt > latest.receivedAt ? record : latest
+  ), null);
+}
+
 const HEALTH_ITEMS: Array<[string, string]> = [
   ["audio", "音频"],
   ["asr", "ASR"],
@@ -80,6 +91,16 @@ function createInitialHealthItems(): Record<string, HealthStatusItem> {
 
 function cls(...items: Array<string | false | null | undefined>) {
   return items.filter(Boolean).join(" ");
+}
+
+function getInitialTheme(): ThemeMode {
+  if (typeof window === "undefined") return "dark";
+  try {
+    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return storedTheme === "light" ? "light" : "dark";
+  } catch {
+    return "dark";
+  }
 }
 
 function formatTime(value: number) {
@@ -194,6 +215,7 @@ function highlightAnswer(answer: string, terms: string[]) {
 }
 
 export default function App() {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => getInitialTheme());
   const [sources, setSources] = useState<AudioSource[]>([]);
   const [mediaDevices, setMediaDevices] = useState<MediaDeviceOptions>({ audioInputs: [], audioOutputs: [] });
   const [companies, setCompanies] = useState<CompanyOption[]>([]);
@@ -213,6 +235,7 @@ export default function App() {
   const [questionRecords, setQuestionRecords] = useState<QuestionRecord[]>([]);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const selectedRecordIdRef = useRef<string | null>(null);
+  const autoFollowLatestQuestionRef = useRef(true);
   const [candidates, setCandidates] = useState<MatchCandidate[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState<MatchCandidate | null>(null);
   const [systemAudioVolumePercent, setSystemAudioVolumePercent] = useState<number | null>(null);
@@ -224,12 +247,31 @@ export default function App() {
   const [logDir, setLogDir] = useState("");
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = themeMode;
+    root.style.colorScheme = themeMode;
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+    } catch {
+      // Storage can be unavailable in locked-down desktop shells; keep the live theme applied.
+    }
+  }, [themeMode]);
+
+  useEffect(() => {
     sessionStateRef.current = sessionState;
   }, [sessionState]);
 
   useEffect(() => {
     selectedRecordIdRef.current = selectedRecordId;
   }, [selectedRecordId]);
+
+  useEffect(() => {
+    if (questionRecords.length === 0) return;
+    const visibleRecord = autoFollowLatestQuestionRef.current
+      ? getLatestQuestionRecord(questionRecords)
+      : questionRecords.find((record) => record.id === selectedRecordIdRef.current) ?? null;
+    if (visibleRecord) showRecord(visibleRecord);
+  }, [questionRecords]);
 
   const hasVirtualSource = useMemo(
     () => sources.some((source) => source.captureMode === "virtual_audio_device"),
@@ -261,7 +303,9 @@ export default function App() {
     setMicrophoneLiveTranscript(null);
     setMicrophoneTranscriptSegments([]);
     setQuestionRecords([]);
+    selectedRecordIdRef.current = null;
     setSelectedRecordId(null);
+    autoFollowLatestQuestionRef.current = true;
     setCandidates([]);
     setSelectedCandidate(null);
   }
@@ -478,7 +522,6 @@ export default function App() {
           selectedCandidate: topCandidate,
         };
 
-        setCandidates(payload.candidates);
         setQuestionRecords((records) => {
           const baseRecords = payload.definite ? records.filter((item) => item.id !== "question-live") : records;
           const duplicateIndex = baseRecords.findIndex((item) => (
@@ -490,29 +533,24 @@ export default function App() {
             if (record.provisional && !existing.provisional) {
               return next.slice(0, 40);
             }
-            next[duplicateIndex] = {
+            const updatedRecord = {
               ...existing,
               ...record,
               id: existing.provisional && !record.provisional ? record.id : existing.id,
               matchId: record.matchId,
               provisional: record.provisional && !record.enhanced,
             };
+            next[duplicateIndex] = updatedRecord;
             return next.slice(0, 40);
           }
           return [record, ...baseRecords].slice(0, 40);
         });
-        setSelectedRecordId((current) => (
-          payload.definite || payload.enhanced || current === "question-live" || current === null ? recordId : current
-        ));
-        if (topCandidate) setSelectedCandidate(topCandidate);
       }));
 
       unlisteners.push(await listenEvent<ModelQuestionUpdateEvent>("model_question_update", (payload) => {
         setQuestionRecords((records) => {
-          let changedRecordId: string | null = null;
-          const next = records.map((record) => {
+          return records.map((record) => {
             if (record.matchId !== payload.matchId) return record;
-            changedRecordId = record.id;
             const selected = record.selectedCandidate && payload.candidates.some((candidate) => candidate.id === record.selectedCandidate?.id)
               ? record.selectedCandidate
               : payload.candidates[0] ?? record.selectedCandidate;
@@ -527,24 +565,14 @@ export default function App() {
               selectedCandidate: selected,
             };
           });
-          if (changedRecordId && selectedRecordIdRef.current === changedRecordId) {
-            const current = next.find((record) => record.id === changedRecordId);
-            if (current) {
-              setCandidates(current.candidates);
-              setSelectedCandidate(current.selectedCandidate ?? current.candidates[0] ?? null);
-            }
-          }
-          return next;
         });
       }));
 
       unlisteners.push(await listenEvent<AiMatchUpdateEvent>("ai_match_update", (payload) => {
         if (payload.status !== "ready" || payload.candidates.length === 0) return;
         setQuestionRecords((records) => {
-          let changedRecordId: string | null = null;
-          const next = records.map((record) => {
+          return records.map((record) => {
             if (record.matchId !== payload.matchId) return record;
-            changedRecordId = record.id;
             const mergedCandidates = mergeCandidateList(payload.candidates, record.candidates, 10);
             const selected = record.selectedCandidate && mergedCandidates.some((candidate) => candidate.id === record.selectedCandidate?.id)
               ? mergedCandidates.find((candidate) => candidate.id === record.selectedCandidate?.id) ?? record.selectedCandidate
@@ -555,14 +583,6 @@ export default function App() {
               selectedCandidate: selected,
             };
           });
-          if (changedRecordId && selectedRecordIdRef.current === changedRecordId) {
-            const current = next.find((record) => record.id === changedRecordId);
-            if (current) {
-              setCandidates(current.candidates);
-              setSelectedCandidate(current.selectedCandidate ?? current.candidates[0] ?? null);
-            }
-          }
-          return next;
         });
       }));
 
@@ -628,7 +648,9 @@ export default function App() {
       setMicrophoneLiveTranscript(null);
       setMicrophoneTranscriptSegments([]);
       setQuestionRecords([]);
+      selectedRecordIdRef.current = null;
       setSelectedRecordId(null);
+      autoFollowLatestQuestionRef.current = true;
       setCandidates([]);
       setSelectedCandidate(null);
     } catch (err) {
@@ -666,10 +688,23 @@ export default function App() {
     }
   }
 
-  function selectRecord(record: QuestionRecord) {
+  function showRecord(record: QuestionRecord) {
+    selectedRecordIdRef.current = record.id;
     setSelectedRecordId(record.id);
     setCandidates(record.candidates);
     setSelectedCandidate(record.selectedCandidate ?? record.candidates[0] ?? null);
+  }
+
+  function followLatestQuestion() {
+    autoFollowLatestQuestionRef.current = true;
+    const latestRecord = getLatestQuestionRecord(questionRecords);
+    if (latestRecord) showRecord(latestRecord);
+  }
+
+  function selectRecord(record: QuestionRecord) {
+    const latestRecord = getLatestQuestionRecord(questionRecords);
+    autoFollowLatestQuestionRef.current = latestRecord?.id === record.id;
+    showRecord(record);
   }
 
   function selectCandidate(candidate: MatchCandidate) {
@@ -726,6 +761,7 @@ export default function App() {
   const modelAnswerParagraphs = splitParagraphs(modelAnswerDetail);
   const modelAnswerStreaming = selectedRecord?.modelAnswerStatus === "streaming";
   const modelAnswerVisible = Boolean(selectedRecord && (modelAnswer || modelAnswerStreaming || selectedRecord.modelAnswerStatus === "error"));
+  const displayedCandidates = candidates.slice(0, CANDIDATE_DISPLAY_LIMIT);
   const displayedTranscriptSegments = [...transcriptSegments].reverse();
   const displayedMicrophoneTranscriptSegments = [...microphoneTranscriptSegments].reverse();
   return (
@@ -794,6 +830,16 @@ export default function App() {
             <button className="icon-button settings-command" type="button" onClick={() => setSettingsOpen(true)} title="打开采集和 ASR 设置">
               <Settings size={16} />
               <span>设置</span>
+            </button>
+            <button
+              className={cls("icon-button", "theme-command", themeMode === "dark" && "active")}
+              type="button"
+              onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
+              aria-pressed={themeMode === "dark"}
+              title={themeMode === "dark" ? "切换到浅色模式" : "切换到深色模式"}
+            >
+              {themeMode === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              <span>{themeMode === "dark" ? "深色" : "浅色"}</span>
             </button>
             {sessionState === "running" ? (
               <button className="icon-button" type="button" onClick={pauseInterview}>
@@ -899,9 +945,14 @@ export default function App() {
         <section className="left-stack">
           <section className="panel question-panel">
             <div className="panel-title split">
-              <div>
+              <button
+                className="panel-title-button"
+                type="button"
+                onClick={followLatestQuestion}
+                title="切回自动跟随最新问题"
+              >
                 <h2>面试官问题列表</h2>
-              </div>
+              </button>
             </div>
             <div className="question-list">
               {questionRecords.length === 0 ? (
@@ -940,10 +991,10 @@ export default function App() {
               {candidates.length === 0 ? (
                 <div className="empty-state">
                   <AudioLines size={24} />
-                  <p>推断出问题后，这里会实时显示本地 Top 10 匹配。</p>
+                  <p>推断出问题后，这里会实时显示最好的 3 个匹配。</p>
                 </div>
               ) : null}
-              {candidates.map((candidate) => (
+              {displayedCandidates.map((candidate) => (
                 <button
                   type="button"
                   key={candidate.id}
