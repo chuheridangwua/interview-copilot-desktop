@@ -31,6 +31,7 @@ const QUESTION_CONTEXT_MAX_SEGMENTS = 80;
 const QUESTION_CONTEXT_MAX_CHARS = 2400;
 const PARTIAL_QUESTION_MIN_CONFIDENCE = 0.72;
 const MANUAL_QUESTION_SUPPRESSION_TAIL_MS = 1200;
+const PRO_ANSWER_SERVICE_TIER = "fast";
 const isDev = Boolean(process.env.ELECTRON_DEV || process.env.ELECTRON_RENDERER_URL);
 
 let mainWindow = null;
@@ -557,7 +558,10 @@ function sortedArchivedQuestions(session) {
 function questionMarkdownBlock(question, index) {
   const candidates = question.candidates || [];
   const topCandidate = candidates[0] || null;
-  const aiAnswer = String(question.aiAnswer || "").trim();
+  const miniAnswer = String(question.aiAnswers?.mini?.answer || question.aiAnswer || "").trim();
+  const miniError = String(question.aiAnswers?.mini?.error || question.aiAnswerError || "").trim();
+  const proAnswer = String(question.aiAnswers?.pro?.answer || "").trim();
+  const proError = String(question.aiAnswers?.pro?.error || "").trim();
   const displayQuestionText = question.confirmedQuestionText || question.questionText || question.localQuestionText || "未命名问题";
   return [
     `## ${index + 1}. ${displayQuestionText}`,
@@ -595,7 +599,12 @@ function questionMarkdownBlock(question, index) {
       "",
     ].join("\n") : "",
     "### AI 答案",
-    aiAnswer || question.aiAnswerError || "暂未生成。",
+    "",
+    "#### Mini",
+    miniAnswer || miniError || "暂未生成。",
+    "",
+    "#### Pro Fast",
+    proAnswer || proError || "暂未生成。",
     "",
   ].filter((line) => line !== "").join("\n");
 }
@@ -731,13 +740,26 @@ function archiveAiMatchUpdate(payload) {
 }
 
 function archiveModelAnswerUpdate(payload) {
+  const variant = payload.variant === "pro" ? "pro" : "mini";
   upsertArchivedQuestion(payload.matchId, (existing) => ({
     questionText: existing.confirmedQuestionText || existing.questionText || payload.questionText,
-    aiAnswerStatus: payload.status,
-    aiAnswer: typeof payload.answer === "string" ? payload.answer : existing.aiAnswer,
-    aiAnswerError: payload.status === "error" ? payload.message : existing.aiAnswerError,
-    aiAnswerReason: payload.reason || existing.aiAnswerReason,
-    aiAnswerLatencyMs: payload.latencyMs,
+    aiAnswers: {
+      ...(existing.aiAnswers || {}),
+      [variant]: {
+        status: payload.status,
+        answer: typeof payload.answer === "string" ? payload.answer : existing.aiAnswers?.[variant]?.answer || "",
+        error: payload.status === "error" ? payload.message : existing.aiAnswers?.[variant]?.error || "",
+        reason: payload.reason || existing.aiAnswers?.[variant]?.reason || "",
+        latencyMs: payload.latencyMs,
+        model: payload.model || existing.aiAnswers?.[variant]?.model || "",
+        serviceTier: payload.serviceTier || existing.aiAnswers?.[variant]?.serviceTier || "",
+      },
+    },
+    aiAnswerStatus: variant === "mini" ? payload.status : existing.aiAnswerStatus,
+    aiAnswer: variant === "mini" && typeof payload.answer === "string" ? payload.answer : existing.aiAnswer,
+    aiAnswerError: variant === "mini" && payload.status === "error" ? payload.message : existing.aiAnswerError,
+    aiAnswerReason: variant === "mini" ? payload.reason || existing.aiAnswerReason : existing.aiAnswerReason,
+    aiAnswerLatencyMs: variant === "mini" ? payload.latencyMs : existing.aiAnswerLatencyMs,
     receivedAt: existing.receivedAt || payload.receivedAt || nowMs(),
   }));
 }
@@ -832,7 +854,11 @@ function finalizeSessionArchive(session) {
       microphoneTranscript: session.archive.microphoneTranscripts.length,
       combinedTranscript: session.archive.combinedTranscripts.length,
       questions: questions.length,
-      questionsWithAiAnswer: questions.filter((question) => String(question.aiAnswer || "").trim()).length,
+      questionsWithAiAnswer: questions.filter((question) => (
+        String(question.aiAnswer || "").trim()
+        || String(question.aiAnswers?.mini?.answer || "").trim()
+        || String(question.aiAnswers?.pro?.answer || "").trim()
+      )).length,
     },
     files: {
       systemAudioPcm: fs.existsSync(systemPcmPath) ? "system-audio.pcm" : "",
@@ -1045,6 +1071,9 @@ function emitModelAnswerUpdate(payload) {
   archiveModelAnswerUpdate(payload);
   appendModelLog("answer_update", {
     matchId: payload.matchId,
+    variant: payload.variant || "mini",
+    model: payload.model || "",
+    serviceTier: payload.serviceTier || "",
     status: payload.status,
     question: snippet(payload.questionText, 160),
     delta: snippet(payload.delta, 220),
@@ -1062,8 +1091,7 @@ function maybeGenerateFallbackAnswer({ matchId, questionText, candidates, reason
 
   fallbackAnswerMatchIds.add(matchId);
   const requestSessionSeq = arkEnhanceSeq;
-  const started = nowMs();
-  let answer = "";
+  const arkConfig = resolveArkConfig();
   const resume = loadResumeText();
   const companyContext = currentSession?.matcherBundle?.companyContext || null;
   const conversationContext = buildConversationContextText(2000);
@@ -1071,106 +1099,161 @@ function maybeGenerateFallbackAnswer({ matchId, questionText, candidates, reason
   const topScore = Number(pool[0]?.score ?? 0);
   const mode = topScore >= 65 ? "answer_guided" : "resume_generated";
 
-  emitDebugLog("model_answer_start", {
-    matchId,
-    reason,
-    mode,
-    question: snippet(cleanedQuestion, 140),
-    candidates: pool.map((item) => `#${item.id}:${item.score}`).join(","),
-    hasResume: resume.length > 0,
-    company: companyContext?.name || "",
-    conversationContextLength: conversationContext.length,
-  });
-  emitModelAnswerUpdate({
-    matchId,
-    status: "streaming",
-    questionText: cleanedQuestion,
-    delta: "",
-    answer: "",
-    reason: reason || mode,
-    receivedAt: nowMs(),
-    latencyMs: 0,
-  });
-
-  generateFallbackAnswerStreamWithArk({
-    question: cleanedQuestion,
-    candidates: pool,
-    resumeText: resume,
-    companyContext,
-    conversationContext,
-    mode,
-    timeoutMs: 10000,
-    onDelta: (delta, fullText) => {
-      if (!currentSession || requestSessionSeq !== arkEnhanceSeq) return;
-      answer = fullText;
-      emitModelAnswerUpdate({
-        matchId,
-        status: "streaming",
-        questionText: cleanedQuestion,
-        delta,
-        answer,
-        reason: reason || mode,
-        receivedAt: nowMs(),
-        latencyMs: nowMs() - started,
-      });
+  const variants = [
+    {
+      variant: "mini",
+      label: "Mini",
+      model: arkConfig.model,
+      serviceTier: "",
+      timeoutMs: 10000,
     },
-  })
-    .then((result) => {
-      if (!currentSession || requestSessionSeq !== arkEnhanceSeq) return;
-      answer = String(result || answer || "").trim();
-      if (!answer) {
+    {
+      variant: "pro",
+      label: "Pro Fast",
+      model: arkConfig.proModel,
+      serviceTier: PRO_ANSWER_SERVICE_TIER,
+      timeoutMs: 14000,
+    },
+  ].filter((item) => item.model);
+
+  function startAnswerVariant({ variant, label, model, serviceTier, timeoutMs }) {
+    const started = nowMs();
+    let answer = "";
+    emitDebugLog("model_answer_start", {
+      matchId,
+      variant,
+      model,
+      serviceTier,
+      reason,
+      mode,
+      question: snippet(cleanedQuestion, 140),
+      candidates: pool.map((item) => `#${item.id}:${item.score}`).join(","),
+      hasResume: resume.length > 0,
+      company: companyContext?.name || "",
+      conversationContextLength: conversationContext.length,
+    });
+    emitModelAnswerUpdate({
+      matchId,
+      variant,
+      label,
+      model,
+      serviceTier,
+      status: "streaming",
+      questionText: cleanedQuestion,
+      delta: "",
+      answer: "",
+      reason: reason || mode,
+      receivedAt: nowMs(),
+      latencyMs: 0,
+    });
+
+    generateFallbackAnswerStreamWithArk({
+      question: cleanedQuestion,
+      candidates: pool,
+      resumeText: resume,
+      companyContext,
+      conversationContext,
+      mode,
+      model,
+      serviceTier,
+      timeoutMs,
+      onDelta: (delta, fullText) => {
+        if (!currentSession || requestSessionSeq !== arkEnhanceSeq) return;
+        answer = fullText;
         emitModelAnswerUpdate({
           matchId,
-          status: "error",
+          variant,
+          label,
+          model,
+          serviceTier,
+          status: "streaming",
           questionText: cleanedQuestion,
-          answer: "",
-          message: "方舟未返回可用答案",
+          delta,
+          answer,
           reason: reason || mode,
           receivedAt: nowMs(),
           latencyMs: nowMs() - started,
         });
-        emitDebugLog("model_answer_empty", {
+      },
+    })
+      .then((result) => {
+        if (!currentSession || requestSessionSeq !== arkEnhanceSeq) return;
+        answer = String(result || answer || "").trim();
+        if (!answer) {
+          emitModelAnswerUpdate({
+            matchId,
+            variant,
+            label,
+            model,
+            serviceTier,
+            status: "error",
+            questionText: cleanedQuestion,
+            answer: "",
+            message: "方舟未返回可用答案",
+            reason: reason || mode,
+            receivedAt: nowMs(),
+            latencyMs: nowMs() - started,
+          });
+          emitDebugLog("model_answer_empty", {
+            matchId,
+            variant,
+            model,
+            question: snippet(cleanedQuestion, 120),
+            latencyMs: nowMs() - started,
+          });
+          return;
+        }
+        emitModelAnswerUpdate({
           matchId,
-          question: snippet(cleanedQuestion, 120),
+          variant,
+          label,
+          model,
+          serviceTier,
+          status: "done",
+          questionText: cleanedQuestion,
+          answer,
+          reason: reason || mode,
+          receivedAt: nowMs(),
           latencyMs: nowMs() - started,
         });
-        return;
-      }
-      emitModelAnswerUpdate({
-        matchId,
-        status: "done",
-        questionText: cleanedQuestion,
-        answer,
-        reason: reason || mode,
-        receivedAt: nowMs(),
-        latencyMs: nowMs() - started,
+        emitDebugLog("model_answer_done", {
+          matchId,
+          variant,
+          model,
+          question: snippet(cleanedQuestion, 120),
+          answer: snippet(answer, 180),
+          latencyMs: nowMs() - started,
+        });
+      })
+      .catch((error) => {
+        if (!currentSession || requestSessionSeq !== arkEnhanceSeq) return;
+        emitModelAnswerUpdate({
+          matchId,
+          variant,
+          label,
+          model,
+          serviceTier,
+          status: "error",
+          questionText: cleanedQuestion,
+          answer,
+          message: error.message,
+          reason: reason || mode,
+          receivedAt: nowMs(),
+          latencyMs: nowMs() - started,
+        });
+        emitDebugLog("model_answer_error", {
+          matchId,
+          variant,
+          model,
+          question: snippet(cleanedQuestion, 120),
+          message: error.message,
+          latencyMs: nowMs() - started,
+        });
+        emitLog({ message: `方舟${label}答案跳过：${error.message}` });
       });
-      emitDebugLog("model_answer_done", {
-        matchId,
-        question: snippet(cleanedQuestion, 120),
-        answer: snippet(answer, 180),
-        latencyMs: nowMs() - started,
-      });
-    })
-    .catch((error) => {
-      emitModelAnswerUpdate({
-        matchId,
-        status: "error",
-        questionText: cleanedQuestion,
-        answer,
-        message: error.message,
-        reason: reason || mode,
-        receivedAt: nowMs(),
-        latencyMs: nowMs() - started,
-      });
-      emitDebugLog("model_answer_error", {
-        matchId,
-        question: snippet(cleanedQuestion, 120),
-        message: error.message,
-        latencyMs: nowMs() - started,
-      });
-      emitLog({ message: `方舟兜底答案跳过：${error.message}` });
-    });
+  }
+
+  variants.forEach(startAnswerVariant);
 }
 
 function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transcript, skipQuestionConfirm = false }) {
@@ -1546,6 +1629,32 @@ async function resolveManualQuestion(payload = {}) {
   };
 }
 
+function resolveManualQuestionFast(payload = {}) {
+  const { sourceText, segments } = buildManualQuestionSource(payload);
+  const compactSource = compactQuestionKey(sourceText);
+  if (compactSource.length < 4) {
+    throw new Error("标记区间内没有可用面试官转写");
+  }
+  const local = inferManualQuestionLocally(sourceText, segments);
+  const fallbackQuestion = normalizeQuestionTextForManual(sourceText.slice(-220));
+  const questionText = normalizeQuestionTextForManual(local?.questionText || fallbackQuestion);
+  if (!questionText || compactQuestionKey(questionText).length < 4) {
+    throw new Error("标记区间内没有可用面试官转写");
+  }
+  return {
+    questionText,
+    localQuestionText: questionText,
+    confirmedQuestionText: "",
+    confidence: local?.confidence ?? 0.7,
+    reason: local?.reason || "手动标记快速原文",
+    confirmed: false,
+    questionType: "",
+    evidenceTerms: [],
+    sourceText,
+    segments,
+  };
+}
+
 async function submitManualQuestionSegment(payload = {}) {
   if (!currentSession) throw new Error("当前没有正在进行的面试会话");
   if (sessionPaused) throw new Error("面试暂停中，不能提交手动问题");
@@ -1555,7 +1664,8 @@ async function submitManualQuestionSegment(payload = {}) {
   addManualQuestionSuppressionWindow(startedAt || manualQuestionMarkingStartedAt, receivedAt, "manual_question_submit");
   manualQuestionMarking = false;
   manualQuestionMarkingStartedAt = 0;
-  const resolved = await resolveManualQuestion(payload);
+  const requestSessionSeq = arkEnhanceSeq;
+  const resolved = resolveManualQuestionFast(payload);
   const matchId = `manual-${receivedAt}-${shortHash(`${resolved.questionText}\n${resolved.sourceText}`)}`;
   removedQuestionMatchIds.delete(matchId);
   const inferred = {
@@ -1588,6 +1698,48 @@ async function submitManualQuestionSegment(payload = {}) {
     matchId,
     skipQuestionConfirm: true,
   });
+  maybeGenerateFallbackAnswer({
+    matchId,
+    questionText: resolved.questionText,
+    candidates: activeMatcherBundle().matcher.search(resolved.questionText, 10),
+    reason: "manual_marker_fast_answer",
+  });
+  confirmManualQuestionWithArk({
+    sourceText: resolved.sourceText,
+    timeoutMs: 2800,
+  })
+    .then((confirmed) => {
+      if (!currentSession || requestSessionSeq !== arkEnhanceSeq || removedQuestionMatchIds.has(matchId)) return;
+      if (!confirmed?.questionText) return;
+      const confirmedQuestionText = normalizeQuestionTextForManual(confirmed.questionText);
+      if (!confirmedQuestionText || normalize(confirmedQuestionText) === normalize(resolved.questionText)) return;
+      const confirmedCandidates = activeMatcherBundle().matcher.search(confirmedQuestionText, 10);
+      emitModelQuestionUpdate({
+        matchId,
+        questionText: confirmedQuestionText,
+        sourceText: resolved.sourceText,
+        confidence: confirmed.confidence ?? resolved.confidence,
+        reason: confirmed.reason || "手动标记方舟整理",
+        source: "manual_marker",
+        manualStartedAt: startedAt,
+        manualEndedAt: receivedAt,
+        manualSegments: resolved.segments,
+        candidates: confirmedCandidates,
+        receivedAt: nowMs(),
+      });
+      emitDebugLog("manual_question_confirmed_background", {
+        matchId,
+        original: snippet(resolved.questionText, 120),
+        confirmed: snippet(confirmedQuestionText, 120),
+      });
+    })
+    .catch((error) => {
+      emitDebugLog("manual_question_confirm_error", {
+        matchId,
+        source: snippet(resolved.sourceText, 160),
+        message: error.message,
+      });
+    });
   return {
     matchId,
     questionText: resolved.questionText,

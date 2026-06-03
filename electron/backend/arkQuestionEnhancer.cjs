@@ -3,6 +3,7 @@ const { execFileSync } = require("node:child_process");
 const DEFAULT_ARK_BASE_URL = "https://ark.cn-beijing.volces.com/api/v3";
 const DEFAULT_ARK_MODEL = "doubao-seed-2-0-mini-260428";
 const DEFAULT_ARK_FAST_MODEL = DEFAULT_ARK_MODEL;
+const DEFAULT_ARK_PRO_MODEL = "doubao-seed-2-0-pro-260215";
 const WINDOWS_ENV_REGISTRY_KEYS = [
   "HKCU\\Environment",
   "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
@@ -67,6 +68,7 @@ function resolveArkConfig() {
     baseUrl: String(getEnv("ARK_BASE_URL") || DEFAULT_ARK_BASE_URL).replace(/\/+$/, ""),
     model,
     fastModel: model,
+    proModel: String(getEnv("ARK_PRO_MODEL") || getEnv("DOUBAO_ARK_PRO_MODEL") || DEFAULT_ARK_PRO_MODEL).trim(),
     enabled: String(getEnv("ARK_QUESTION_ENHANCER") || "1") !== "0",
   };
 }
@@ -157,6 +159,7 @@ async function streamArkChat({
   timeoutMs = 9000,
   model,
   disableThinking = true,
+  serviceTier,
   onDelta,
 }) {
   const config = resolveArkConfig();
@@ -177,6 +180,9 @@ async function streamArkChat({
     };
     if (disableThinking && supportsThinkingControl(modelId)) {
       body.thinking = { type: "disabled" };
+    }
+    if (serviceTier) {
+      body.service_tier = serviceTier;
     }
     const response = await fetch(`${config.baseUrl}/chat/completions`, {
       method: "POST",
@@ -514,6 +520,7 @@ async function generateFallbackAnswerStreamWithArk({
   signal,
   timeoutMs = 9000,
   model,
+  serviceTier,
   onDelta,
 }) {
   const pool = (candidates ?? []).slice(0, 5).map(compactCandidate);
@@ -524,6 +531,7 @@ async function generateFallbackAnswerStreamWithArk({
     signal,
     timeoutMs,
     model: resolveArkFastModel(model),
+    serviceTier,
     maxTokens: 760,
     temperature: 0.2,
     onDelta,
@@ -539,13 +547,18 @@ async function generateFallbackAnswerStreamWithArk({
           "如果题库没有可靠命中，再基于简历事实和相近题库片段生成通用回答。",
           "如果提供了面试公司信息，回答公司相关问题时要优先结合公司定位、岗位JD、公司产品、公司题库片段和候选人经历做匹配。",
           "不要编造简历和公司资料之外的事实；题库不匹配时，用简历里的真实经历和公司资料组织通用回答。",
-          "必须严格按下面格式输出，不要输出其他标题、markdown、序号或寒暄：",
+          "输出要更口语化，像候选人在面试现场可以直接朗读的回答；少用书面报告腔，不要堆长句。",
+          "必须严格按下面格式输出，且只能有“回答逻辑：”和“具体内容：”两个一级标签；除具体内容里的**关键词**加粗外，不要输出其他标题、markdown、序号或寒暄：",
           "回答逻辑：",
-          "用一行短语概括，例如：基本身份——核心经历——岗位匹配",
+          "只写一行3到5个短名词短语，用中文破折号“——”连接；不要写完整句子，不要写解释，不要出现【】段落主题。",
+          "例如：设计思路——评分维度——动态权重——落地效果",
+          "如果当前问题询问模型、评分、权重或规则设计，回答逻辑优先使用：设计思路——评分维度——动态权重——落地效果。",
           "",
           "具体内容：",
           "分成2到4段，每段用【段落主题】开头，段落之间用空行分隔。",
-          "具体内容整体4到7句，清晰具体，偏AI产品经理岗位。",
+          "具体内容整体4到7句，清晰具体，偏AI产品经理岗位，语气自然，方便用户直接照着说。",
+          "每段挑3到5个关键词用**关键词**包裹，关键词优先选业务对象、评分维度、权重机制、权限对象、知识库、风险指标、落地结果；不要整句加粗。",
+          "Mini 和 Pro 都必须执行关键词加粗；如果一句话里有核心名词，优先把核心名词加粗。",
         ].join(""),
       },
       {

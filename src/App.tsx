@@ -46,6 +46,18 @@ const MANUAL_MARKER_PREROLL_MS = 10_000;
 type SessionState = "idle" | "running" | "paused" | "ended";
 type ThemeMode = "dark" | "light";
 type ManualMarkerState = "idle" | "marking" | "submitting";
+type ModelAnswerVariant = "mini" | "pro";
+
+interface ModelAnswerState {
+  status?: "streaming" | "done" | "error";
+  answer?: string;
+  error?: string;
+  reason?: string;
+  latencyMs?: number;
+  model?: string;
+  label?: string;
+  serviceTier?: string;
+}
 
 interface TranscriptSegment {
   id: string;
@@ -70,6 +82,7 @@ interface QuestionRecord {
   receivedAt: number;
   candidates: MatchCandidate[];
   selectedCandidate: MatchCandidate | null;
+  modelAnswers?: Partial<Record<ModelAnswerVariant, ModelAnswerState>>;
   modelAnswerStatus?: "streaming" | "done" | "error";
   modelAnswer?: string;
   modelAnswerError?: string;
@@ -172,12 +185,89 @@ function parseModelAnswer(text: string) {
   if (!logicMatch && !detailMatch) return { logic: "", detail: value };
 
   const logicStart = logicMatch ? (logicMatch.index ?? 0) + logicMatch[0].length : 0;
-  const detailStart = detailMatch ? (detailMatch.index ?? value.length) : value.length;
-  const detailContentStart = detailMatch ? detailStart + detailMatch[0].length : value.length;
+  const fallbackDetailMatch = !detailMatch && logicMatch
+    ? value.slice(logicStart).match(/【[^】]{2,24}】/)
+    : null;
+  const fallbackDetailStart = fallbackDetailMatch
+    ? logicStart + (fallbackDetailMatch.index ?? 0)
+    : value.length;
+  const detailStart = detailMatch ? (detailMatch.index ?? value.length) : fallbackDetailStart;
+  const detailContentStart = detailMatch ? detailStart + detailMatch[0].length : fallbackDetailStart;
   return {
     logic: value.slice(logicStart, detailStart).trim(),
     detail: value.slice(detailContentStart).trim(),
   };
+}
+
+function renderModelAnswerText(text: string) {
+  const value = String(text ?? "");
+  if (!value) return null;
+  const nodes: Array<string | JSX.Element> = [];
+  const pattern = /\*\*([^*]+)\*\*/g;
+  let cursor = 0;
+  let match: RegExpExecArray | null = null;
+  function pushAutoHighlighted(segment: string, keyPrefix: string) {
+    const terms = [
+      "权限对象",
+      "权限来源",
+      "权限隔离",
+      "权限映射",
+      "隔离审计",
+      "调用链路",
+      "知识库",
+      "数据源",
+      "工具",
+      "角色",
+      "部门",
+      "岗位",
+      "业务对象",
+      "评分维度",
+      "动态权重",
+      "权重",
+      "规则",
+      "风险指标",
+      "落地效果",
+      "召回",
+      "过滤",
+      "审计",
+      "监控",
+      "成本",
+      "版本",
+      "权限",
+      "风险",
+      "平台",
+      "中台",
+      "模型",
+      "Agent",
+      "AI",
+    ];
+    const escapedTerms = terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const autoPattern = new RegExp(`(${escapedTerms.join("|")})`, "g");
+    let segmentCursor = 0;
+    let autoMatch: RegExpExecArray | null = null;
+    while ((autoMatch = autoPattern.exec(segment)) !== null) {
+      if (autoMatch.index > segmentCursor) nodes.push(segment.slice(segmentCursor, autoMatch.index));
+      nodes.push(
+        <strong className="model-answer-emphasis auto-emphasis" key={`${keyPrefix}-${autoMatch.index}-${autoMatch[1]}`}>
+          {autoMatch[1]}
+        </strong>,
+      );
+      segmentCursor = autoMatch.index + autoMatch[0].length;
+    }
+    if (segmentCursor < segment.length) nodes.push(segment.slice(segmentCursor));
+  }
+
+  while ((match = pattern.exec(value)) !== null) {
+    if (match.index > cursor) pushAutoHighlighted(value.slice(cursor, match.index), `auto-${cursor}`);
+    nodes.push(
+      <strong className="model-answer-emphasis" key={`${match.index}-${match[1]}`}>
+        {match[1]}
+      </strong>,
+    );
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < value.length) pushAutoHighlighted(value.slice(cursor), `auto-${cursor}`);
+  return nodes.length ? nodes : value;
 }
 
 function mergeCandidateList(primary: MatchCandidate[], fallback: MatchCandidate[], limit = 10) {
@@ -657,16 +747,41 @@ export default function App() {
       unlisteners.push(await listenEvent<ModelAnswerUpdateEvent>("model_answer_update", (payload) => {
         setQuestionRecords((records) => records.map((record) => {
           if (record.matchId !== payload.matchId) return record;
+          const variant: ModelAnswerVariant = payload.variant === "pro" ? "pro" : "mini";
+          const previousAnswerState = record.modelAnswers?.[variant] ?? (variant === "mini" ? {
+            status: record.modelAnswerStatus,
+            answer: record.modelAnswer,
+            error: record.modelAnswerError,
+            reason: record.modelAnswerReason,
+            latencyMs: record.modelAnswerLatencyMs,
+          } : {});
           const nextAnswer = typeof payload.answer === "string"
             ? payload.answer
-            : `${record.modelAnswer || ""}${payload.delta || ""}`;
+            : `${previousAnswerState.answer || ""}${payload.delta || ""}`;
+          const nextAnswerState: ModelAnswerState = {
+            ...previousAnswerState,
+            status: payload.status,
+            answer: nextAnswer,
+            error: payload.status === "error" ? payload.message : undefined,
+            reason: payload.reason || previousAnswerState.reason,
+            latencyMs: payload.latencyMs,
+            model: payload.model || previousAnswerState.model,
+            label: payload.label || previousAnswerState.label,
+            serviceTier: payload.serviceTier || previousAnswerState.serviceTier,
+          };
           return {
             ...record,
-            modelAnswerStatus: payload.status,
-            modelAnswer: nextAnswer,
-            modelAnswerError: payload.status === "error" ? payload.message : undefined,
-            modelAnswerReason: payload.reason || record.modelAnswerReason,
-            modelAnswerLatencyMs: payload.latencyMs,
+            modelAnswers: {
+              ...(record.modelAnswers || {}),
+              [variant]: nextAnswerState,
+            },
+            ...(variant === "mini" ? {
+              modelAnswerStatus: payload.status,
+              modelAnswer: nextAnswer,
+              modelAnswerError: payload.status === "error" ? payload.message : undefined,
+              modelAnswerReason: payload.reason || record.modelAnswerReason,
+              modelAnswerLatencyMs: payload.latencyMs,
+            } : {}),
           };
         }));
       }));
@@ -690,6 +805,13 @@ export default function App() {
         : "请选择正在播放会议声音的系统输出设备。"
       );
       return;
+    }
+
+    if (!selectedCompanyId) {
+      const confirmed = window.confirm(
+        "当前未选择面试公司，将只使用通用题库，AI 回答不会结合公司介绍、JD 或公司题库。\n\n确认继续开始面试吗？",
+      );
+      if (!confirmed) return;
     }
 
     const settings: SessionSettings = {
@@ -1003,13 +1125,28 @@ export default function App() {
   const latestManualRecord = questionRecords
     .filter((record) => record.source === "manual_marker" && !record.provisional)
     .sort((a, b) => b.receivedAt - a.receivedAt)[0] ?? null;
-  const modelAnswer = selectedRecord?.modelAnswer?.trim() ?? "";
-  const parsedModelAnswer = parseModelAnswer(modelAnswer);
-  const modelAnswerDetail = parsedModelAnswer.detail || (!parsedModelAnswer.logic ? modelAnswer : "");
-  const modelAnswerParagraphs = splitParagraphs(modelAnswerDetail);
-  const modelAnswerStreaming = selectedRecord?.modelAnswerStatus === "streaming";
-  const modelAnswerVisible = Boolean(selectedRecord && (modelAnswer || modelAnswerStreaming || selectedRecord.modelAnswerStatus === "error"));
+  const miniAnswerState: ModelAnswerState = selectedRecord?.modelAnswers?.mini ?? {
+    status: selectedRecord?.modelAnswerStatus,
+    answer: selectedRecord?.modelAnswer,
+    error: selectedRecord?.modelAnswerError,
+    reason: selectedRecord?.modelAnswerReason,
+    latencyMs: selectedRecord?.modelAnswerLatencyMs,
+    label: "Mini",
+  };
+  const proAnswerState: ModelAnswerState = selectedRecord?.modelAnswers?.pro ?? {
+    label: "Pro Fast",
+    model: "doubao-seed-2-0-pro-260215",
+    serviceTier: "fast",
+  };
   const displayedCandidates = candidates.slice(0, CANDIDATE_DISPLAY_LIMIT);
+  const selectedInterviewQuestion = selectedRecord?.questionText.trim() ?? "";
+  const selectedInterviewQuestionMeta = selectedRecord
+    ? [
+      selectedRecord.source === "manual_marker" ? "手动标记" : "自动识别",
+      typeof selectedRecord.confidence === "number" ? `${Math.round(selectedRecord.confidence * 100)}%` : "",
+      selectedRecord.enhanced ? "已增强" : "",
+    ].filter(Boolean).join(" · ")
+    : "暂无问题";
   const displayedTranscriptSegments = [...transcriptSegments].reverse();
   const displayedMicrophoneTranscriptSegments = [...microphoneTranscriptSegments].reverse();
   const manualMarkerDisabled = sessionState !== "running" || manualMarkerState === "submitting";
@@ -1018,6 +1155,58 @@ export default function App() {
     : manualMarkerState === "submitting"
       ? "提交中"
       : "标记问题";
+
+  function renderModelAnswerCard(
+    variant: ModelAnswerVariant,
+    title: string,
+    fallbackState: ModelAnswerState,
+  ) {
+    const answer = fallbackState.answer?.trim() ?? "";
+    const parsedAnswer = parseModelAnswer(answer);
+    const answerDetail = parsedAnswer.detail || (!parsedAnswer.logic ? answer : "");
+    const answerParagraphs = splitParagraphs(answerDetail);
+    const streaming = fallbackState.status === "streaming";
+    const visible = Boolean(selectedRecord && (answer || streaming || fallbackState.status === "error"));
+    const latencyText = !streaming && typeof fallbackState.latencyMs === "number"
+      ? `${fallbackState.latencyMs}ms`
+      : "";
+    const tierText = fallbackState.serviceTier ? ` · ${fallbackState.serviceTier}` : "";
+    const modelText = fallbackState.model ? `${fallbackState.model}${tierText}` : "";
+
+    return (
+      <section className={cls("model-answer-section", "model-answer-card", `${variant}-answer-card`, streaming && "streaming")}>
+        <div className="model-answer-head">
+          <div>
+            <h3>{title}</h3>
+            {modelText ? <p>{modelText}</p> : null}
+          </div>
+          {streaming ? <span>生成中</span> : null}
+          {latencyText ? <span>{latencyText}</span> : null}
+        </div>
+        {visible && (answerParagraphs.length || parsedAnswer.logic) ? (
+          <div className="model-answer-content">
+            {parsedAnswer.logic ? (
+              <section className="model-answer-block model-answer-logic">
+                <h4>回答逻辑：</h4>
+                <p>{renderModelAnswerText(parsedAnswer.logic)}</p>
+              </section>
+            ) : null}
+            {answerParagraphs.length ? (
+              <section className="model-answer-block model-answer-detail">
+                <h4>具体内容：</h4>
+                {answerParagraphs.map((line, index) => <p key={index}>{renderModelAnswerText(line)}</p>)}
+              </section>
+            ) : null}
+          </div>
+        ) : (
+          <p className="section-empty">
+            {fallbackState.error || "等待稳定问题后生成 AI 口述稿。"}
+          </p>
+        )}
+      </section>
+    );
+  }
+
   return (
     <main className="shell">
       <header className="topbar">
@@ -1211,6 +1400,18 @@ export default function App() {
         </div>
       ) : null}
 
+      <section
+        className={cls("current-match-strip", !selectedInterviewQuestion && "empty")}
+        title={selectedInterviewQuestion || "等待用户选择面试官问题"}
+      >
+        <div className="current-match-icon">
+          {selectedInterviewQuestion ? <CheckCircle2 size={15} /> : <AudioLines size={15} />}
+        </div>
+        <span className="current-match-label">当前匹配问题</span>
+        <p>{selectedInterviewQuestion || "等待选择面试官问题"}</p>
+        <span className="current-match-meta">{selectedInterviewQuestionMeta}</span>
+      </section>
+
       <section className="workspace">
         <section className="left-stack">
           <section className="panel question-panel">
@@ -1340,36 +1541,9 @@ export default function App() {
             </div>
 
             {selectedRecord ? (
-              <div className="answer-body">
-                <section className={cls("answer-section", "model-answer-section", modelAnswerStreaming && "streaming")}>
-                  <div className="model-answer-head">
-                    <h3>模型口述稿：</h3>
-                    {modelAnswerStreaming ? <span>生成中</span> : null}
-                    {!modelAnswerStreaming && typeof selectedRecord.modelAnswerLatencyMs === "number" ? (
-                      <span>{selectedRecord.modelAnswerLatencyMs}ms</span>
-                    ) : null}
-                  </div>
-                  {modelAnswerVisible && (modelAnswerParagraphs.length || parsedModelAnswer.logic) ? (
-                    <div className="model-answer-content">
-                      {parsedModelAnswer.logic ? (
-                        <section className="model-answer-block model-answer-logic">
-                          <h4>回答逻辑：</h4>
-                          <p>{parsedModelAnswer.logic}</p>
-                        </section>
-                      ) : null}
-                      {modelAnswerParagraphs.length ? (
-                        <section className="model-answer-block model-answer-detail">
-                          <h4>具体内容：</h4>
-                          {modelAnswerParagraphs.map((line, index) => <p key={index}>{line}</p>)}
-                        </section>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <p className="section-empty">
-                      {selectedRecord.modelAnswerError || "等待稳定问题后生成 AI 口述稿。"}
-                    </p>
-                  )}
-                </section>
+              <div className="answer-body model-answer-stack">
+                {renderModelAnswerCard("mini", "Mini 口述稿", miniAnswerState)}
+                {renderModelAnswerCard("pro", "Pro Fast 口述稿", proAnswerState)}
               </div>
             ) : (
               <div className="answer-placeholder">
@@ -1421,6 +1595,21 @@ export default function App() {
                 ))}
               </div>
             </section>
+          </section>
+          <section className="manual-marker-pad">
+            <button
+              className={cls("manual-marker-pad-button", manualMarkerState === "marking" && "active", manualMarkerState === "submitting" && "submitting")}
+              type="button"
+              disabled={manualMarkerDisabled}
+              onClick={toggleManualQuestionMark}
+              title="按 M 开始或结束手动标记问题"
+              aria-label={manualMarkerLabel}
+            >
+              <span className="manual-marker-pad-icon">
+                {manualMarkerState === "submitting" ? <LoaderCircle size={34} /> : <Flag size={34} />}
+              </span>
+              <span className="manual-marker-pad-label">{manualMarkerLabel}</span>
+            </button>
           </section>
         </section>
       </section>

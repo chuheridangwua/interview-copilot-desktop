@@ -162,6 +162,10 @@ export interface HealthStatusEvent {
 
 export interface ModelAnswerUpdateEvent {
   matchId: string;
+  variant?: "mini" | "pro";
+  label?: string;
+  model?: string;
+  serviceTier?: string;
   status: "streaming" | "done" | "error";
   questionText: string;
   delta?: string;
