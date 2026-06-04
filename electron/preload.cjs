@@ -277,6 +277,25 @@ const api = {
     capturePaused = false;
     return ipcRenderer.invoke("resume_session");
   },
+  setMicrophoneCaptureEnabled: async (enabled, settings = {}) => {
+    if (enabled) {
+      try {
+        await startMicrophoneCapture(settings?.microphoneDeviceId);
+      } catch (error) {
+        await stopMicrophoneCapture();
+        await ipcRenderer.invoke("microphone_capture_error", error instanceof Error ? error.message : String(error));
+        throw error;
+      }
+      try {
+        return await ipcRenderer.invoke("set_microphone_capture_enabled", true, settings);
+      } catch (error) {
+        await stopMicrophoneCapture();
+        throw error;
+      }
+    }
+    await stopMicrophoneCapture();
+    return ipcRenderer.invoke("set_microphone_capture_enabled", false, settings);
+  },
   setManualQuestionMarking: (active) => ipcRenderer.invoke("set_manual_question_marking", Boolean(active)),
   submitManualQuestionSegment: (payload) => ipcRenderer.invoke("submit_manual_question_segment", payload),
   undoManualQuestion: (matchId) => ipcRenderer.invoke("undo_manual_question", matchId),

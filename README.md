@@ -261,6 +261,7 @@ model-answers.jsonl
 - Electron main process 使用共享 `InterviewQuestionEngine` 作为自动抽题兜底；自动抽题会结合最近约 180 秒面试官转写和最近约 2000 字候选人上下文，处理弱追问吸收、主题级合并和重复问题压缩。
 - 手动标记期间自动问题引擎的 final/update 会被抑制，不进入历史、不触发答案；标记结束后仍会按标记时间窗口屏蔽晚到的自动 final，避免和手动问题重复。
 - 麦克风 ASR 结果只写入最近对话上下文，最终口述稿生成时会截取最近约 2000 字传给方舟。
+- 底部操作条提供麦克风收音开关；停止后会关闭浏览器麦克风流和后端麦克风 ASR，晚到的麦克风识别结果不会继续进入“我”的上下文。
 - Electron main process 会自动归档每场面试的系统/麦克风录音、两路转写、整合转写、问题列表，以及每个问题对应的题库答案和 AI 答案。
 - Electron main process 会扫描 `resources/company/*`，按当前选择的公司生成会话级公司优先 matcher：先查公司 `question.md`，没有候选时再查通用题库，并把公司 `Introduction.md` 注入最终口述稿生成。
 - 方舟小模型后台执行短 JSON 任务，用于手动问题整理、自动 final 问题确认、主题合并边界判断和候选重排；所有文本任务默认使用 `doubao-seed-2-0-mini-260428`。

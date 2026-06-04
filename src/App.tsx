@@ -8,6 +8,7 @@ import {
   Flag,
   LoaderCircle,
   Mic,
+  MicOff,
   Moon,
   OctagonAlert,
   Pause,
@@ -355,6 +356,8 @@ export default function App() {
   const [selectedCandidate, setSelectedCandidate] = useState<MatchCandidate | null>(null);
   const [systemAudioVolumePercent, setSystemAudioVolumePercent] = useState<number | null>(null);
   const [microphoneVolumePercent, setMicrophoneVolumePercent] = useState<number | null>(null);
+  const [microphoneCaptureEnabled, setMicrophoneCaptureEnabled] = useState(false);
+  const [microphoneToggleBusy, setMicrophoneToggleBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [companyMenuOpen, setCompanyMenuOpen] = useState(false);
@@ -617,7 +620,15 @@ export default function App() {
       unlisteners.push(await listenEvent<AudioStatusEvent>("microphone_audio_status", (payload) => {
         if (typeof payload.volume === "number") {
           setMicrophoneVolumePercent(Math.min(100, Math.round(payload.volume * 100)));
+        } else if (payload.state === "paused" || payload.state === "stopped" || payload.state === "error") {
+          setMicrophoneVolumePercent(0);
         }
+        if (payload.state === "starting" || payload.state === "capturing" || payload.state === "paused") {
+          setMicrophoneCaptureEnabled(true);
+        } else if (payload.state === "idle" || payload.state === "stopped" || payload.state === "error") {
+          setMicrophoneCaptureEnabled(false);
+        }
+        if (payload.state === "error") setError(payload.message);
       }));
 
       unlisteners.push(await listenEvent<HealthStatusEvent>("health_status", (payload) => {
@@ -856,11 +867,14 @@ export default function App() {
 
     setSystemAudioVolumePercent(0);
     setMicrophoneVolumePercent(0);
+    setMicrophoneCaptureEnabled(false);
+    setMicrophoneToggleBusy(false);
     try {
-      await api.startSession(settings);
+      const result = await api.startSession(settings);
       void api.listMediaDevices().then(setMediaDevices).catch(() => undefined);
       sessionStateRef.current = "running";
       setSessionState("running");
+      setMicrophoneCaptureEnabled(Boolean(result.microphoneContextEnabled));
       setLiveTranscript(null);
       liveTranscriptRef.current = null;
       setTranscriptSegments([]);
@@ -905,12 +919,41 @@ export default function App() {
     }
   }
 
+  async function toggleMicrophoneCapture() {
+    const nextEnabled = !microphoneCaptureEnabled;
+    const canStop = microphoneCaptureEnabled && (sessionStateRef.current === "running" || sessionStateRef.current === "paused");
+    const canStart = !microphoneCaptureEnabled && sessionStateRef.current === "running";
+    if ((nextEnabled && !canStart) || (!nextEnabled && !canStop)) return;
+
+    setError(null);
+    setMicrophoneToggleBusy(true);
+    try {
+      const result = await api.setMicrophoneCaptureEnabled(nextEnabled, {
+        microphoneDeviceId: selectedMicrophoneId || undefined,
+        microphoneDeviceName: selectedMicrophone?.label || "默认麦克风",
+      });
+      setMicrophoneCaptureEnabled(result.enabled);
+      if (!result.enabled) {
+        setMicrophoneVolumePercent(0);
+        setMicrophoneLiveTranscript(null);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      if (nextEnabled) setMicrophoneCaptureEnabled(false);
+    } finally {
+      setMicrophoneToggleBusy(false);
+    }
+  }
+
   async function endInterview() {
     try {
       if (manualMarkerStateRef.current !== "idle") await cancelManualQuestionMark();
       await api.stopSession();
       sessionStateRef.current = "ended";
       setSessionState("ended");
+      setMicrophoneCaptureEnabled(false);
+      setMicrophoneToggleBusy(false);
+      setMicrophoneVolumePercent(0);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -1178,6 +1221,10 @@ export default function App() {
     : "暂无问题";
   const displayedTranscriptSegments = [...transcriptSegments].reverse();
   const displayedMicrophoneTranscriptSegments = [...microphoneTranscriptSegments].reverse();
+  const canStopMicrophoneCapture = microphoneCaptureEnabled && (sessionState === "running" || sessionState === "paused");
+  const canStartMicrophoneCapture = !microphoneCaptureEnabled && sessionState === "running";
+  const microphoneToggleDisabled = microphoneToggleBusy || (!canStopMicrophoneCapture && !canStartMicrophoneCapture);
+  const microphoneToggleLabel = microphoneCaptureEnabled ? "停止麦克风" : "开启麦克风";
   const manualMarkerDisabled = sessionState !== "running" || manualMarkerState === "submitting";
   const manualMarkerLabel = manualMarkerState === "marking"
     ? `结束标记 ${formatDuration(manualElapsedMs)}`
@@ -1402,60 +1449,6 @@ export default function App() {
 
       <section className="workspace">
         <section className="left-stack">
-          <section className="panel question-panel">
-            <div className="panel-title split">
-              <button
-                className="panel-title-button"
-                type="button"
-                onClick={followLatestQuestion}
-                title="切回自动跟随最新问题"
-              >
-                <h2>面试官问题列表</h2>
-              </button>
-              {latestManualRecord && (sessionState === "running" || sessionState === "paused") ? (
-                <button
-                  className="undo-command"
-                  type="button"
-                  onClick={undoLatestManualQuestion}
-                  title="撤销最近一条手动标记问题"
-                >
-                  <Undo2 size={14} />
-                  <span>撤销手动</span>
-                </button>
-              ) : null}
-            </div>
-            <div className="question-list">
-              {questionRecords.length === 0 ? (
-                <div className="empty-state compact-empty">
-                  <FileText size={22} />
-                  <p>识别到面试官问题后会按时间倒序显示。</p>
-                </div>
-              ) : null}
-              {questionRecords.map((record) => (
-                <button
-                  type="button"
-                  key={record.id}
-                  className={cls(
-                    "question-record",
-                    selectedRecordId === record.id && "selected",
-                    record.provisional && "provisional",
-                    record.enhanced && "enhanced",
-                    record.source === "manual_marker" && "manual",
-                  )}
-                  onClick={() => selectRecord(record)}
-                >
-                  <span className="record-time">
-                    {formatTime(record.receivedAt)}
-                    {record.source === "manual_marker" ? <span className="manual-badge">手动</span> : null}
-                  </span>
-                  <p className="record-query">{record.questionText}</p>
-                </button>
-              ))}
-            </div>
-          </section>
-        </section>
-
-        <section className="answer-split">
           <article className="panel answer-panel original-answer-panel">
             <div className="panel-title split">
               <div>
@@ -1518,6 +1511,60 @@ export default function App() {
               </div>
             )}
           </article>
+        </section>
+
+        <section className="answer-split">
+          <section className="panel question-panel">
+            <div className="panel-title split">
+              <button
+                className="panel-title-button"
+                type="button"
+                onClick={followLatestQuestion}
+                title="切回自动跟随最新问题"
+              >
+                <h2>面试官问题列表</h2>
+              </button>
+              {latestManualRecord && (sessionState === "running" || sessionState === "paused") ? (
+                <button
+                  className="undo-command"
+                  type="button"
+                  onClick={undoLatestManualQuestion}
+                  title="撤销最近一条手动标记问题"
+                >
+                  <Undo2 size={14} />
+                  <span>撤销手动</span>
+                </button>
+              ) : null}
+            </div>
+            <div className="question-list">
+              {questionRecords.length === 0 ? (
+                <div className="empty-state compact-empty">
+                  <FileText size={22} />
+                  <p>识别到面试官问题后会按时间倒序显示。</p>
+                </div>
+              ) : null}
+              {questionRecords.map((record) => (
+                <button
+                  type="button"
+                  key={record.id}
+                  className={cls(
+                    "question-record",
+                    selectedRecordId === record.id && "selected",
+                    record.provisional && "provisional",
+                    record.enhanced && "enhanced",
+                    record.source === "manual_marker" && "manual",
+                  )}
+                  onClick={() => selectRecord(record)}
+                >
+                  <span className="record-time">
+                    {formatTime(record.receivedAt)}
+                    {record.source === "manual_marker" ? <span className="manual-badge">手动</span> : null}
+                  </span>
+                  <p className="record-query">{record.questionText}</p>
+                </button>
+              ))}
+            </div>
+          </section>
 
           <article className="panel answer-panel ai-answer-panel">
             <div className="panel-title split">
@@ -1553,7 +1600,7 @@ export default function App() {
             </section>
             <section className="live-transcript microphone-live">
               <div className="subpanel-title">麦克风实时</div>
-              <p>{microphoneLiveTranscript?.text || "等待麦克风"}</p>
+              <p>{microphoneLiveTranscript?.text || (microphoneCaptureEnabled ? "等待麦克风" : "麦克风已停止")}</p>
             </section>
           </section>
           <section className="transcript-streams">
@@ -1594,6 +1641,17 @@ export default function App() {
                   <span>麦克风 {microphoneVolumePercent === null ? "--" : microphoneVolumePercent}%</span>
                 </div>
               </div>
+              <button
+                className={cls("icon-button", "microphone-command", !microphoneCaptureEnabled && "muted")}
+                type="button"
+                onClick={toggleMicrophoneCapture}
+                disabled={microphoneToggleDisabled}
+                aria-pressed={microphoneCaptureEnabled}
+                title={microphoneCaptureEnabled ? "停止麦克风收音，只保留系统声音识别" : "重新开启麦克风收音，继续作为回答上下文"}
+              >
+                {microphoneCaptureEnabled ? <MicOff size={16} /> : <Mic size={16} />}
+                <span>{microphoneToggleBusy ? "处理中" : microphoneToggleLabel}</span>
+              </button>
               <button
                 className="health-strip"
                 type="button"

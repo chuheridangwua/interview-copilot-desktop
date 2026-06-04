@@ -1971,7 +1971,7 @@ function handleTranscript(transcript) {
 }
 
 function handleMicTranscript(transcript) {
-  if (sessionPaused) return;
+  if (sessionPaused || !currentSession?.settings?.microphoneContextEnabled) return;
   const receivedAt = nowMs();
   const text = String(transcript.text ?? "").trim();
   if (!text) return;
@@ -2007,6 +2007,80 @@ function handleMicTranscript(transcript) {
     startMs: transcript.startMs,
     endMs: transcript.endMs,
   }, transcript);
+}
+
+function stopCurrentMicrophoneContext(message = "麦克风收音已停止") {
+  const session = currentSession;
+  if (!session) return { enabled: false };
+  session.settings.microphoneContextEnabled = false;
+  if (session.micAsr) {
+    const micAsr = session.micAsr;
+    session.micAsr = null;
+    micAsr.close();
+  }
+  emitMicrophoneAudioStatus({
+    state: "stopped",
+    deviceName: session.settings.microphoneDeviceName || "麦克风",
+    volume: 0,
+    message,
+  });
+  emitLog({ message });
+  return { enabled: false };
+}
+
+async function startCurrentMicrophoneContext(settings = {}) {
+  const session = currentSession;
+  if (!session) throw new Error("当前没有正在运行的面试会话");
+  if (session.micAsr && session.settings.microphoneContextEnabled) return { enabled: true };
+
+  const microphoneDeviceId = String(settings?.microphoneDeviceId || session.settings.microphoneDeviceId || "").trim();
+  const microphoneDeviceName = String(settings?.microphoneDeviceName || session.settings.microphoneDeviceName || "麦克风").trim();
+  session.settings.microphoneDeviceId = microphoneDeviceId;
+  session.settings.microphoneDeviceName = microphoneDeviceName;
+
+  if (!session.micAudioFile && session.sessionDir) {
+    session.micAudioFile = fs.createWriteStream(path.join(session.sessionDir, "microphone-audio.pcm"), { flags: "a" });
+  }
+
+  emitMicrophoneAudioStatus({
+    state: "starting",
+    deviceName: microphoneDeviceName,
+    volume: 0,
+    message: "正在开启麦克风收音",
+  });
+
+  const micAsr = new DoubaoAsrSession({
+    apiKey: resolveApiKey(),
+    resourceId: session.settings.resourceId,
+    requestId: `${session.sessionId}-mic-${Date.now()}`,
+    emitLog: (payload) => emitLog({ ...payload, message: `麦克风上下文：${payload.message}` }),
+    onTranscript: handleMicTranscript,
+  });
+  session.micAsr = micAsr;
+  session.settings.microphoneContextEnabled = true;
+  try {
+    await micAsr.start();
+    emitMicrophoneAudioStatus({
+      state: "capturing",
+      deviceName: microphoneDeviceName,
+      volume: 0,
+      message: "麦克风收音已开启",
+    });
+    emitLog({ message: "麦克风收音已开启，将继续作为回答上下文" });
+    return { enabled: true };
+  } catch (error) {
+    session.settings.microphoneContextEnabled = false;
+    session.micAsr = null;
+    micAsr.close();
+    emitMicrophoneAudioStatus({
+      state: "error",
+      deviceName: microphoneDeviceName,
+      volume: undefined,
+      message: `麦克风收音开启失败：${error.message}`,
+    });
+    emitLog({ message: `麦克风收音开启失败：${error.message}` });
+    throw error;
+  }
 }
 
 function closeCurrentSession() {
@@ -2362,7 +2436,7 @@ ipcMain.handle("start_session", async (_event, settings) => {
     volume: 0,
     message: "ASR 已连接，正在采集系统声音",
   });
-  return { sessionId };
+  return { sessionId, microphoneContextEnabled: normalizedSettings.microphoneContextEnabled };
 });
 
 ipcMain.handle("stop_session", async () => {
@@ -2390,6 +2464,11 @@ ipcMain.handle("resume_session", async () => {
   if (currentSession?.settings?.microphoneContextEnabled) {
     emitMicrophoneAudioStatus({ state: "capturing", deviceName: currentSession.settings.microphoneDeviceName || "麦克风", volume: 0, message: "麦克风上下文已继续" });
   }
+});
+
+ipcMain.handle("set_microphone_capture_enabled", async (_event, enabled, settings = {}) => {
+  if (enabled) return startCurrentMicrophoneContext(settings);
+  return stopCurrentMicrophoneContext();
 });
 
 ipcMain.handle("search_questions", async (_event, query, companyId) => (

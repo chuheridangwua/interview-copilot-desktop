@@ -34,6 +34,15 @@ export interface SessionSettings {
   microphoneContextEnabled?: boolean;
 }
 
+export interface SessionStartResult {
+  sessionId: string;
+  microphoneContextEnabled: boolean;
+}
+
+export interface MicrophoneCaptureResult {
+  enabled: boolean;
+}
+
 export interface CompanyOption {
   id: string;
   name: string;
@@ -188,10 +197,11 @@ export interface DesktopBridge {
   listAudioSources: () => Promise<AudioSource[]>;
   listMediaDevices: () => Promise<MediaDeviceOptions>;
   listCompanies: () => Promise<CompanyOption[]>;
-  startSession: (settings: SessionSettings) => Promise<{ sessionId: string }>;
+  startSession: (settings: SessionSettings) => Promise<SessionStartResult>;
   stopSession: () => Promise<void>;
   pauseSession: () => Promise<void>;
   resumeSession: () => Promise<void>;
+  setMicrophoneCaptureEnabled: (enabled: boolean, settings?: Pick<SessionSettings, "microphoneDeviceId" | "microphoneDeviceName">) => Promise<MicrophoneCaptureResult>;
   setManualQuestionMarking: (active: boolean) => Promise<{ active: boolean }>;
   submitManualQuestionSegment: (payload: ManualQuestionSegmentPayload) => Promise<ManualQuestionSubmitResult>;
   undoManualQuestion: (matchId: string) => Promise<ManualQuestionUndoResult>;
@@ -230,6 +240,9 @@ export const api = {
   stopSession: () => bridge().stopSession(),
   pauseSession: () => bridge().pauseSession(),
   resumeSession: () => bridge().resumeSession(),
+  setMicrophoneCaptureEnabled: (enabled: boolean, settings?: Pick<SessionSettings, "microphoneDeviceId" | "microphoneDeviceName">) => (
+    bridge().setMicrophoneCaptureEnabled(enabled, settings)
+  ),
   setManualQuestionMarking: (active: boolean) => bridge().setManualQuestionMarking(active),
   submitManualQuestionSegment: (payload: ManualQuestionSegmentPayload) => bridge().submitManualQuestionSegment(payload),
   undoManualQuestion: (matchId: string) => bridge().undoManualQuestion(matchId),

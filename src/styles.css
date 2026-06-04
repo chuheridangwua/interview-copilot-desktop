@@ -298,6 +298,18 @@ button {
   border-color: var(--blue-border);
 }
 
+.microphone-command {
+  color: var(--green-strong);
+  background: var(--green-soft);
+  border-color: var(--green-border);
+}
+
+.microphone-command.muted {
+  color: var(--muted);
+  background: var(--field-raised);
+  border-color: var(--line);
+}
+
 .theme-command {
   min-width: 76px;
 }
@@ -1035,6 +1047,7 @@ button:disabled {
 .operation-pad .volume-cluster,
 .operation-pad .health-strip,
 .operation-pad .company-selector,
+.operation-pad .microphone-command,
 .operation-pad .session-command,
 .operation-pad .danger-command {
   grid-column: 1 / -1;
