@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AudioLines,
   CheckCircle2,
+  ChevronDown,
   CircleStop,
   FileText,
   Flag,
@@ -139,7 +140,7 @@ function formatDuration(value: number) {
 function isTextInputTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   const tagName = target.tagName.toLowerCase();
-  return tagName === "input" || tagName === "textarea" || tagName === "select" || target.isContentEditable;
+  return ["button", "input", "select", "textarea"].includes(tagName) || target.isContentEditable;
 }
 
 function normalizeText(text: string) {
@@ -356,6 +357,8 @@ export default function App() {
   const [microphoneVolumePercent, setMicrophoneVolumePercent] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [companyMenuOpen, setCompanyMenuOpen] = useState(false);
+  const companySelectorRef = useRef<HTMLDivElement | null>(null);
   const [healthItems, setHealthItems] = useState<Record<string, HealthStatusItem>>(() => createInitialHealthItems());
   const [healthCheckedAt, setHealthCheckedAt] = useState<number | null>(null);
   const [logDir, setLogDir] = useState("");
@@ -407,6 +410,27 @@ export default function App() {
   }, [selectedRecordId]);
 
   useEffect(() => {
+    if (!companyMenuOpen) return undefined;
+
+    function closeOnOutsidePointer(event: PointerEvent) {
+      const target = event.target;
+      if (target instanceof Node && companySelectorRef.current?.contains(target)) return;
+      setCompanyMenuOpen(false);
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setCompanyMenuOpen(false);
+    }
+
+    window.addEventListener("pointerdown", closeOnOutsidePointer, true);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("pointerdown", closeOnOutsidePointer, true);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [companyMenuOpen]);
+
+  useEffect(() => {
     if (questionRecords.length === 0) return;
     const visibleRecord = autoFollowLatestQuestionRef.current
       ? getLatestQuestionRecord(questionRecords)
@@ -437,6 +461,10 @@ export default function App() {
   const companySelectorDisabled = sessionState === "running" || sessionState === "paused";
   const deviceSelectorDisabled = sessionState === "running" || sessionState === "paused";
   const bankSummary = healthItems.bank?.message || "等待题库自检";
+
+  useEffect(() => {
+    if (companySelectorDisabled) setCompanyMenuOpen(false);
+  }, [companySelectorDisabled]);
 
   function clearInterviewResults() {
     setLiveTranscript(null);
@@ -918,6 +946,7 @@ export default function App() {
 
   function handleCompanyChange(nextCompanyId: string) {
     if (companySelectorDisabled) return;
+    setCompanyMenuOpen(false);
     setSelectedCompanyId(nextCompanyId);
     clearInterviewResults();
   }
@@ -1155,6 +1184,12 @@ export default function App() {
     : manualMarkerState === "submitting"
       ? "提交中"
       : "标记问题";
+  const topbarQuestionRecords = questionRecords
+    .filter((record) => record.questionText.trim())
+    .slice(0, 6);
+  const topbarQuestionMidpoint = Math.ceil(topbarQuestionRecords.length / 2);
+  const topbarQuestionLeftRecords = topbarQuestionRecords.slice(0, topbarQuestionMidpoint).reverse();
+  const topbarQuestionRightRecords = topbarQuestionRecords.slice(topbarQuestionMidpoint);
 
   function renderModelAnswerCard(
     variant: ModelAnswerVariant,
@@ -1200,7 +1235,7 @@ export default function App() {
           </div>
         ) : (
           <p className="section-empty">
-            {fallbackState.error || "等待稳定问题后生成 AI 口述稿。"}
+            {fallbackState.error || "等待稳定问题后生成输出答案。"}
           </p>
         )}
       </section>
@@ -1219,110 +1254,63 @@ export default function App() {
           </div>
         </section>
 
-        <section className="topbar-actions">
-          <div className="command-strip">
-            <div className="volume-cluster">
-              <div className="volume-indicator" title={`系统声音音量${selectedAudioOutput ? ` · ${selectedAudioOutput.label}` : ""}`}>
-                <AudioLines size={15} />
-                <span>系统 {systemAudioVolumePercent === null ? "--" : systemAudioVolumePercent}%</span>
-              </div>
-              <div className="volume-indicator microphone-volume" title={`麦克风音量${selectedMicrophone ? ` · ${selectedMicrophone.label}` : ""}`}>
-                <Mic size={14} />
-                <span>麦克风 {microphoneVolumePercent === null ? "--" : microphoneVolumePercent}%</span>
-              </div>
-            </div>
+        <section className="topbar-question-rail left" aria-label="最近面试官问题">
+          {topbarQuestionLeftRecords.map((record) => (
             <button
-              className="health-strip"
+              key={record.id}
+              className={cls(
+                "topbar-question-chip",
+                selectedRecordId === record.id && "selected",
+                record.provisional && "provisional",
+                record.source === "manual_marker" && "manual",
+              )}
               type="button"
-              onClick={refreshHealthStatus}
-              title={logDir ? `点击重测 · 日志目录：${logDir}` : "点击重测启动自检"}
+              onClick={() => selectRecord(record)}
+              title={record.questionText}
             >
-              {HEALTH_ITEMS.map(([key, fallbackLabel]) => {
-                const item = healthItems[key] ?? { state: "checking", label: fallbackLabel, message: "启动自检中" };
-                const title = [
-                  item.message,
-                  item.model ? `模型：${item.model}` : "",
-                  typeof item.latencyMs === "number" ? `耗时：${item.latencyMs}ms` : "",
-                  healthCheckedAt ? `检测时间：${formatTime(healthCheckedAt)}` : "",
-                  logDir ? `日志：${logDir}` : "",
-                ].filter(Boolean).join("\n");
-                const Icon = item.state === "ok" ? CheckCircle2 : item.state === "checking" ? LoaderCircle : OctagonAlert;
-                return (
-                  <span key={key} className={cls("health-pill", `health-${item.state}`)} title={title}>
-                    <Icon size={13} />
-                    <span>{item.label || fallbackLabel}</span>
-                  </span>
-                );
-              })}
+              {record.source === "manual_marker" ? <Flag size={13} /> : <AudioLines size={13} />}
+              <span>{record.questionText}</span>
             </button>
-            <label className="company-selector" title={selectedCompany ? `当前面试公司：${selectedCompany.name}` : "当前仅使用通用题库"}>
-              <span>面试公司</span>
-              <select
-                value={selectedCompanyId}
-                disabled={companySelectorDisabled}
-                onChange={(event) => handleCompanyChange(event.target.value)}
-              >
-                <option value="">无公司</option>
-                {companies.map((company) => (
-                  <option key={company.id} value={company.id}>
-                    {company.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button className="icon-button settings-command" type="button" onClick={() => setSettingsOpen(true)} title="打开采集和 ASR 设置">
-              <Settings size={16} />
-              <span>设置</span>
+          ))}
+        </section>
+
+        <section className="topbar-marker">
+          <button
+            className={cls("manual-marker-command", manualMarkerState === "marking" && "active", manualMarkerState === "submitting" && "submitting")}
+            type="button"
+            disabled={manualMarkerDisabled}
+            onClick={toggleManualQuestionMark}
+            title="按 M 开始或结束手动标记问题"
+          >
+            {manualMarkerState === "submitting" ? <LoaderCircle size={16} /> : <Flag size={16} />}
+            <span>{manualMarkerLabel}</span>
+          </button>
+          {manualMarkerState === "marking" ? (
+            <button className="manual-cancel-command" type="button" onClick={cancelManualQuestionMark} title="取消当前标记">
+              <X size={16} />
+              <span>取消</span>
             </button>
+          ) : null}
+        </section>
+
+        <section className="topbar-question-rail right" aria-label="最近面试官问题">
+          {topbarQuestionRightRecords.map((record) => (
             <button
-              className={cls("icon-button", "theme-command", themeMode === "dark" && "active")}
+              key={record.id}
+              className={cls(
+                "topbar-question-chip",
+                selectedRecordId === record.id && "selected",
+                record.provisional && "provisional",
+                record.source === "manual_marker" && "manual",
+              )}
               type="button"
-              onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
-              aria-pressed={themeMode === "dark"}
-              title={themeMode === "dark" ? "切换到浅色模式" : "切换到深色模式"}
+              onClick={() => selectRecord(record)}
+              title={record.questionText}
             >
-              {themeMode === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-              <span>{themeMode === "dark" ? "深色" : "浅色"}</span>
+              {record.source === "manual_marker" ? <Flag size={13} /> : <AudioLines size={13} />}
+              <span>{record.questionText}</span>
             </button>
-            {sessionState === "running" ? (
-              <button className="icon-button session-command" type="button" onClick={pauseInterview}>
-                <Pause size={17} />
-                <span>暂停面试</span>
-              </button>
-            ) : sessionState === "paused" ? (
-              <button className="primary-command session-command" type="button" onClick={resumeInterview}>
-                <Play size={17} />
-                <span>继续面试</span>
-              </button>
-            ) : (
-              <button className="primary-command session-command" type="button" onClick={startInterview}>
-                <Play size={17} />
-                <span>开始面试</span>
-              </button>
-            )}
-            <button
-              className={cls("manual-marker-command", manualMarkerState === "marking" && "active", manualMarkerState === "submitting" && "submitting")}
-              type="button"
-              disabled={manualMarkerDisabled}
-              onClick={toggleManualQuestionMark}
-              title="按 M 开始或结束手动标记问题"
-            >
-              {manualMarkerState === "submitting" ? <LoaderCircle size={16} /> : <Flag size={16} />}
-              <span>{manualMarkerLabel}</span>
-            </button>
-            {manualMarkerState === "marking" ? (
-              <button className="manual-cancel-command" type="button" onClick={cancelManualQuestionMark} title="取消当前标记">
-                <X size={16} />
-                <span>取消</span>
-              </button>
-            ) : null}
-            {(sessionState === "running" || sessionState === "paused") ? (
-              <button className="danger-command" type="button" onClick={endInterview}>
-                <CircleStop size={17} />
-                <span>结束面试</span>
-              </button>
-            ) : null}
-          </div>
+          ))}
         </section>
       </header>
 
@@ -1465,46 +1453,6 @@ export default function App() {
               ))}
             </div>
           </section>
-
-          <section className="panel candidate-panel">
-            <div className="panel-title split">
-              <div>
-                <h2>匹配到的问题</h2>
-              </div>
-            </div>
-
-            <div className="candidate-list">
-              {candidates.length === 0 ? (
-                <div className="empty-state">
-                  <AudioLines size={24} />
-                  <p>推断出问题后，这里会实时显示最好的 3 个匹配。</p>
-                </div>
-              ) : null}
-              {displayedCandidates.map((candidate) => (
-                <button
-                  type="button"
-                  key={candidate.id}
-                  className={cls("candidate-card", selectedCandidate?.id === candidate.id && "selected")}
-                  onClick={() => selectCandidate(candidate)}
-                >
-                  <div className="candidate-main">
-                    <div className="candidate-heading">
-                      <h3>{candidate.question}</h3>
-                      <span>{candidate.score}%</span>
-                    </div>
-                    <div className="candidate-meta">
-                      <span className={cls("source-badge", candidate.source === "company" && "company-source")}>
-                        {candidate.sourceLabel || "通用"}
-                      </span>
-                      {candidate.source === "company" && typeof candidate.sourceQuestionId === "number" ? (
-                        <span>原题 #{candidate.sourceQuestionId}</span>
-                      ) : null}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
         </section>
 
         <section className="answer-split">
@@ -1514,6 +1462,44 @@ export default function App() {
                 <h2>匹配原文答案</h2>
               </div>
             </div>
+
+            <section className="candidate-strip">
+              <div className="candidate-strip-head">
+                <h3>匹配到的问题</h3>
+                <span>{displayedCandidates.length ? `Top ${displayedCandidates.length}` : "暂无匹配"}</span>
+              </div>
+              <div className="candidate-list">
+                {candidates.length === 0 ? (
+                  <div className="empty-state candidate-empty">
+                    <AudioLines size={18} />
+                    <p>推断出问题后，这里会显示最好的 3 个匹配。</p>
+                  </div>
+                ) : null}
+                {displayedCandidates.map((candidate) => (
+                  <button
+                    type="button"
+                    key={candidate.id}
+                    className={cls("candidate-card", selectedCandidate?.id === candidate.id && "selected")}
+                    onClick={() => selectCandidate(candidate)}
+                  >
+                    <div className="candidate-main">
+                      <div className="candidate-heading">
+                        <h3>{candidate.question}</h3>
+                        <span>{candidate.score}%</span>
+                      </div>
+                      <div className="candidate-meta">
+                        <span className={cls("source-badge", candidate.source === "company" && "company-source")}>
+                          {candidate.sourceLabel || "通用"}
+                        </span>
+                        {candidate.source === "company" && typeof candidate.sourceQuestionId === "number" ? (
+                          <span>原题 #{candidate.sourceQuestionId}</span>
+                        ) : null}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
 
             {selectedCandidate ? (
               <div className="answer-body">
@@ -1536,7 +1522,7 @@ export default function App() {
           <article className="panel answer-panel ai-answer-panel">
             <div className="panel-title split">
               <div>
-                <h2>AI 输出答案</h2>
+                <h2>输出答案</h2>
               </div>
             </div>
 
@@ -1547,7 +1533,7 @@ export default function App() {
               </div>
             ) : (
               <div className="answer-placeholder">
-                <p>选择面试官问题后显示 AI 口述稿。</p>
+                <p>选择面试官问题后显示输出答案。</p>
               </div>
             )}
           </article>
@@ -1596,20 +1582,128 @@ export default function App() {
               </div>
             </section>
           </section>
-          <section className="manual-marker-pad">
-            <button
-              className={cls("manual-marker-pad-button", manualMarkerState === "marking" && "active", manualMarkerState === "submitting" && "submitting")}
-              type="button"
-              disabled={manualMarkerDisabled}
-              onClick={toggleManualQuestionMark}
-              title="按 M 开始或结束手动标记问题"
-              aria-label={manualMarkerLabel}
-            >
-              <span className="manual-marker-pad-icon">
-                {manualMarkerState === "submitting" ? <LoaderCircle size={34} /> : <Flag size={34} />}
-              </span>
-              <span className="manual-marker-pad-label">{manualMarkerLabel}</span>
-            </button>
+          <section className="operation-pad">
+            <div className="command-strip">
+              <div className="volume-cluster">
+                <div className="volume-indicator" title={`系统声音音量${selectedAudioOutput ? ` · ${selectedAudioOutput.label}` : ""}`}>
+                  <AudioLines size={15} />
+                  <span>系统 {systemAudioVolumePercent === null ? "--" : systemAudioVolumePercent}%</span>
+                </div>
+                <div className="volume-indicator microphone-volume" title={`麦克风音量${selectedMicrophone ? ` · ${selectedMicrophone.label}` : ""}`}>
+                  <Mic size={14} />
+                  <span>麦克风 {microphoneVolumePercent === null ? "--" : microphoneVolumePercent}%</span>
+                </div>
+              </div>
+              <button
+                className="health-strip"
+                type="button"
+                onClick={refreshHealthStatus}
+                title={logDir ? `点击重测 · 日志目录：${logDir}` : "点击重测启动自检"}
+              >
+                {HEALTH_ITEMS.map(([key, fallbackLabel]) => {
+                  const item = healthItems[key] ?? { state: "checking", label: fallbackLabel, message: "启动自检中" };
+                  const title = [
+                    item.message,
+                    item.model ? `模型：${item.model}` : "",
+                    typeof item.latencyMs === "number" ? `耗时：${item.latencyMs}ms` : "",
+                    healthCheckedAt ? `检测时间：${formatTime(healthCheckedAt)}` : "",
+                    logDir ? `日志：${logDir}` : "",
+                  ].filter(Boolean).join("\n");
+                  const Icon = item.state === "ok" ? CheckCircle2 : item.state === "checking" ? LoaderCircle : OctagonAlert;
+                  return (
+                    <span key={key} className={cls("health-pill", `health-${item.state}`)} title={title}>
+                      <Icon size={13} />
+                      <span>{item.label || fallbackLabel}</span>
+                    </span>
+                  );
+                })}
+              </button>
+              <div
+                ref={companySelectorRef}
+                className={cls("company-selector", companyMenuOpen && "open", companySelectorDisabled && "disabled")}
+                title={selectedCompany ? `当前面试公司：${selectedCompany.name}` : "当前仅使用通用题库"}
+              >
+                <span>面试公司</span>
+                <button
+                  className="company-selector-button"
+                  type="button"
+                  disabled={companySelectorDisabled}
+                  aria-haspopup="listbox"
+                  aria-expanded={companyMenuOpen}
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    if (companySelectorDisabled) return;
+                    setCompanyMenuOpen((open) => !open);
+                  }}
+                >
+                  <span>{selectedCompany?.name || "无公司"}</span>
+                  <ChevronDown size={14} />
+                </button>
+                {companyMenuOpen && !companySelectorDisabled ? (
+                  <div className="company-menu" role="listbox" aria-label="选择面试公司">
+                    <button
+                      className={cls("company-option", !selectedCompanyId && "selected")}
+                      type="button"
+                      role="option"
+                      aria-selected={!selectedCompanyId}
+                      onClick={() => handleCompanyChange("")}
+                    >
+                      <span>无公司</span>
+                      {!selectedCompanyId ? <CheckCircle2 size={13} /> : null}
+                    </button>
+                    {companies.map((company) => (
+                      <button
+                        key={company.id}
+                        className={cls("company-option", selectedCompanyId === company.id && "selected")}
+                        type="button"
+                        role="option"
+                        aria-selected={selectedCompanyId === company.id}
+                        onClick={() => handleCompanyChange(company.id)}
+                      >
+                        <span>{company.name}</span>
+                        {selectedCompanyId === company.id ? <CheckCircle2 size={13} /> : null}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+              <button className="icon-button settings-command" type="button" onClick={() => setSettingsOpen(true)} title="打开采集和 ASR 设置">
+                <Settings size={16} />
+                <span>设置</span>
+              </button>
+              <button
+                className={cls("icon-button", "theme-command", themeMode === "dark" && "active")}
+                type="button"
+                onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
+                aria-pressed={themeMode === "dark"}
+                title={themeMode === "dark" ? "切换到浅色模式" : "切换到深色模式"}
+              >
+                {themeMode === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                <span>{themeMode === "dark" ? "深色" : "浅色"}</span>
+              </button>
+              {sessionState === "running" ? (
+                <button className="icon-button session-command" type="button" onClick={pauseInterview}>
+                  <Pause size={17} />
+                  <span>暂停面试</span>
+                </button>
+              ) : sessionState === "paused" ? (
+                <button className="primary-command session-command" type="button" onClick={resumeInterview}>
+                  <Play size={17} />
+                  <span>继续面试</span>
+                </button>
+              ) : (
+                <button className="primary-command session-command" type="button" onClick={startInterview}>
+                  <Play size={17} />
+                  <span>开始面试</span>
+                </button>
+              )}
+              {(sessionState === "running" || sessionState === "paused") ? (
+                <button className="danger-command" type="button" onClick={endInterview}>
+                  <CircleStop size={17} />
+                  <span>结束面试</span>
+                </button>
+              ) : null}
+            </div>
           </section>
         </section>
       </section>

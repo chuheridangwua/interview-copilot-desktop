@@ -1091,13 +1091,12 @@ function maybeGenerateFallbackAnswer({ matchId, questionText, candidates, reason
 
   fallbackAnswerMatchIds.add(matchId);
   const requestSessionSeq = arkEnhanceSeq;
+  const pool = (candidates ?? []).slice(0, 5);
   const arkConfig = resolveArkConfig();
   const resume = loadResumeText();
   const companyContext = currentSession?.matcherBundle?.companyContext || null;
   const conversationContext = buildConversationContextText(2000);
-  const pool = (candidates ?? []).slice(0, 5);
-  const topScore = Number(pool[0]?.score ?? 0);
-  const mode = topScore >= 65 ? "answer_guided" : "resume_generated";
+  const mode = pool.length ? "answer_guided" : "resume_generated";
 
   const variants = [
     {
@@ -1368,7 +1367,7 @@ function scheduleModelMatchReview({ matchId, inferred, event, rerankPool, transc
         matchId,
         questionText: reviewedQuestion,
         candidates: confirmedCandidates,
-        reason: confirmedCandidates.length ? "confirmed_answer_guided" : "confirmed_no_match",
+        reason: confirmedCandidates.length ? "confirmed_bank_candidates" : "confirmed_no_match",
       });
 
       if (normalize(reviewedQuestion) === normalize(originalQuestion)) return;

@@ -445,14 +445,16 @@ async function decideQuestionMergeWithArk({
   };
 }
 
-function compactCandidate(candidate) {
+function compactCandidate(candidate, options = {}) {
+  const answerLogicLimit = Number(options.answerLogicLimit || 320);
+  const answerDetailLimit = Number(options.answerDetailLimit || 1000);
   return {
     id: candidate.id,
     question: candidate.question,
     sourceLabel: candidate.sourceLabel || "通用",
     score: candidate.score,
-    answerLogic: String(candidate.answerLogic || "").slice(0, 320),
-    answerDetail: String(candidate.answerDetail || candidate.answer || "").slice(0, 1000),
+    answerLogic: String(candidate.answerLogic || "").slice(0, answerLogicLimit),
+    answerDetail: String(candidate.answerDetail || candidate.answer || "").slice(0, answerDetailLimit),
   };
 }
 
@@ -523,7 +525,10 @@ async function generateFallbackAnswerStreamWithArk({
   serviceTier,
   onDelta,
 }) {
-  const pool = (candidates ?? []).slice(0, 5).map(compactCandidate);
+  const pool = (candidates ?? []).slice(0, 5).map((candidate, index) => compactCandidate(candidate, {
+    answerLogicLimit: index === 0 ? 600 : 260,
+    answerDetailLimit: index === 0 ? 2600 : 900,
+  }));
   const topScore = Number(candidates?.[0]?.score ?? 0);
   const companyName = String(companyContext?.name || "").trim();
   const companyIntroduction = String(companyContext?.introduction || "").trim();
@@ -543,8 +548,9 @@ async function generateFallbackAnswerStreamWithArk({
           "你会收到当前问题、最近对话上下文、候选人的题库答案片段和简历。",
           "最近对话上下文只用于理解面试进度、候选人刚才说过的背景和追问承接；当前问题仍然是唯一要回答的问题。",
           "上下文里“我：”开头的是候选人麦克风识别内容，只能作为已说过内容和补充背景，不能当成面试官问题去回答。",
-          "如果题库候选分数高或题目明显匹配，必须优先按照题库里的回答逻辑和具体内容来组织，只做压缩、口语化和贴合当前问法。",
-          "如果题库没有可靠命中，再基于简历事实和相近题库片段生成通用回答。",
+          "无论题库匹配分数高低，你都必须生成一版可直接口述的答案，不要因为题库高分命中而跳过生成。",
+          "如果题库候选与当前问题明显匹配，你可以选择一模一样输出题库答案，也可以在不改变事实、立场和核心结构的前提下改写成更适合现场口述的回答。",
+          "如果题库没有可靠命中，再基于简历事实、公司资料、最近对话上下文和相近题库片段生成通用回答。",
           "如果提供了面试公司信息，回答公司相关问题时要优先结合公司定位、岗位JD、公司产品、公司题库片段和候选人经历做匹配。",
           "不要编造简历和公司资料之外的事实；题库不匹配时，用简历里的真实经历和公司资料组织通用回答。",
           "输出要更口语化，像候选人在面试现场可以直接朗读的回答；少用书面报告腔，不要堆长句。",

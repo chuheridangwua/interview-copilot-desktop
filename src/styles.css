@@ -159,9 +159,9 @@ button {
 }
 
 .topbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(220px, auto) minmax(260px, 1fr) auto minmax(260px, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   min-height: 40px;
 }
@@ -194,20 +194,95 @@ button {
   letter-spacing: 0;
 }
 
-.topbar-actions {
+.topbar-marker {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex: 1 1 auto;
+  grid-column: 3;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
   min-width: 0;
 }
 
+.topbar-marker .manual-marker-command {
+  min-width: 142px;
+}
+
+.topbar-question-rail {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.topbar-question-rail.left {
+  justify-content: flex-end;
+}
+
+.topbar-question-rail.right {
+  justify-content: flex-start;
+}
+
+.topbar-question-chip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 1 250px;
+  min-width: 0;
+  height: 32px;
+  gap: 6px;
+  padding: 0 9px;
+  color: var(--control-text);
+  background: color-mix(in srgb, var(--field-raised) 78%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px var(--shadow-soft);
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.topbar-question-chip:hover {
+  transform: translateY(-1px);
+  background: var(--field-hover);
+  border-color: var(--line-strong);
+}
+
+.topbar-question-chip.selected {
+  color: var(--blue-strong);
+  background: var(--blue-soft);
+  border-color: var(--blue-border);
+}
+
+.topbar-question-chip.provisional {
+  color: var(--muted);
+  border-style: dashed;
+}
+
+.topbar-question-chip.manual {
+  color: var(--green-strong);
+  background: var(--green-soft);
+  border-color: var(--green-border);
+}
+
+.topbar-question-chip svg {
+  flex: 0 0 auto;
+}
+
+.topbar-question-chip span {
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 720;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .command-strip {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 6px;
   width: 100%;
   min-width: 0;
@@ -312,6 +387,8 @@ button {
 }
 
 .company-selector {
+  position: relative;
+  display: flex;
   flex-direction: row;
   align-items: center;
   height: 32px;
@@ -324,7 +401,7 @@ button {
   box-shadow: 0 8px 20px var(--shadow-soft);
 }
 
-.company-selector span {
+.company-selector > span {
   flex: 0 0 auto;
   color: var(--muted);
   font-size: 12px;
@@ -332,14 +409,94 @@ button {
   white-space: nowrap;
 }
 
-.company-selector select {
+.company-selector-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   width: 112px;
   height: 26px;
+  min-width: 0;
+  gap: 6px;
   padding: 0 7px;
   color: var(--ink-strong);
-  border-color: var(--line-strong);
+  background: var(--field);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.company-selector-button span {
+  overflow: hidden;
+  color: inherit;
   font-size: 12px;
   font-weight: 720;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.company-selector-button svg {
+  color: var(--muted);
+}
+
+.company-selector-button:focus-visible {
+  outline: none;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 25%, transparent);
+}
+
+.company-selector.open .company-selector-button {
+  border-color: var(--blue);
+}
+
+.company-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 30;
+  display: grid;
+  width: min(260px, 100%);
+  max-height: 210px;
+  padding: 5px;
+  overflow: auto;
+  background: var(--field-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  box-shadow: 0 18px 40px var(--shadow);
+}
+
+.company-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 30px;
+  gap: 8px;
+  padding: 0 8px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 720;
+  text-align: left;
+  cursor: pointer;
+}
+
+.company-option:hover {
+  background: var(--field-hover);
+  border-color: var(--line);
+}
+
+.company-option.selected {
+  color: var(--green-strong);
+  background: var(--green-soft);
+  border-color: var(--green-border);
+}
+
+.company-option span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @keyframes spin {
@@ -706,7 +863,7 @@ button:disabled {
 }
 
 .left-stack {
-  grid-template-rows: minmax(0, 7fr) minmax(0, 3fr);
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .answer-split {
@@ -764,7 +921,6 @@ button:disabled {
 
 .question-panel,
 .transcript-panel,
-.candidate-panel,
 .answer-panel,
 .original-answer-panel,
 .ai-answer-panel {
@@ -859,79 +1015,92 @@ button:disabled {
   min-height: 0;
 }
 
-.manual-marker-pad {
-  display: grid;
+.operation-pad {
+  display: flex;
   flex: 0 0 auto;
-  place-items: center;
+  flex-direction: column;
+  gap: 6px;
   padding: 8px 6px 10px;
   background: color-mix(in srgb, var(--panel-soft) 82%, transparent);
   border-top: 1px solid var(--line);
 }
 
-.manual-marker-pad-button {
+.operation-pad .command-strip {
   display: grid;
-  grid-template-rows: 1fr auto;
-  place-items: center;
-  width: min(100%, 220px);
-  aspect-ratio: 1 / 1;
-  padding: 18px 12px;
-  color: var(--green-strong);
-  background:
-    radial-gradient(circle at 50% 24%, color-mix(in srgb, var(--green-soft) 88%, transparent), transparent 56%),
-    var(--field-raised);
-  border: 1px solid var(--green-border);
-  border-radius: 8px;
-  box-shadow: 0 14px 30px var(--control-shadow);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 5px;
+}
+
+.operation-pad .volume-cluster,
+.operation-pad .health-strip,
+.operation-pad .company-selector,
+.operation-pad .session-command,
+.operation-pad .danger-command {
+  grid-column: 1 / -1;
+}
+
+.operation-pad .volume-cluster {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  gap: 5px;
+}
+
+.operation-pad .volume-indicator,
+.operation-pad .health-pill,
+.operation-pad .icon-button,
+.operation-pad .primary-command,
+.operation-pad .danger-command {
+  width: 100%;
+  min-width: 0;
+}
+
+.operation-pad .volume-indicator {
+  height: 30px;
+  padding: 0 6px;
+  font-size: 11.5px;
+}
+
+.operation-pad .volume-indicator span,
+.operation-pad .health-pill span,
+.operation-pad .icon-button span,
+.operation-pad .primary-command span,
+.operation-pad .danger-command span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operation-pad .health-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+  height: auto;
+  gap: 4px;
   cursor: pointer;
-  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
 }
 
-.manual-marker-pad-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 18px 34px var(--control-shadow);
+.operation-pad .health-pill {
+  height: 26px;
+  padding: 0 5px;
+  font-size: 10.5px;
 }
 
-.manual-marker-pad-button.active {
-  color: var(--amber-strong);
-  background:
-    radial-gradient(circle at 50% 24%, color-mix(in srgb, var(--amber-soft) 88%, transparent), transparent 56%),
-    var(--field-raised);
-  border-color: var(--amber-border);
-}
-
-.manual-marker-pad-button.submitting {
-  color: var(--blue-strong);
-  background:
-    radial-gradient(circle at 50% 24%, color-mix(in srgb, var(--blue-soft) 88%, transparent), transparent 56%),
-    var(--field-raised);
-  border-color: var(--blue-border);
-}
-
-.manual-marker-pad-button.submitting svg {
-  animation: spin 950ms linear infinite;
-}
-
-.manual-marker-pad-icon {
+.operation-pad .company-selector {
   display: grid;
-  place-items: center;
-  width: 68px;
-  height: 68px;
-  align-self: end;
-  color: currentColor;
-  background: color-mix(in srgb, currentColor 11%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 24%, transparent);
-  border-radius: 50%;
+  grid-template-columns: auto minmax(0, 1fr);
+  width: 100%;
+  height: 32px;
 }
 
-.manual-marker-pad-label {
-  align-self: start;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  color: var(--ink-strong);
-  text-align: center;
-  font-size: 18px;
-  font-weight: 860;
-  line-height: 1.18;
+.operation-pad .company-selector-button {
+  width: 100%;
+  min-width: 0;
+}
+
+.operation-pad .settings-command,
+.operation-pad .theme-command {
+  min-width: 0;
 }
 
 .question-list {
@@ -1165,6 +1334,53 @@ button:disabled {
   gap: 8px;
   padding: 8px;
   overflow: hidden;
+}
+
+.candidate-strip {
+  flex: 0 0 auto;
+  padding: 7px 8px 8px;
+  background: color-mix(in srgb, var(--field-raised) 56%, transparent);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.candidate-strip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.candidate-strip-head h3 {
+  margin: 0;
+  color: var(--blue-strong);
+  font-size: 12px;
+  font-weight: 820;
+  line-height: 1.2;
+}
+
+.candidate-strip-head span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 720;
+}
+
+.candidate-strip .candidate-list {
+  max-height: 210px;
+  padding: 0;
+  overflow: auto;
+}
+
+.candidate-strip .candidate-card {
+  min-height: 44px;
+}
+
+.candidate-strip .candidate-heading h3 {
+  -webkit-line-clamp: 2;
+}
+
+.candidate-empty {
+  min-height: 74px;
 }
 
 .answer-section {
