@@ -16,6 +16,7 @@ const {
 const { DoubaoAsrSession } = require("./backend/doubaoAsr.cjs");
 const { InterviewQuestionEngine } = require("./backend/interviewQuestionEngine.cjs");
 const {
+  CompanyFirstMatcher,
   Matcher,
   inferQuestionsFromSegments,
   loadQuestionBank,
@@ -362,8 +363,12 @@ function getMatcherBundle(companyId = "") {
   const baseItems = loadBaseQuestionBank();
   const companyContext = normalizedCompanyId ? loadCompanyContext(normalizedCompanyId, { strict: true }) : null;
   const items = companyContext ? [...baseItems, ...companyContext.items] : [...baseItems];
+  const baseMatcher = new Matcher(baseItems);
+  const companyMatcher = companyContext?.items.length ? new Matcher(companyContext.items) : null;
   const bundle = {
-    matcher: new Matcher(items),
+    matcher: companyMatcher
+      ? new CompanyFirstMatcher({ companyMatcher, baseMatcher })
+      : baseMatcher,
     items,
     baseCount: baseItems.length,
     companyCount: companyContext?.items.length ?? 0,

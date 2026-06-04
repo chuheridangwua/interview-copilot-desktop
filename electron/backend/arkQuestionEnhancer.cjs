@@ -458,6 +458,40 @@ function compactCandidate(candidate, options = {}) {
   };
 }
 
+function compactCompanyIntroductionForAnswer(text) {
+  const value = String(text ?? "").trim();
+  if (!value || value.length <= 9000) return value;
+
+  const sections = value
+    .split(/\n(?=##\s+)/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const output = [];
+  const seen = new Set();
+  const sectionSpecs = [
+    { keywords: ["二面准备结论"], limit: 1600 },
+    { keywords: ["目标岗位本质"], limit: 2600 },
+    { keywords: ["你的项目怎么重新包装"], limit: 3400 },
+    { keywords: ["最后 30 秒"], limit: 900 },
+    { keywords: ["公司当前理解"], limit: 1800 },
+    { keywords: ["模型效果和 badcase"], limit: 2200 },
+  ];
+
+  for (const spec of sectionSpecs) {
+    const section = sections.find((item) => (
+      spec.keywords.some((keyword) => item.includes(keyword))
+    ));
+    if (!section) continue;
+    const key = section.slice(0, 80);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    output.push(section.slice(0, spec.limit));
+  }
+
+  if (!output.length) return value.slice(0, 9000);
+  return output.join("\n\n").slice(0, 9000);
+}
+
 async function rerankCandidatesWithArk({ question, candidates, resumeText, signal, timeoutMs = 9000 }) {
   const content = await callArkChat({
     signal,
@@ -532,6 +566,7 @@ async function generateFallbackAnswerStreamWithArk({
   const topScore = Number(candidates?.[0]?.score ?? 0);
   const companyName = String(companyContext?.name || "").trim();
   const companyIntroduction = String(companyContext?.introduction || "").trim();
+  const companyAnswerContext = compactCompanyIntroductionForAnswer(companyIntroduction);
   const content = await streamArkChat({
     signal,
     timeoutMs,
@@ -551,8 +586,13 @@ async function generateFallbackAnswerStreamWithArk({
           "无论题库匹配分数高低，你都必须生成一版可直接口述的答案，不要因为题库高分命中而跳过生成。",
           "如果题库候选与当前问题明显匹配，你可以选择一模一样输出题库答案，也可以在不改变事实、立场和核心结构的前提下改写成更适合现场口述的回答。",
           "如果题库没有可靠命中，再基于简历事实、公司资料、最近对话上下文和相近题库片段生成通用回答。",
-          "如果提供了面试公司信息，回答公司相关问题时要优先结合公司定位、岗位JD、公司产品、公司题库片段和候选人经历做匹配。",
+          "如果提供了面试公司信息，公司资料里的公司定位、岗位JD、面试复盘、项目包装原则是高优先级上下文，必须主动用于组织答案。",
+          "如果当前问题是项目介绍、项目迁移、为什么匹配岗位、客户需求、模型效果或策略设计，必须把候选人项目重新包装到目标公司的岗位语境里，而不是只复述技术栈或项目链路。",
+          "对数美或内容风控岗位，项目回答优先围绕客户场景、内容形态、风险目标、标签边界、处置策略、效果指标和badcase迭代展开。",
+          "讲合同/投标评审时，优先包装成企业内部内容审核产品：定义风险类型，拆审核项，输出风险等级和证据，分级提示/人工复核/低风险建议，再用badcase优化规则、prompt、知识库和评测集。",
+          "讲商机推送时，优先包装成标签和评分体系：把招采非结构化内容结构化，再按地域、金额、产品匹配度、历史客户、资质要求等维度打标签和评分，最后按业务目标配置策略。",
           "不要编造简历和公司资料之外的事实；题库不匹配时，用简历里的真实经历和公司资料组织通用回答。",
+          "不要把“我开发了80%”“部署H200”“用了LangGraph、LlamaIndex、Milvus”等技术细节作为主线；除非面试官追问技术，否则技术只作为支撑客户、标签、策略和效果优化的手段。",
           "输出要更口语化，像候选人在面试现场可以直接朗读的回答；少用书面报告腔，不要堆长句。",
           "必须严格按下面格式输出，且只能有“回答逻辑：”和“具体内容：”两个一级标签；除具体内容里的**关键词**加粗外，不要输出其他标题、markdown、序号或寒暄：",
           "回答逻辑：",
@@ -578,7 +618,7 @@ async function generateFallbackAnswerStreamWithArk({
           local_question_bank_candidates: pool,
           resume: String(resumeText ?? "").slice(0, 3200),
           company_name: companyName,
-          company_introduction: companyIntroduction.slice(0, 5200),
+          company_introduction: companyAnswerContext,
         }),
       },
     ],

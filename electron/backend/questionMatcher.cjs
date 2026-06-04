@@ -392,6 +392,30 @@ class Matcher {
   }
 }
 
+class CompanyFirstMatcher {
+  constructor({ companyMatcher, baseMatcher }) {
+    this.companyMatcher = companyMatcher;
+    this.baseMatcher = baseMatcher;
+  }
+
+  search(query, limit = 3) {
+    const companyHits = this.companyMatcher?.search(query, limit) ?? [];
+    if (companyHits.length) return companyHits;
+    return this.baseMatcher?.search(query, limit) ?? [];
+  }
+
+  searchWithEvent(query, limit = 3) {
+    const started = Date.now();
+    return {
+      query: String(query ?? ""),
+      definite: false,
+      receivedAt: 0,
+      candidates: this.search(query, limit),
+      latencyMs: Date.now() - started,
+    };
+  }
+}
+
 const strongQuestionIntentPatterns = [
   /为什么/,
   /怎么/,
@@ -687,6 +711,7 @@ function loadQuestionBank(appPath = process.cwd()) {
 }
 
 module.exports = {
+  CompanyFirstMatcher,
   Matcher,
   inferQuestionFromSegments,
   inferQuestionsFromSegments,

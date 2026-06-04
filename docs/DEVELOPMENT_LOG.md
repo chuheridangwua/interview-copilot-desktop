@@ -11,6 +11,93 @@
 - 如果改了启动方式、环境变量、端口、脚本或用户操作流程，必须同步更新 `README.md` 和 `docs/LOCAL_CODEX_HANDOFF.md`。
 - 如果发现线上或本机真实表现和本文档不一致，以本机实测为准，并立刻追加修正记录。
 
+## 2026-06-04 15:36 +08:00
+
+### 目标
+
+修正数美二面项目介绍口径：合同/投标评审和商机推送不能只按技术栈或通用 AI 项目讲，必须按数美岗位关心的客户理解、标签体系、策略配置、模型效果和 badcase 迭代重新包装；同时确保右侧 AI 输出真正吃到公司背景、JD 和二面准备材料。
+
+### 已完成
+
+- 更新 `resources/company/数美/question.md`：
+  - #47 `请用二面版本介绍合同/投标智能评审项目。` 改为企业内部 AI 内容审核产品口径，主线是风险类型、审核项、风险等级、分级策略、人工复核和 badcase 迭代。
+  - #48 `商机智能推送平台和数美标签策略有什么关系？` 改为标签和评分体系口径，主线是非结构化招采内容结构化、地域/金额/产品匹配/历史客户/资质要求等维度打标签和评分，再按业务目标配置策略。
+- 更新 `resources/company/数美/Introduction.md` 的项目包装章节，明确不要把“开发了 80%”“部署 H200”“用了 LangGraph/LlamaIndex/Milvus”作为二面主线。
+- 强化 `generateFallbackAnswerStreamWithArk()` 的系统提示词：
+  - 公司资料里的公司定位、岗位 JD、面试复盘、项目包装原则是高优先级上下文。
+  - 项目介绍、项目迁移、岗位匹配、客户需求、模型效果、策略设计类问题，必须把项目重新包装到目标公司岗位语境。
+  - 数美/内容风控岗位优先围绕客户场景、内容形态、风险目标、标签边界、处置策略、效果指标和 badcase 迭代。
+- 修正公司资料注入方式：
+  - 旧逻辑只传 `company_introduction.slice(0, 5200)`，数美资料约 6970 字，项目包装章节后半段容易被截断。
+  - 新增 `compactCompanyIntroductionForAnswer()`，短资料完整传入；长资料优先保留二面准备结论、岗位本质、项目重新包装、最后记忆块、公司理解、模型效果和 badcase 等关键章节。
+
+### 验证结果
+
+已通过：
+
+```powershell
+node --check electron\backend\arkQuestionEnhancer.cjs
+node --check electron\main.cjs
+npm run test:matcher
+npm run build
+git diff --check
+curl.exe -fsS http://127.0.0.1:1421/
+```
+
+额外确认：
+
+```powershell
+node -e "const fs=require('fs'); const text=fs.readFileSync('resources/company/数美/Introduction.md','utf8'); console.log(JSON.stringify({length:text.length, projectPackagingIndex:text.indexOf('你的项目怎么重新包装'), oldSliceWouldInclude:text.slice(0,5200).includes('你的项目怎么重新包装')}))"
+```
+
+输出显示数美资料长度约 6970 字，项目包装章节在约 5064 字位置；旧截断方式最多只带到章节开头附近，不能稳定覆盖完整项目包装内容。
+
+### 已知问题
+
+- 这次没有真实调用方舟验证生成文本质量；需要在 Windows Electron 客户端里重新选择 `数美` 后，对“介绍合同审核项目”“介绍商机推送项目”各标记一次，看 Mini / Pro 是否按标签、策略、badcase 口径输出。
+
+### 下一步
+
+- 如果真实输出仍偏技术栈，再把 prompt 中“项目介绍题禁用技术栈主线”升级成更强约束，并考虑把数美项目包装规则单独作为 `company_alignment_rules` 字段传给模型。
+
+## 2026-06-04 15:27 +08:00
+
+### 目标
+
+选择面试公司后，题库匹配必须先查公司题库；公司题库没有候选时，才匹配通用题库。
+
+### 已完成
+
+- 新增 `CompanyFirstMatcher`，同时支持 `search()` 和 `searchWithEvent()`。
+- Electron 会话级 matcher 改为：
+  - 未选择公司，使用通用题库 matcher。
+  - 已选择公司且公司题库非空，先查公司题库 matcher。
+  - 公司题库返回空候选时，再查通用题库 matcher。
+- 题库候选、手动标记、自动 final、方舟确认后的重排、搜索框 IPC 都继续走同一个 matcher bundle，因此公司优先规则统一生效。
+- `scripts/test-question-matcher.mjs` 增加公司优先/通用兜底断言，并把题库数量断言从固定 `31` 改为按当前题库标题数校验，避免新增题目后测试误失败。
+- README 和 `docs/LOCAL_CODEX_HANDOFF.md` 已同步公司优先匹配说明。
+
+### 验证结果
+
+已通过：
+
+```powershell
+node --check electron\main.cjs
+node --check electron\backend\questionMatcher.cjs
+npm run test:matcher
+npm run build
+git diff --check
+curl.exe -fsS http://127.0.0.1:1421/
+```
+
+### 已知问题
+
+- 当前规则按 matcher 返回候选来判断“公司题库有命中”：只要公司题库有候选，就不会混入通用题库候选。如果后续发现低相关公司候选压住高相关通用候选，可以再增加“有效候选分数阈值”。
+
+### 下一步
+
+- Windows Electron 真机会话里选择具体公司后，分别用公司题和通用题各标记一次，确认 UI 候选来源徽标与最终 AI 答案上下文一致。
+
 ## 2026-06-04 14:24 +08:00
 
 ### 目标

@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const {
+  CompanyFirstMatcher,
   Matcher,
   inferQuestionFromSegments,
   inferQuestionsFromSegments,
@@ -21,10 +22,12 @@ const shumeiQuestionBankPath = new URL("../resources/company/数美/question.md"
 const questionBankPath = process.env.QUESTION_BANK_PATH
   || (fs.existsSync(embeddedQuestionBankPath) ? embeddedQuestionBankPath : fixtureQuestionBankPath);
 
-const bank = parseQuestionBank(fs.readFileSync(questionBankPath, "utf8"));
+const questionBankContent = fs.readFileSync(questionBankPath, "utf8");
+const expectedQuestionCount = [...questionBankContent.matchAll(/^(\d+)\.\s+(.+)$/gm)].length;
+const bank = parseQuestionBank(questionBankContent);
 const matcher = new Matcher(bank);
 
-assert.equal(bank.length, 31, "should parse 31 numbered questions");
+assert.equal(bank.length, expectedQuestionCount, `should parse ${expectedQuestionCount} numbered questions`);
 assert.ok(bank.every((item) => item.id && item.question && item.answer), "each item should contain id, question, and answer");
 assert.ok(bank.every((item) => item.answerLogic && item.answerDetail), "each item should contain answer logic and detail sections");
 assert.ok(bank.every((item) => item.source === "base" && item.sourceLabel === "通用"), "base items should carry source metadata");
@@ -53,7 +56,42 @@ assert.ok(baseOnlyCompanyQueryHits.every((item) => item.source === "base" && ite
 const shumeiCompanyQueryHits = shumeiMatcher.search("你为什么想来数美科技", 10);
 assert.equal(shumeiCompanyQueryHits[0]?.source, "company", "company matcher should prioritize company question for company-specific query");
 assert.equal(shumeiCompanyQueryHits[0]?.sourceLabel, "数美");
-assert.equal(shumeiCompanyQueryHits[0]?.sourceQuestionId, 1);
+assert.equal(typeof shumeiCompanyQueryHits[0]?.sourceQuestionId, "number");
+
+const shumeiCompanyFirstMatcher = new CompanyFirstMatcher({
+  companyMatcher: new Matcher(shumeiBank),
+  baseMatcher: matcher,
+});
+const shumeiCompanyFirstHits = shumeiCompanyFirstMatcher.search("你为什么想来数美科技", 10);
+assert.ok(shumeiCompanyFirstHits.length > 0, "company-first matcher should find company candidates first");
+assert.ok(
+  shumeiCompanyFirstHits.every((item) => item.source === "company" && item.sourceLabel === "数美"),
+  "company-first matcher should not mix base candidates when company hits exist",
+);
+
+const priorityBaseItems = parseQuestionBank([
+  "1. 通用兜底问题",
+  "回答逻辑：通用逻辑",
+  "具体内容：这条通用答案包含 baseonly。",
+].join("\n"));
+const priorityCompanyItems = parseQuestionBank([
+  "1. 公司专属问题",
+  "回答逻辑：公司逻辑",
+  "具体内容：这条公司答案包含 companyonly。",
+].join("\n"), {
+  source: "company",
+  sourceLabel: "测试公司",
+  idOffset: 10000,
+});
+const priorityMatcher = new CompanyFirstMatcher({
+  companyMatcher: new Matcher(priorityCompanyItems),
+  baseMatcher: new Matcher(priorityBaseItems),
+});
+const mixedPriorityHits = priorityMatcher.search("companyonly baseonly", 10);
+assert.ok(mixedPriorityHits.length > 0, "company-first matcher should return primary hits");
+assert.ok(mixedPriorityHits.every((item) => item.source === "company"), "company hits should suppress base fallback");
+assert.equal(priorityMatcher.search("baseonly", 10)[0]?.source, "base", "base matcher should be used only when company has no hit");
+assert.equal(priorityMatcher.searchWithEvent("baseonly", 10).candidates[0]?.source, "base", "searchWithEvent should use the same fallback rule");
 
 const matchCases = [
   ["你们的 RAG 是怎么做的，复杂 PDF 和表格怎么处理", 24],
