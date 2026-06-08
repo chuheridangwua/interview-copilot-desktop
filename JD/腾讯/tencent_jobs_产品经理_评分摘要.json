@@ -1,0 +1,36 @@
+{
+  "company": "腾讯",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\腾讯\\tencent_jobs_产品经理.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-08",
+  "cutoff_date": "2026-03-08",
+  "source_total": 132,
+  "eligible_total": 100,
+  "scored_total": 100,
+  "top_n": 50,
+  "concurrency": 5,
+  "distribution": {
+    "count": 100,
+    "min": 23,
+    "max": 85,
+    "mean": 52.17,
+    "stddev": 16.35,
+    "p10": 32.0,
+    "p50": 52.0,
+    "p90": 76.1,
+    "buckets": {
+      "0_59": 64,
+      "60_69": 21,
+      "70_79": 7,
+      "80_89": 8,
+      "90_100": 0
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\腾讯\\tencent_jobs_产品经理_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\腾讯\\tencent_jobs_产品经理_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\腾讯\\tencent_jobs_产品经理_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\腾讯\\tencent_jobs_产品经理_top50_模型初筛.csv"
+  }
+}

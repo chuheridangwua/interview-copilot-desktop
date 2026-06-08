@@ -1,0 +1,36 @@
+{
+  "company": "字节",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-08",
+  "cutoff_date": "2026-03-08",
+  "source_total": 601,
+  "eligible_total": 172,
+  "scored_total": 172,
+  "top_n": 50,
+  "concurrency": 5,
+  "distribution": {
+    "count": 172,
+    "min": 32,
+    "max": 92,
+    "mean": 58.83,
+    "stddev": 14.04,
+    "p10": 42.0,
+    "p50": 58.5,
+    "p90": 76.9,
+    "buckets": {
+      "0_59": 88,
+      "60_69": 48,
+      "70_79": 24,
+      "80_89": 11,
+      "90_100": 1
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_top50_模型初筛.csv"
+  }
+}
