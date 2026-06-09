@@ -28,6 +28,9 @@ DATE_PATTERNS = [
     re.compile(r"(?P<y>\d{4})年(?P<m>\d{1,2})月(?P<d>\d{1,2})日"),
 ]
 FIVE_PLUS_RE = re.compile(r"(?:^|[^0-9])(?:5年(?:及以上|以上)|五年(?:及以上|以上)|至少5年|5\+\s*年)")
+MASTER_PLUS_RE = re.compile(
+    r"(?:硕士(?:研究生)?(?:及以上|以上)?学历|研究生(?:及以上|以上)?学历|硕士及以上|研究生及以上|仅限硕士|必须硕士|硕博(?:及以上)?|硕士研究生)"
+)
 
 SYSTEM_PROMPT = """你是一个严谨的中文岗位匹配评分员。
 
@@ -169,6 +172,10 @@ def join_text(*parts: str) -> str:
     return "\n\n".join(part.strip() for part in parts if str(part or "").strip())
 
 
+def join_inline(*parts: str) -> str:
+    return " / ".join(part.strip() for part in parts if str(part or "").strip())
+
+
 def infer_company(path: Path, explicit: str | None) -> str:
     if explicit:
         return explicit
@@ -232,12 +239,55 @@ def normalize_row(path: Path, company: str, row_index: int, row: dict[str, str])
             source_schema="bytedance",
             raw=row,
         )
+    if "title" in row and "post_url" in row and "jd_text" in row:
+        title = row.get("title", "").strip()
+        description = row.get("responsibility", "").strip()
+        requirement_text = row.get("requirement_text", "").strip()
+        source_schema = row.get("source_schema", "").strip() or "alibaba_family"
+        publish_raw = (
+            row.get("publish_date", "").strip()
+            or row.get("raw_publish_time", "").strip()
+            or row.get("raw_modify_time", "").strip()
+        )
+        publish_date = parse_date(publish_raw).isoformat()
+        business_line = row.get("business_line", "").strip() or join_inline(
+            row.get("company", "").strip(),
+            row.get("department", "").strip(),
+            row.get("project", "").strip(),
+            row.get("category_name", "").strip(),
+            row.get("batch_name", "").strip(),
+        )
+        jd_text = row.get("jd_text", "").strip() or join_text(
+            f"岗位职责：\n{description}",
+            f"任职要求：\n{requirement_text}",
+        )
+        return NormalizedJob(
+            company=row.get("company", "").strip() or company,
+            source_file=str(path),
+            source_row_index=row_index,
+            title=title,
+            business_line=business_line,
+            location=row.get("location", "").strip(),
+            publish_date=publish_date,
+            post_url=row.get("post_url", "").strip(),
+            jd_text=jd_text,
+            responsibility=description,
+            requirement_text=requirement_text,
+            experience_text=row.get("experience_text", "").strip() or requirement_text,
+            source_schema=source_schema,
+            raw=row,
+        )
     raise ValueError(f"unsupported csv schema: {path}")
 
 
 def requires_five_plus(text: str) -> bool:
     normalized = re.sub(r"\s+", "", str(text or ""))
     return bool(FIVE_PLUS_RE.search(normalized))
+
+
+def requires_master_plus(text: str) -> bool:
+    normalized = re.sub(r"\s+", "", str(text or ""))
+    return bool(MASTER_PLUS_RE.search(normalized))
 
 
 def filter_jobs(jobs: list[NormalizedJob], cutoff_date: date) -> tuple[list[NormalizedJob], list[dict[str, Any]]]:
@@ -250,6 +300,8 @@ def filter_jobs(jobs: list[NormalizedJob], cutoff_date: date) -> tuple[list[Norm
             reasons.append(f"发布日期早于{cutoff_date.isoformat()}")
         if requires_five_plus(job.experience_text) or requires_five_plus(job.requirement_text):
             reasons.append("要求5年以上工作经验")
+        if requires_master_plus(job.requirement_text) or requires_master_plus(job.jd_text):
+            reasons.append("要求硕士或研究生及以上学历")
 
         audit.append(
             {

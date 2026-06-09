@@ -1,0 +1,80 @@
+请求网址
+https://talent.taotian.com/position/search?_csrf=0a2cbff7-a079-4c3b-a2a6-20fd23fc6d43
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:08:55 GMT
+eagleeye-traceid
+213e054f17809673357327237ea602
+expires
+0
+pragma
+no-cache
+server
+Tengine/Aserver
+strict-transport-security
+max-age=0
+timing-allow-origin
+*
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-xss-protection
+1; mode=block
+:authority
+talent.taotian.com
+:method
+POST
+:path
+/position/search?_csrf=0a2cbff7-a079-4c3b-a2a6-20fd23fc6d43
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+227
+content-type
+application/json
+cookie
+xlly_s=1; prefered-lang=zh; SSO_LANG_V2=zh-CN; recruit-careers_USER_COOKIE_V3=ST180.iZjhpIwN7xlhC0TUi8V8FjQMRkIngYEqTZ0qb_OBXYp-jHm-4c26LjGOg0RlTqZJbkCHMc6Wy1mtWGeQqI-ETLWTCbQsXKwEBuyhLm0TvyO1GM_bw1Wkrg-RYEofIm_ObVDyxncD3Zzg631uN9x4XbaScvyip-nUHGLKqOvY8RkQ4-0B2rQc-VbvQwKqIPXTM32KwbGOtSqNmwOCmH1oz2QmUTN4SIygWGlvBJ_Eg6NAPeA6hoo7MxUfQDGVEhA3sBxOM6scE6sUnYS_KhioqJRtSRF3aUWpM-kIAJwFx8_W3XZ6-7vbOJO0VmmNewRu7dDI2fZUiyS7TAevhRtqjN5Xp9dvDlAClLFtyLdY6SdS_t3F5LCkoGkZrja4Iep41fqaBXZ4RsnEN1bo9h70VZxDF7lZND6949VFyt-5Km7OCHTzlzuEMJt1FWVofx2fJ0Bt8H-gcy9FL8bJw-fkbYrVD5S7BlbirYm-DlopAMyL_6XhUv94zkwgKxy0L0Gl.YkUZzX6CUAZ1E4pKTfT_9kMZ7KMgkiXgB_TFRmG7VbH3fHlXYUib-tjXE5bDLoW6c8E8-qVDCvAqAbYBKzmpOJu5JfmVEPIrVpKoTen9-GA6KAUh2cG27Q9ROdv3GCCRWXh1UbwmgaBpRY1AYdF27qvU9R8wIn2JDjiG5NaAkbIUaen3f5IlO3lzOaRu_YwazvvuCyRz3EwUaHq0cbeSsNznvuQ_w5aOUcWOfAVOuDf7VbCY08TmZ1mVv86OyZwge-6rdzHxCQyUsAQ7DOHgIEfScgrO_qVamHDvjAKl_FR6p7viqdJfXH1_XSJYYksj45plKBlURnbOTtjzY7sXaA; recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3MzE4MzM5LCJ0b2tlbiI6IjNjNmRjMzQxNzdjNTQ3MmZhMTQ4NTQxZjk0NTU4MjUzNDIwNmRjMDEifQ.G9B-FwFAHbiF28u0_MmvbeyCA7qVWkBOKShny7qu_E0tpX2UPEhlFKz8xHER7CGqlaUmZPfLK8iPR-90nyR-bxK1EZu298clL_1IEzgE-Vo7cYsccnOF-g6hLIyyfn9iTQzYH0mY1FUyQFZk2bSPXkIpdYM9yXavGQsH8aU2S3LwN8ldGxq3F0tZj7AE_ZJl7YTnqDv0cViMgOPPN17lXJNpf2HjhsLSndSJolqBTrpBLnWby71ubxkPyqo6yBmrj3roSvMf8eEzR3sBDNT2PrHYOBDHgxkCBFrcMw0DGhPLt7LSn0hLYhMoH7xsBVQR-fT-OhV0lROvfF2VtzFH6g; SESSION=MkU1Mjk3MEFENjFGQzUxRTBCOTQxRUY0NThBNDY2NkY=; XSRF-TOKEN=0a2cbff7-a079-4c3b-a2a6-20fd23fc6d43; tfstk=gAHKqp1-6FYhN0J6k9AiZKQwAIxiwCmU52ofEz4hNV3t04eot04o6ugo7TmHT0cTyVgTRyxy4AU-rVUlty2IV4nSJTm3K0D922mPE4nyYuaSP4UotCvmYDyzFEXJnKmebop3N4FCd5wsboZCPCVI2grm-EYDndACf8Lpo0DIKIe_4PZCdyaBX5Zz08ZQFWtT5uEVNwg7FhKTxuZ5A6NQflZY5zw7F4i6Xu4_A8wSPctT4vVp9PIQXThNlsLRtaMlFTMTv5Oi2PMKL3qU9PiQWU8xBOPLlDaOeeuE8j487xTM6clsO2qZyKLTUVlSPu315UVEVf3Tv2YAzzDExYUnvBTsXRzKRWh9c6rtjvn-N5KBdceLJSDSRg1LpbgEeWld4no_dVl4uWOw7lHnn7U46NTIjcUQMb3H7TanMcgTiAbGn8uZN4Z-5wIPzxDvr8b0kufBXhCPaWZZviRbsKtYQfZToHEda_P7blUDXhCPaWZaXrxdJ_5zNl5..; isg=BJSUSQFZgmDNqxatjCr6EEt8ZdIG7bjXvsBlkS50KZ-lGTZjX_sxZujXHRGB5vAv
+origin
+https://talent.taotian.com
+priority
+u=1, i
+referer
+https://talent.taotian.com/off-campus/position-list
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36

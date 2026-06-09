@@ -1,0 +1,80 @@
+请求网址
+https://careers.aliyun.com/position/search?_csrf=d9b1c2da-af79-45b9-8288-b5d1476d00d2
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:15:47 GMT
+eagleeye-traceid
+0b87b7e317809677476121548e577f
+expires
+0
+pragma
+no-cache
+server
+Tengine
+strict-transport-security
+max-age=0
+timing-allow-origin
+*
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-xss-protection
+1; mode=block
+:authority
+careers.aliyun.com
+:method
+POST
+:path
+/position/search?_csrf=d9b1c2da-af79-45b9-8288-b5d1476d00d2
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+227
+content-type
+application/json
+cookie
+cna=SGDnIZ2Fm3ICATzQUd5aEoXc; account_info_switch=close; aliyun_lang=zh; cnaui=1753884157441403; aui=1753884157441403; yunpk=1753884157441403; login_aliyunid_pk=1984011977242414; login_current_pk=1984011977242414; login_aliyunid_pks="BG+hnQ03L7Oh1UK+4hkN5TNf7ukdLBnlZnbZEepxuSUD/8="; aliyun_country=CN; aliyun_site=CN; _rb_id=5e41a08c76224a6e9809f95dcd301861; arms_uid=088da597-e931-49e4-9f61-f0fab06363eb; SSO_LANG_V2=zh-CN; prefered-lang=zh; aliyun-recruit-careers_USER_COOKIE_V3=ST180.Al_VuXnT0qVGhc9DC5FnBME7vSorJMtef4MfkmGAZTzQA0kkjONiDIOpESB9C8wo-_8-y7Q7ajxa_VWtWV5VZjZN3Tyebdn4wgu7cYeaBNj6kavQF3SZbUSzB-iTzJghI75QqqIkNKTA5YaOXKyTwrhix9wNs4nl94Y0UslWlkOjj2nZYDosBjIN0vhi_KJ3z-KEsTsSCoFowNZV_YWlf4-xME5qvDTzz6hhnUwwD0hAHGDFEAPSl0o415xtuhuaOQM1ED5cFX3NCd9WiHWMXrLB7PxeV3599lCGUGiCuE5ZnsgFhbb0eOrwcVOcV9lQN5Z_hjGzISQRCcWpkJlyC4SED1lJoqrExtOLjgEqiij76hxsy1_p2edlmJQNdQQSkJBZerc5p-I3TCbmyfxmZcVmBbD8YBNqd_DNJHiyP901R9LsEr8yYjA2MRw9afmoGvSvw_UM4WZSGiucdi75QjUXZFjrE2ZPdY2KYCMVWJY8SjAYQ3ptgEQ3TZz-SzVy.ugG-6EF5ZD5AR-z0PljgmVG-K6nbHMvNXAwY9dXsPR0BD0Sw5rDpU0kbZVNjaV6BOHvcxG5CdpLhtfs63RsKN_h8UF3fCXPkUIG7KomizAYZ3Av6GZBQNxLoOiks7DgcK0znEkD3O6bYELxl1tQQNX-bOZaNtZx4u1Jomt5kq4FVYRb6kTheG8wyzOWEdIK4egNBPdnwk43ny-2mhXbstkBFfYACmrxjnZPoF5DJDk_GAGzJHWRgP5wtoVwMwaXXfprKWoebWW2bJ0QIc-ZvUVNewEteSAiE2zsvpFwcJqDjrN0cgFvSk3wCq0jOSkgCzWbbq1qsh0cvBRjNF6mmdQ; aliyun-recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3NzQxNDI2LCJ0b2tlbiI6IjYzOWQ0ODBlNmViYzRlMjViZjc2MGRmODQzNGI4MjUzNDIwNmRjMDEifQ.XSr2asHRji8JfZHfDH-mu1B_ngtoUqBtWfboyZtlvRnx2lRnsYzwN2fbERynJhn1PYbgwBjTk_V1duT0c9wegMsClWlIwigHEHfbOnWwPnax5QURlecpqobBYw8i1Lbr2cEuQaPqiIeVTd25NW3-kUI3rc_N7Knsjn0LoGByScopbvuyJW-SPdmKDGMPWaIFEOF-xcFfBzEKJzvWSlaT3Fbw8G3qY2-pY9IrPEg-R2K0GhQuSC8b_nDsY8i_EvR6hrMLOODx2th5somdIVTHcTmdzbV_7vtbDOPXgca_9tzGvqCo65CS928qHnuy_DZ1pU7w90DFaidWxms59QDBIA; SESSION=RkFFNEIwQUJDNkIyMjU2QzhDQzIwQUNBRTJGOUNDN0E=; XSRF-TOKEN=d9b1c2da-af79-45b9-8288-b5d1476d00d2; tfstk=g1hS2D_Ilgj5fp8Jvg8V5xUJhIFIRERa2waKS2CPJ7F8AWgIfYzU42FBR0u5UJupqDGQDmDEL4KuOXgn5_r8T7rpOVm74Ju-YBZKS7enUkrzAWgnfE-w_CuorW29bhRwUE-275jdp6IUksUUOznJXcmKrWVp0Z5pQCgoVl0rK8FplSUL7MFLezCvlyzh2WE8piBYWoEL9DERDsUzWgQ8y8Ljko4L9knLeENYmyFLvDFKK21bJLatPemWUcYNjzg8c6CKwB20f9ZYorhbP8ZTEuCKuja7Fl3SsGRaurhqGRyV8dVxSxo8l5OVe53jpcMtxdW0N2H-x-ikmtZqHb0Lv8_d_qgsyAFxTeQghmUQBWefJ63bZkiIw5dOcrDxzvhoVw1Lrbladl2XJ62UMfytB0_HSqF8JD2iThfu223isAP6gTFtlvnsdg-V_lsxh9_bI6abbETfK9DA0RKvsZvE08U0Ph8XlgX3er4bbETfK928ozgwlEslK; isg=BLOzbHzX3X2Y6pIKQSvcBu5TQrfd6EeqRa2iVGVQplIPZNAG67uz-9LyGpSKQ5-i
+origin
+https://careers.aliyun.com
+priority
+u=1, i
+referer
+https://careers.aliyun.com/off-campus/position-list?lang=zh&search=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36

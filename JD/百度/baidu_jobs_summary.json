@@ -1,0 +1,14 @@
+{
+  "fetched_at": "2026-06-09 09:42:52",
+  "api_url": "https://talent.baidu.com/httservice/getPostListNew",
+  "page_size": 10,
+  "total_social_jobs": 1602,
+  "total_pages": 161,
+  "deduped_total": 1602,
+  "post_type_filter": "产品",
+  "filtered_total": 533,
+  "files": {
+    "raw_json": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\百度\\baidu_jobs_产品岗.raw.json",
+    "csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\百度\\baidu_jobs_产品岗.csv"
+  }
+}

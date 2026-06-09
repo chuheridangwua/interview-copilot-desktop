@@ -4,6 +4,8 @@ param(
     [string]$TableId = "tblVEj5n5JATZhY0",
     [string]$TencentCsv = "E:\CLX\project\interview-copilot-desktop\JD\腾讯\tencent_jobs_产品经理_top10_人工筛选_新流程.csv",
     [string]$ByteDanceCsv = "E:\CLX\project\interview-copilot-desktop\JD\字节\bytedance_jobs_AI产品经理_top10_人工筛选.csv",
+    [string]$BaiduCsv = "",
+    [string]$AlibabaCsv = "E:\CLX\project\interview-copilot-desktop\JD\阿里系\本科可投_产品经理\alibaba_family_jobs_产品经理_top20_人工重排.csv",
     [string]$TempDir = ".\JD\.tmp_feishu_sync",
     [string]$SummaryPath = "E:\CLX\project\interview-copilot-desktop\JD\feishu_sync_summary.json",
     [string]$DefaultStatus = "未投递",
@@ -38,6 +40,27 @@ function Normalize-Text {
     }
 
     return ($Value -replace "`r`n", "`n" -replace "`r", "`n").Trim()
+}
+
+function Get-FirstColumnValue {
+    param(
+        [psobject]$Row,
+        [string[]]$Names
+    )
+
+    foreach ($name in $Names) {
+        $prop = $Row.PSObject.Properties[$name]
+        if ($null -eq $prop) {
+            continue
+        }
+
+        $value = [string]$prop.Value
+        if (-not [string]::IsNullOrWhiteSpace($value)) {
+            return $value
+        }
+    }
+
+    return ""
 }
 
 function Convert-DateText {
@@ -112,6 +135,26 @@ function Build-MatchReason {
     return $gap
 }
 
+function Build-BusinessLineText {
+    param([psobject]$Row)
+
+    $businessLine = Normalize-Text (Get-FirstColumnValue -Row $Row -Names @("BusinessLine", "business_line", "事业部名称"))
+    if ($businessLine) {
+        return $businessLine
+    }
+
+    $bgName = Normalize-Text (Get-FirstColumnValue -Row $Row -Names @("BGName"))
+    $productName = Normalize-Text (Get-FirstColumnValue -Row $Row -Names @("ProductName"))
+
+    if ($bgName -and $productName) {
+        return "$bgName / $productName"
+    }
+    if ($bgName) {
+        return $bgName
+    }
+    return $productName
+}
+
 function Get-Key {
     param(
         [string]$Company,
@@ -177,34 +220,77 @@ function Invoke-LarkJson {
 function Import-TopJobsCsv {
     param(
         [string]$Path,
-        [string]$CompanyName
+        [string]$CompanyName = ""
     )
 
     $rows = Import-Csv -LiteralPath $Path
     $items = New-Object System.Collections.Generic.List[object]
 
     foreach ($row in $rows) {
-        $link = Normalize-Link $row.PostURL
-        $jobName = Normalize-Text $row.RecruitPostName
+        $company = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("company", "Company", "公司"))
+        if (-not $company) {
+            $company = Normalize-Text $CompanyName
+        }
+
+        $link = Normalize-Link (Get-FirstColumnValue -Row $row -Names @("PostURL", "post_url", "链接"))
+        $jobName = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("RecruitPostName", "title", "岗位名称"))
+        $location = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("LocationName", "location", "地点"))
+        $businessLine = Build-BusinessLineText -Row $row
+        $responsibility = Get-FirstColumnValue -Row $row -Names @("Responsibility", "responsibility")
+        $requirement = Get-FirstColumnValue -Row $row -Names @("Requirement", "requirement_text", "RequirementText")
+        $jdContent = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("JD内容", "JDContent", "jd_text"))
+        if (-not $jdContent) {
+            $jdContent = Build-JdContent -Responsibility $responsibility -Requirement $requirement
+        }
+
+        $manualMatchReason = Get-FirstColumnValue -Row $row -Names @("ManualMatchReason", "why_selected", "匹配原因")
+        $potentialGap = Get-FirstColumnValue -Row $row -Names @("PotentialGap", "main_gap")
+        $sourceRow = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("SourceRowIndex", "source_row_index", "来源序号"))
+        $rank = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("Rank", "manual_rank", "排名"))
+
+        if (-not $company) {
+            throw "CSV row missing company: $Path / 岗位=$jobName"
+        }
+        if (-not $jobName) {
+            throw "CSV row missing job title: $Path / 公司=$company"
+        }
+
         $item = [ordered]@{
-            公司     = $CompanyName
-            地点     = Normalize-Text $row.LocationName
+            公司     = $company
+            地点     = $location
             岗位名称 = $jobName
-            事业部名称 = Normalize-Text $row.BusinessLine
+            事业部名称 = $businessLine
             链接     = $link
-            发布日期 = Convert-DateText $row.LastUpdateTime
-            JD内容   = Build-JdContent -Responsibility $row.Responsibility -Requirement $row.Requirement
-            匹配原因 = Build-MatchReason -ManualMatchReason $row.ManualMatchReason -PotentialGap $row.PotentialGap
+            发布日期 = Convert-DateText (Get-FirstColumnValue -Row $row -Names @("LastUpdateTime", "publish_date", "发布日期"))
+            JD内容   = $jdContent
+            匹配原因 = Build-MatchReason -ManualMatchReason $manualMatchReason -PotentialGap $potentialGap
             状态     = $DefaultStatus
             来源文件 = $Path
-            来源序号 = Normalize-Text $row.SourceRowIndex
-            排名     = Normalize-Text $row.Rank
-            去重键   = Get-Key -Company $CompanyName -RoleName $jobName -Link $link
+            来源序号 = $sourceRow
+            排名     = $rank
+            去重键   = Get-Key -Company $company -RoleName $jobName -Link $link
         }
         $items.Add([pscustomobject]$item)
     }
 
     return $items
+}
+
+function Add-DesiredJobs {
+    param(
+        [System.Collections.Generic.List[object]]$Target,
+        [string]$Path,
+        [string]$CompanyName
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return
+    }
+    if (-not (Test-Path -LiteralPath $Path)) {
+        throw "CSV not found: $Path"
+    }
+
+    $Target.AddRange((Import-TopJobsCsv -Path $Path -CompanyName $CompanyName))
 }
 
 function Get-CurrentRecords {
@@ -322,8 +408,10 @@ function Invoke-Upsert {
 }
 
 $desired = New-Object System.Collections.Generic.List[object]
-$desired.AddRange((Import-TopJobsCsv -Path $TencentCsv -CompanyName "腾讯"))
-$desired.AddRange((Import-TopJobsCsv -Path $ByteDanceCsv -CompanyName "字节跳动"))
+Add-DesiredJobs -Target $desired -Path $TencentCsv -CompanyName "腾讯"
+Add-DesiredJobs -Target $desired -Path $ByteDanceCsv -CompanyName "字节跳动"
+Add-DesiredJobs -Target $desired -Path $BaiduCsv -CompanyName "百度"
+Add-DesiredJobs -Target $desired -Path $AlibabaCsv -CompanyName ""
 
 $existing = Get-CurrentRecords -BaseTokenValue $BaseToken -TableIdValue $TableId
 $existingMap = @{}

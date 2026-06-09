@@ -1,0 +1,86 @@
+请求网址
+https://talent-holding.alibaba.com/position/search?_csrf=3c56414c-4fd2-4eb5-83a8-9df0c21f46f6
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:10:33 GMT
+eagleeye-traceid
+212c2b4317809674332373522e0bf8
+expires
+0
+pragma
+no-cache
+s-brt
+164
+s-rt
+168
+server
+Tengine
+strict-transport-security
+max-age=0
+ups-target-key
+recruit-careers.vipserver
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-protocol
+HTTP/2.0
+x-xss-protection
+1; mode=block
+:authority
+talent-holding.alibaba.com
+:method
+POST
+:path
+/position/search?_csrf=3c56414c-4fd2-4eb5-83a8-9df0c21f46f6
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+227
+content-type
+application/json
+cookie
+cbc=T2gAhO6OxvWPLVHucVd2BUTwY-pBCkRFlmJoY_Fmv3IDBa8B7NACyOlYcVmT1qtCAKY=; t=51c3d42f4581b2d317e9218fff8f8a85; xlly_s=1; SSO_LANG_V2=zh-CN; prefered-lang=zh; recruit-careers_USER_COOKIE_V3=ST180.Dbqc6kRAU9ITyjxk-h0LSOn3I0Jh8h3AvtJr6N7CpG5-jHm-4c26LjGOg0RlTqZJbkCHMc6Wy1mtWGeQqI-ETLWTCbQsXKwEBuyhLm0TvyO1GM_bw1Wkrg-RYEofIm_ObVDyxncD3Zzg631uN9x4XbaScvyip-nUHGLKqOvY8RkQ4-0B2rQc-VbvQwKqIPXTM32KwbGOtSqNmwOCmH1oz2QmUTN4SIygWGlvBJ_Eg6NAPeA6hoo7MxUfQDGVEhA3sBxOM6scE6sUnYS_KhioqJRtSRF3aUWpM-kIAJwFx8_W3XZ6-7vbOJO0VmmNewRu7dDI2fZUiyS7TAevhRtqjN5Xp9dvDlAClLFtyLdY6SdS_t3F5LCkoGkZrja4Iep41fqaBXZ4RsnEN1bo9h70VZxDF7lZND6949VFyt-5Km7OCHTzlzuEMJt1FWVofx2fJ0Bt8H-gcy9FL8bJw-fkbYrVD5S7BlbirYm-DlopAMyL_6XhUv94zkwgKxy0L0Gl.VBcNEyOO9BCs4jWiirIU5KbRFMepOszT80QZHncTzRY-gm64lHAaaYa9OPOXUkm4RbN7cEiGSgsEjf7rZteIpxOc1qRjRIOuvFi8TUmpBySPGZQWsOU1AryotrS_vIjiXUdm_dNwiDJPgkcb2C8i_B3ex8IzStj03MtY-9lKvJ8VEmQPdz8bCOWrzy6repZk0dbqbjhU62CCrBHl1760fBy_SjIoX1yft2cPlCdrSU1D7CyMO2d4lY_5mNbCZ3aTJN99YGnndU14SrM0fGmq_ghlOfNBWOveKu4BaEqjvLeYIpmcsmfeRpglS5be1VNMxo-y8SZbqScIW85eh-BtcQ; recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3NDE5NTQ3LCJ0b2tlbiI6IjlhOGUwNTE5ZDJmNTQ2NzdhYjJiODQ5Y2Y4YWQ5ODUzNDIwNmRjMDEifQ.vMBNIW06TiL0dVVIpwHIAxZhBlwHWwXGhO-yWQ7889wxVbEOziP9BA3UEd_s9TUwJhcfxKDCauKNb1DwN-LmImegZ3hrcJcU2HnoulYyuXSkmW68zzsvF-3tM8ZMfofkDuemvkcXkRLuzFt4lK5n7RUEtA2NYKN5L0TkG6et9UgfNKOITjjc_f8tVghwbquBQ1dpYjCMb3WtwPBfBKuf5uX_pUA2orxTsGaregGFLpQCfQT7tmCRJCA0_xfx2b6p7Uf7PYcBfMMfxZkWSCfkdjRgAc8GxKw-6aHh_tQJD8Yldf257mAG4OnjFN0f30ohX9goTeDRIR9munbi0Tu-fQ; SESSION=RTFGOUQ1Q0I3OTVCQTU1N0MwQTAzMjcwNTRFQzJBRDY=; XSRF-TOKEN=3c56414c-4fd2-4eb5-83a8-9df0c21f46f6; tfstk=gZLo-ti-R3SSK12qSJ7SmYj9RhmxVa_CNpUdpwBE0tWbJb9KNHfFHLWRJvtJxJXDKwd-A0sh-tvCegQPykqhHpG52wCRLKABhzdRp3pHxtp2wzBp-naH1BT-Nwh5PQ_C8AHtW9AWNw_3fPlk-ZyVO1uL8wzPPZ59NR3sWVdWa7Cr6Iu9v-Vhz6XF8gWP3tWf9_ryLuSqi65LUkzyLIlch6UzYMrz0-5C677F8pRqi66VawSyLIlcOtWEK1FPQe-euAGUysk1sd8cZgXwica_W-C7BOdPnyzFHsjuvQW08y82AGg8aTo_M9_RFefkdVa5zMx696vorzJH1E9cgdu3WTRX6hIWzDUOjZXlvUJnKkfkXLvCUQyz41blEG8Pc7lDiM-DoaLrdlOviTSGknnjeMQkEh614mMXKIXJLUj4ExBpXILPmdkYopsHfBCHE44yQgRg0l8oky1q9ErQAg5fiOFlU4p0eHA25jc0fHsPG1XtijqQAg5fiOhmilMC4s1GB; isg=BNfX8JEucQkdK_WstxhVysSNZkshHKt-wSEGeCkF1qYIWPWaNuqTzwI2vvjGt4P2
+origin
+https://talent-holding.alibaba.com
+priority
+u=1, i
+referer
+https://talent-holding.alibaba.com/off-campus/position-list
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36

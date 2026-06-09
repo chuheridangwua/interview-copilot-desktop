@@ -1,0 +1,36 @@
+{
+  "company": "美团",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_full_detail_candidates.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-09",
+  "cutoff_date": "2026-03-09",
+  "source_total": 31,
+  "eligible_total": 21,
+  "scored_total": 21,
+  "top_n": 21,
+  "concurrency": 5,
+  "distribution": {
+    "count": 21,
+    "min": 20,
+    "max": 72,
+    "mean": 36.52,
+    "stddev": 15.66,
+    "p10": 20.0,
+    "p50": 32.0,
+    "p90": 65.0,
+    "buckets": {
+      "0_59": 18,
+      "60_69": 2,
+      "70_79": 1,
+      "80_89": 0,
+      "90_100": 0
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_full_detail_candidates_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_full_detail_candidates_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_full_detail_candidates_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_full_detail_candidates_top21_模型初筛.csv"
+  }
+}

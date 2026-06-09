@@ -1,0 +1,2100 @@
+{
+  "company": "淘天",
+  "origin": "https://talent.taotian.com",
+  "searchUrl": "https://talent.taotian.com/position/search?_csrf=0a2cbff7-a079-4c3b-a2a6-20fd23fc6d43",
+  "totalCount": 34,
+  "exportedCount": 34,
+  "fetchedAt": "2026-06-09T01:46:55.193Z",
+  "items": [
+    {
+      "trackId": "SSP1780969612677CyamLncKng4544",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199902900003,
+      "name": "算法工程师- AIGC方向（T-Star Lab26届秋招）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1769573911000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 硕士及以上学历，计算机科学、人工智能、电子与通信等相关专业；\n2. 精通Diffusion模型及相关技术，掌握T2V基础模型及相关技术原理，有图像/视频生成或处理相关经验；\n3. 具备卓越的工程实现能力，熟练掌握C/C++、Java、Python等至少一门编程语言；\n4. 熟练掌握深度学习框架，如TensorFlow、PyTorch；\n5. 学习能力强，对新技术有敏锐的洞察力，对AIGC领域充满热情，善于独立思考并持续优化；\n6. 良好的沟通能力和团队协作精神，乐于分享技术见解，善于与团队成员合作。\n\n【加分项】\n1. 具有文本到视频（T2V）、AIGC内容编辑、多模态视频理解等相关领域的实习或项目经验；\n2. 拥有百亿参数级别大模型训练经验，或具备超大规模数据集构建与管理经验；\n3. 在计算机视觉和人工智能领域的国际顶级会议（CVPR, ICCV, ECCV, AAAI, NeurIPS等）或期刊(T-PAMI, T-IP等)发表论文，或在权威学术竞赛中获奖。\n\n面向人群：\n1、毕业时间在 2025年11月-2026年10月的海内外高校硕博毕业生。\n*中国大陆（内地）以毕业证为准，中国港澳台及海外地区以学位证为准\n2、包括但不限于计算机、软件工程、人工智能、网络安全、信息与通信工程、电子科学、自动化、量子计算、数学以及其他前沿交叉学科等相关专业。",
+      "description": "T-Star计划是阿里巴巴淘天集团顶尖人才招聘和培养项目，继承“阿里星〞的使命与愿景，面向全球招募顶尖技术人才。首次开设实习生专项招聘，面向2025年10月后毕业的校优秀技术同学。期待你们在淘天，通过极具挑战的前沿课题与亿级规模的海量数据、应用场景，探索和实践最前沿的Al技术，在有价值的业务场景落地技术成果。\n\n\n如果你，渴望深入探索视频生成技术，开发文本到视频（T2V）基础模型的前沿技术，致力于提升生成视频的画质，真实性，一致性，以及视频生产的效率；\n如果你，热衷于AIGC驱动的视频增强与处理技术，专注于将通用大模型架构优化并迁移到垂直领域，推动下游应用性能的突破；\n如果你，专注于基于AIGC的可控性编辑，探索如何精准实现内容生成与修改，满足多样化的业务需求；\n如果你，对基于AIGC的人脸，人体生成编辑技术充满热情，致力于打造具有高度交互性和真实性的数字形象；\n如果你，期望在多模态视频理解领域取得突破，通过技术创新提升视频内容的理解与分析能力；\n如果你，期望与一群聪明、皮实、乐观、追求卓越的优秀伙伴并肩作战，共同开创音视频技术的新篇章；\n那还在等待什么，赶紧加入我们吧！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677vRhCFsWvQF6120",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199902900004,
+      "name": "算法工程师-多模态（T-Star Lab26届秋招）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1769573909000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、硕士及以上学历，计算机、人工智能、电子与通信等相关专业；\n2、熟悉计算机视觉、机器学习、图像/视频分析与处理、多模态内容理解、AIGC等相关领域技术和应用；\n3、具备极佳的工程实现能力，熟练掌握C/C++、Java、Python等至少一门语言；\n4、学习能力强，对新事物有好奇心，对所在领域有热情，善于独立思考并反思总结；\n5、良好的沟通能力和团队协同能力，善于合作，乐于分享。\n\n【加分项】\n1、在校园内或互联网公司有相关实习或项目经历；\n2、在ICCV、CVPR等国际顶级会议、期刊上发表论文，或在相关学术会议组织的权威比赛中获奖。 \n\n【面向人群】\n1、毕业时间在 2025年11月-2026年10月的海内外高校硕博毕业生。\n*中国大陆（内地）以毕业证为准，中国港澳台及海外地区以学位证为准\n2、包括但不限于计算机、软件工程、人工智能、网络安全、信息与通信工程、电子科学、自动化、量子计算、数学以及其他前沿交叉学科等相关专业。",
+      "description": "T-Star计划是阿里巴巴淘天集团顶尖人才招聘和培养项目，继承“阿里星〞的使命与愿景，面向全球招募顶尖技术人才。首次开设实习生专项招聘，面向2025年10月后毕业的校优秀技术同学。期待你们在淘天，通过极具挑战的前沿课题与亿级规模的海量数据、应用场景，探索和实践最前沿的Al技术，在有价值的业务场景落地技术成果。\n\n\n在这里，你可以基于淘天海量商品数据，打造技术先进的电商多模态大模型，提升对多模态异构的商品数据(图、文、视频等)的理解能力和结构化能力，输出底层算法能力和高质量结构化数据，支撑发布、比货、导购等多种电商业务场景，并面向商家和消费者探索AIGC等创新业务应用。工作内容包括模型结构设计、训练任务设计、预训练和下游能力建设等；\n在这里，你将参与跟踪、探索大模型方向/多模态预训练方向的前沿技术，将各方向的SOTA能力集成到模型底座上，提升下游任务的效果，打造团队的技术先进性。\n",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677BfYymdsUBr5493",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199903040006,
+      "name": "算法工程师-计算机视觉（T-Star Lab26届秋招）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1769573905000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、硕士及以上学历，计算机、人工智能、电子与通信等相关专业；\n2、熟悉计算机视觉、机器学习、图像/视频分析与处理、多模态内容理解、AIGC等相关领域技术和应用；\n3、具备极佳的工程实现能力，熟练掌握C/C++、Java、Python等至少一门语言；\n4、学习能力强，对新事物有好奇心，对所在领域有热情，善于独立思考并反思总结；\n5、良好的沟通能力和团队协同能力，善于合作，乐于分享。\n\n【加分项】\n1、在校园内或互联网公司有相关实习或项目经历；\n2、在ICCV、CVPR等国际顶级会议、期刊上发表论文，或在相关学术会议组织的权威比赛中获奖。 \n\n面向人群：\n1、毕业时间在 2025年11月-2026年10月的海内外高校硕博毕业生。\n*中国大陆（内地）以毕业证为准，中国港澳台及海外地区以学位证为准\n2、包括但不限于计算机、软件工程、人工智能、网络安全、信息与通信工程、电子科学、自动化、量子计算、数学以及其他前沿交叉学科等相关专业。",
+      "description": "T-Star计划是阿里巴巴淘天集团顶尖人才招聘和培养项目，继承“阿里星〞的使命与愿景，面向全球招募顶尖技术人才。首次开设实习生专项招聘，面向2025年10月后毕业的校优秀技术同学。期待你们在淘天，通过极具挑战的前沿课题与亿级规模的海量数据、应用场景，探索和实践最前沿的Al技术，在有价值的业务场景落地技术成果。\n\n\n如果你，期望参与淘天集团海量图像/视频数据的理解、分发、生成等方面的算法研究、系统研发和产品开发；\n如果你，期望参与图像/视频相关算法的前沿技术探索，包括机器学习及深度学习在内容理解和AIGC中的应用，以及计算机视觉与自然语言处理、计算机图形学等相关领域的联合创新；\n如果你，期望和聪明、皮实、乐观、自省、追求卓越和自我驱动的优秀战友一起共同开创视觉技术的新格局；那还在等待什么，赶紧加入我们吧！\n",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677LruqqldJPP5935",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140027,
+      "name": "算法工程师-自然语言处理（大模型）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1765515270000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 计算机科学、人工智能、数学等相关专业本科及以上学历，理论基础扎实；\n2. 对大模型及前沿NLP技术充满热情，具备强烈的求知欲和攻克复杂技术难题的决心与能力；\n3. 精通Python，熟练掌握PyTorch等至少一种主流深度学习框架；\n4. 了解阅读理解、序列标注、文本生成、文本分类等传统NLP任务，深入理解Transformer架构；\n5. Prompt工程及SFT/RLHF等主流训练范式，对大模型技术栈有深刻认知；\n6. 具备出色的工程实践能力，追求高质量的代码和系统设计；\n7. 具备良好的数学基础、英语阅读能力和团队协作精神，能够高效沟通与协作。\n\n【加分项】\n1. 有Qwen、Llama、Deepseek等主流开源大模型的微调、部署或二次开发经验；\n2. 熟悉DeepSpeed、Megatron-LM、PyTorch FSDP等分布式训练技术，具备多机多卡大规模模型训练与优化经验者；\n3. 有复杂RAG（Retrieval-Augmented Generation）系统搭建与优化经验者优先；\n4. 在ACL、NeurIPS、ICML、EMNLP等顶级会议/期刊有论文发表，或在相关AI竞赛中取得优异成绩者；\n5. 博士学历或具备大规模、高并发系统开发与优化经验者。",
+      "description": "我们正在寻找对前沿AI技术充满热情的自然语言算法工程师，共同探索和构建基于大模型的下一代智能应用。你将深入复杂且富有挑战的商业场景，负责从底层模型优化、前沿算法研究到大规模线上服务落地的全链路工作，打造能够真正赋能业务、实现技术与商业价值完美结合的AI解决方案。\n\n你将负责：\n端到端方案研发：主导大模型应用的全生命周期研发，包括技术选型、架构设计、模型训练、效果评测及线上部署，确保方案的高性能与高可用性。\n核心模型技术攻坚：运用Pre-training、SFT、RLHF、RAG等训练技术，持续提升模型在复杂推理、内容生成等方面的能力；同时，深入研究并应用模型蒸馏、信号压缩、Prefill优化等技术，打造高性能、低延迟的推理服务。\n驱动业务场景创新：聚焦将尖端技术转化为可落地的创新应用，解决实际商业问题，例如文本内容的理解，商业场景的多语言多模态翻译和沟通，海量数据与超大规模工程框架的智能研发与维护等\n构建工程化技术体系：持续优化模型算法与系统架构，构建高效、自动化的评测与迭代体系，提升整体系统的性能、效率与稳定性。\n追踪并转化前沿技术：紧密跟踪大模型（LLM）领域的国际前沿动态，快速实现从论文到代码再到解决方案（Paper→Code→Solution）的技术转化，并有机会将高水平研发成果以论文/专利等形式发布。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677QsGguFbjjQ1296",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140017,
+      "name": "客户端开发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1765509528000,
+      "workLocations": [
+        "北京"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1.本科及以上学历，计算机、软件、人工智能、信息安全、网络安全、通信等相关专业优先；\n2.熟悉操作系统/计算机网络/内存管理/多线程，对数据结构、算法有一定了解，具备良好的逻辑思维能力，能够具备独立解决复杂线上问题；\n3.熟悉 C/C++/Java/Kotlin/Swift/Objective-C/ArkTS 中一门编程语言，或有iOS/Android/HarmonyOS/PC 等客户端开发经验或对客户端研发体系有了解；\n4.学习能力强，不畏挑战，喜欢钻研，有良好的沟通能力和团队协同能力，善于独立思考并反思总结。\n\n【 加分项】\n1.在校期间参与过 ACM、大学生数学建模竞赛、“挑战杯”、机器人足球等比赛并获奖者优先；\n2.具备学习并运用AI工具提升研发效能的能力；对前沿技术探索富有热情，能够结合实际工作需求，积极投入AI与传统技术融合的创新实践，并主动参与AI相关的研发项目；\n3.熟练掌握以下开发领域中的一项：Flutter/RN/WEEX/KMP/CMP、图形图像、游戏开发、终端网络、3D/XR 等领域技能；\n4.深入理解移动端架构设计（模块化/组件化/动态化），有复杂业务需求的开发经验；\n5.有大型互联网公司相关岗位的项目开发经历，有AppStore/GooglePlay/AppGallery等应用上架经验者更佳；\n6.国内外 TOP 开源项目的 Owner 或 Maintainer，并有相应的代码提交或贡献。",
+      "description": "在这里，你将有机会：\n1. 深度参与亿级DAU移动端产品开发，构建高性能/高可用性的客户端App架构，支撑千万级在线用户的稳定流畅使用;\n2. 使用C/C++/Java/Kotlin/Swift/Objective-C/ArkTS 等业界前沿的编程语言，主导技术方案设计与终端开发实践，打造极致流畅的交互体验;\n3. 面向iOS/Android/HarmonyOS/PC演进的多端架构，面向多终端打造的跨平台解决方案，不断提升多端使用体验;\n4. 探索操作系统底层技术原理，结合厂商新系统特性不断功能创新，攻克系统级技术难题;\n5. 面向AI/3DXR时代突破移动端技术边界，构建终端智能化能力与创新场景落地，探索XR设备探索沉浸式使用体验;\n6. 参与行业领先的技术项目，与优秀的团队一起成长，探索技术的深度和广度，持续学习和掌握新技术，提升自身技术水平实现个人职业发展的飞跃;\n7. 践行AI 新技术的前沿应用，参与工程技术方案设计与实现，推动前沿技术与业务的深度融合。\n\n加入我们，你与业界顶尖技术团队合作，将利用前沿技术为亿万用户打造优秀终端体验，也将亲历双11等顶级流量项目实战机会，并有机会成为阿里巴巴鸿蒙应用生态的早期建设者，及参与到阿里移动技术中台的架构演进与深度实践，也有技术大牛带教的成长加速计划！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677xkPgfgfqkX2720",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140004,
+      "name": "前端开发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1764039725000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、本科及以上学历，计算机相关专业；\n2、熟练使用各种Web前端技术，包括HTML(5)/CSS(3)/Javascript等，并有相关的项目开发经验或成果；\n2、熟悉前端工程化，用过git，gulp或webpack等工具，最好有自己的github仓库；\n3、有基于Ajax应用的开发经验，有NodeJS/Java开发经验，或者有移动端开发经验；\n4、深刻理解Web标准，对可用性、可访问性等相关知识有实际的了解；\n5、对算法、数据结构、建模有一定了解；\n6、学习能力强，对新事物保有好奇心，并能快速适应新环境；具备良好的沟通、团队协同能力；\n7、对所在领域有热情，善于独立思考并反思总结。\n\n【加分项】\n1、具备一定的AI 知识储备，有较为丰富的 AI 工具使用经验或 AI 应用开发经验；\n2、对AI领域发展趋势有一定了解，能够结合实际场景提出创新性想法或解决方案；\n3、有大型互联网公司相关岗位实习及项目开发经历；\n4、在相关领域国际顶级会议、期刊发表论文或相关学术会议组织的权威比赛中获奖。",
+      "description": "在这里，你将有机会与交互设计师一起，美化产品线Web功能的设计； \n在这里，你将有机会与视觉设计师一起，完成产品线Web功能的开发与实现； \n在这里，你将有机会做全栈式开发，做多端/跨端开发； \n在这里，你将有机会做性能、架构等方面的改进与优化； \n在这里，你将有机会自己亲手打造一个产品的从设计到发布。 \n加入我们，加入到我们业内最前沿Web技术的研究与开发中。\n\n你将与来自不同部门的优秀人才合作，不仅能够获得专业的培训和指导，还可以在工作中不断挑战自我，在职业生涯中不断成长和发展，享受工作中的乐趣和成就感。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677MWfrQFlBvI4509",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140047,
+      "name": "AI前端开发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1764039717000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 本科及以上学历，计算机相关专业。\n2. 扎实的前端基础，熟练掌握HTML5/CSS3/JavaScript/TypeScript，了解现代前端框架（如React、Vue等）。\n3. 具备前端工程化思维，了解构建工具（如Webpack、Vite等）和版本控制系统。\n4. 关注AI业界技术发展趋势，有使用Claude Code、Cursor、通义灵码等AI工具辅助开发经验，一定提示词工程能力。\n5. 良好的编程习惯和代码质量意识，能够编写可维护、高性能的前端代码。\n6. 对用户体验和交互设计有基本理解，具备良好的沟通、团队协同能力。\n7. 学习能力强，对新事物保有好奇心，并能快速适应新环境。\n8. 对所在技术领域有热情，善于独立思考、执着于对问题追根溯源。\n\n【加分项】\n1. AI前端应用开发：有开发过LLM相关前端应用，参与AI相关产品前端实现。\n2. AI辅助开发实践：使用AI工具rules，增加自定义命令，理解上下文工程来增强AI工具的能力。\n3. 前端自动化实践：有前端测试自动化、部署自动化或CI/CD实践经验。\n4. 技术视野：对AI技术体系有浓厚兴趣，掌握LLM/PE/Agent/RAG等原理与运用；关注AI与前端技术的发展趋势，了解大模型能力及其在开发中的应用场景。\n5. 项目经验：有完整的个人/团队项目经验，能够展示解决复杂问题的能力，有独立开源代表作，或有知名开源项目代码贡献者优先。\n6. 创新思维：能够提出创新性的技术方案或产品想法，能将AI技术与前端开发创造性结合，有AI增强型应用设计经验。\n7. 跨领域知识：具备基础的后端、设计或产品知识，能够进行跨领域交付。",
+      "description": "在这里，你将有机会与设计师一起，应用AI高效完成产品线Web功能的开发与实现； \n在这里，你将有机会在AI辅助下做全栈式、多端开发，实现端到端交付； \n在这里，你将有机会结合AI做性能、架构等方面的改进与优化； \n在这里，你将有机会自己亲手打造一个产品的从设计到发布。 \n加入我们，加入到AI时代、AI电商最前沿的Web技术研究与开发中。\n\n你将与来自不同部门的优秀人才合作，不仅能够获得专业的培训和指导，大量AI工具的辅助，还可以在工作中不断挑战自我，在职业生涯中不断成长和发展，享受工作中的乐趣和成就感。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677qaZwdNareG2369",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140034,
+      "name": "AI Agent 应用开发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1758597247000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 本科及以上学历，计算机科学、软件工程、人工智能相关专业优先；\n2. 掌握Python/Java/Go/C++等编程语言开发，具备扎实的算法与数据结构基础；\n3. 具备Agent系统开发经验，掌握LangChain/LLamaIndex/AutoGen等框架及实现原理，能够设计高可用、高扩展性的大模型/Agent工程架构；\n4. 掌握Prompt工程、RAG、Tool Calling、Context Engineering等AI应用关键技术；\n5. 能够进行工具集成，掌握OpenAPI、RPC、MCP等协议实现方案；\n6. 了解机器学习、深度学习框架（PyTorch/TensorFlow），有Transformer等模型实战经验优先；\n7. 具备问题/价值驱动的探索精神和优秀的问题解决能力；\n8. 敢于创新，主动探索AI新技术/新范式在商业场景中的应用边界；\n9. 对AI技术充满热情，具备快速学习的能力，持续关注和学习AIGC前沿技术研究。\n\n加分项：\n有数据工程、模型微调/后训练、模型评测经验的同学优先。",
+      "description": "我们正在寻找热爱AI的你，共同探索电商领域智能应用新可能。如果你渴望在最复杂的电商生态中，充分发挥AI应用的巨大价值，构建电商领域下一代AI技术体系，这里是你最理想的舞台！加入我们，你将：\n\n重塑消费者体验：建设大模型智能化比价辅助决策、Al消费者智能问答助手等多元AI工具，提高用户购物体验，并进一步探索AI Native的新消费者产品形态；\n赋能商家智能化运营：基于大模型调度多领域智能体，实现智能客服、采购寻源、内容生成、直播运营等全链路提效，赋能千万商家；\n构建平台级技术基建：开发AI代码生成工具提升研发效率，打造面向运营小二的智能提效平台，探索面向全体企业员工办公场景的智能体架构；\n\n在 AI 与技术深度融合的新时代，让我们一起定义未来！来吧，期待你的加入，开启属于你的 AI 应用创新之旅！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677qORSTwEolD9599",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140005,
+      "name": "研发工程师JAVA",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1758112469000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 本科及以上学历，计算机、软件、人工智能、信息安全、网络安全、通信等相关专业优先；\n2. 熟练Java语言，具有扎实Java功底。熟悉Java虚拟机原理、Java高级特性和类库、Java网络与服务器编程、Java多线程编程；熟练掌握Spring，Mybatis，Springboot等常用的Java框架；熟悉常用的数据结构和算法；\n3. 了解大模型基本原理和典型应用场景；掌握大模型应用开发技术栈，包括但不限于提示词工程、检索增强、微调（Fine-tuning）、 langchain 框架、MCP 协议、workflow、Agent/Multi-Agent构建等；\n4.  熟悉常规的分布式架构，熟悉缓存、消息队列等开源中间件；\n5. 具备独立工作能力和解决问题的能力、善于沟通、勤于思考、乐于合作、善于总结分享；有强烈的责任心和团队合作精神，积极融入团队。\n\n【加分项】\n1. 有大型互联网公司相关岗位实习及项目开发经历；\n2. 有大模型应用落地项目经验者优先；\n3. 在相关领域国际顶级会议、期刊发表论文或在相关学术会议组织的权威比赛中获奖。",
+      "description": "在这里，你可以参与高性能分布式服务端程序的系统设计，为淘宝天猫的产品提供强有力的支持，在海量的网络访问和数据处理中设计并设施最强大的解决方案；\n在这里，你会深入理解业务，参与产品的开发和维护，完成从需求到设计、开发和上线等整个项目周期内的工作，为用户提供丰富而有价值的产品；\n在这里，你可以参与基础软件的设计、开发和维护，如分布式在线服务、文件系统、缓存系统、Key/Value存储系统、数据库、Linux操作系统和Java优化等；\n在这里，你可以背靠世界领先的大模型基座，在丰富的 B/C端应用场景中，探索 AI 技术在电商领域最前沿的应用；\n在这里，你可以参与海量数据处理和开发，通过sql、pl/sql、java进行etl程序开发，满足商业上对数据的开发需求；\n在这里，你会接触超大规模的计算底层核心技术的设计和实现，构建高可靠性、高可用性、高可扩展性的体系结构，满足日趋复杂的业务需求\n\n加入我们，你将与淘天集团广泛的电子商务产品技术为伍，将消费者的喜爱变为极致性能的挑战，为业务产品保驾护航。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677wCjdtGBLeX1495",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140010,
+      "name": "算法工程师-机器学习",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349475000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、本科及以上学历，计算机等相关专业；\n2、熟悉常用机器学习算法，对模式识别、深度学习、增强学习等相关领域，极佳的工程实现能力，精通C/C++、Java、Python等至少一门编程语言；\n3、有数理分析方面良好的素养以及数理统计基础；有良好的数据敏感能力、较强的逻辑分析能力；\n4、有较强的学习能力，对新事物保有好奇心，并能快速适应新环境；\n5、有良好的沟通能力和团队协同能力；能与他人合作，共同完成目标；\n6、对所在领域有热情，善于独立思考并反思总结。\n\n【加分项】\n1、有实际成果并发表在国际顶级会议、期刊者优先，有在KDDCUP、ImageNet、MSCOCO、ICDAR等权威比赛中取得优异成绩者优先；\n2、有deeplearning的经验，有linux下开发经验的，大规模数据处理经验优先。",
+      "description": "在这里，你将参与机器学习、深度学习领域的技术研发工作，包括但不限于神经元网络模型设计与优化、强化学习、迁移学习、主动学习、维度降低、核方法、谱方法、特征提取与稀疏学习、等级学习、推荐、随机优化等的算法和系统研发等； \n在这里，你将进行机器学习尤其是深度学习前沿问题的探索与研究，结合未来实际应用场景，提供全面的技术解决方案； \n在这里，你将有机会负责提供分布式的算法实现的解决方案，大幅提升算法计算规模和性能； \n在这里，你将参与提供大数据分析建模方案，沉淀行业解决方案，协助拓展业务边界。\n\n加入我们，共同专注于大数据之上的机器学习算法研究与应用。将对人工智能的极大热情投入到挑战各种实际应用难题中。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677LwEAHhGdvK1637",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140011,
+      "name": "算法工程师-大模型应用",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349473000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 计算机科学/人工智能/机器学习等相关领域的硕士或博士，具备扎实的编程基础（Python/C++/Java），熟悉常用算法与数据结构；\n2. 掌握机器学习基础理论，了解搜、推、广系统/自然语言处理/多模态等至少一个领域；\n3. 有PyTorch/TensorFlow等框架使用经验，参与过算法竞赛（Kaggle/天池等）或开源项目者优先；\n4. 对AI技术充满好奇心，主动关注大模型、搜推广系统、NLP、强化学习等领域前沿进展；\n5. 在顶级会议或高水平期刊发表过论文，或有复现前沿论文的经验者优先；\n6. 具备较强的问题拆解能力，能通过数据分析定位业务痛点并提出创新思路；\n7. 良好的沟通能力，能与工程师、产品经理高效协作，将技术方案转化为业务价值；\n8. 对电商场景有基本认知，愿意深入理解用户需求与商业逻辑。\n【加分项】\n1. 有大模型训练/微调经验（如Llama、GPT、多模态模型）或搜推广算法相关项目经历；\n2. 有海量数据处理经验或者大厂实习经验；\n3. 在算法竞赛中获得优异成绩（ACM-ICPC/挑战赛TOP10等）或者顶会论文发表。",
+      "description": "1. 大模型驱动的算法革新：\n参与大模型（LLM、多模态大模型）在电商核心场景（搜索、推荐、广告、多智能体对话等）中的算法创新与应用；\n研究大模型与经典搜推广模型的融合方案，提升模型效果与用户体验；\n2. 下一代AI系统构建：\n通过分布式训练、模型压缩、低延迟推理等技术，面向工业级应用完成千亿级参数大模型的高效训练与部署；\n尝试生成式AI、多智能体协作等前沿方向，推动AI技术在电商领域的创新应用；\n3. 大模型在亿级用户规模落地的实战：\n直面淘宝数亿用户、百亿级行为数据的挑战，落地大模型应用；\n参与双11、618等顶级电商场景的算法优化，见证大模型技术驱动商业增长的完整链路。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677evVODcehrO3208",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140012,
+      "name": "算法工程师-多模态方向",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349472000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1、计算机、数学或统计学相关专业硕士及以上学历，2年内计算机多模态/NLP/CV相关工作经验，有较强的coding能力；\n2、熟悉开源多模态大模型/文本大模型的技术原理和发展脉络，有多模态领域经验优先，有大模型的预训练、SFT等实践经验，熟悉常用的训练框架；\n3、对通用大模型和其他新技术充满热情，能够独立实现前沿模型，有NLP/CV/ML顶会发表经验者（ACL/EMNLP/CVPR/ICCV/NeurIPS等）优先；\n4、较强的分析和解决问题的能力，对数据敏感，能结合特定领域数据提出新问题新思路。\n",
+      "description": "1、基于淘天海量商品数据，打造技术先进的电商多模态大模型，提升对多模态异构的商品数据(图、文、视频等)的理解能力和结构化能力，输出底层算法能力和高质量结构化数据，支撑发布、比货、导购等多种电商业务场景，并面向商家和消费者探索AIGC等创新业务应用。工作内容包括模型结构设计、训练任务设计、预训练和下游能力建设等；\n2、 跟踪、探索大模型方向/多模态预训练方向的前沿技术，将各方向的SOTA能力集成到模型底座上，提升下游任务的效果，打造团队的技术先进性。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677BMwsXUXgNE9922",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140029,
+      "name": "算法工程师-自然语言处理",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349470000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、本科及以上学历，计算机、数据等相关专业；\n2、具备极佳的工程实现能力，精通C/C++、Java、Python、Perl等至少一门语言； \n3、对目前主流的深度学习平台，如tensorflow、pytorch、mxnet等，至少对其中一个有上手经验； \n4、熟悉深度学习以及常见机器学习算法的原理与算法，能熟练运用聚类、分类、回归、排序等模型解决有挑战性的问题，有大数据处理的实战经验；\n5、有强烈求知欲，对人工智能领域相关技术有热情；学习能力强，对新事物保有好奇心；\n6、具有良好的数学基础，良好的英语阅读能力；有团队意识，最好具有团队协作的经验。\n【加分项】\n1、精通自然语言处理领域的1到2项底层技术，有实际成果并发表在自然语言处理国际顶级会议、期刊；\n2、在相关的自然语言处理竞赛中获得优异成绩。",
+      "description": "在这里，你将紧跟业界最新自然语言处理技术动态，深入研发并努力创新自然语言处理相关的知识库、词法、句法、语义、文档分析、深度学习、机器翻译、智能对话等技术，包括新颖的算法/模型的提出，模块的实际开发，对接自然语言处理平台的接入以及把高水平研发成果以论文/专利等形式进行发布；\n在这里，你需要理解自然语言处理技术应用的相关的业务场景及需求，在自然语言处理技术内核的基础上考虑业务场景的特殊性进而适当适配业务需求； \n在这里，你除了在核心技术研发之外，也有机会参与到具体的NLP相关业务中，例如文本内容的理解，商业场景的多语言多模态翻译和沟通，搜索Query分析、智能对话的语义解析及意图理解、商品评价的语义理解、内容搜索推荐的结构化分析、商品搜索推荐的标签体系、社会化问答的文本分析、智能客服的场景定制等。\n\n加入我们，起来夯实基础、赋能商业，实现技术与商业的完美结合，共同推进自然语言处理技术赋能平台化、服务化策略，不断追求技术的深度以及技术与业务的适当解耦。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677UHXkojcqLl6204",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140013,
+      "name": "算法工程师-搜索推荐",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349469000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 本科及以上学历，计算机等相关专业；\n2. 熟练掌握Java/C++/Python中至少一门语言，熟悉tensorflow或者pytorch至少一种机器学习常用框架；\n3. 了解深度学习、LLM大模型的基本原理和应用场景，掌握深度学习与LLM的开发，包括但不局限与深度模型优化、提示词工程、检索增强、SFT微调和蒸馏等；\n4.  逻辑思维清晰，学习能力强，对新事物保有好奇心，并能快速适应新环境；\n5. 良好的沟通能力和团队协同能力；能与他人合作，共同完成目标；\n6. 遇事沉稳，不急不躁，心理素质过硬，有担当、有韧性，表达能力强。\n\n【加分项】\n1. 有相关推荐系统、机器学习、计算机视觉、数据挖掘等相关领域研究及实践经验优先；\n2. 有相关顶级会议论文发表者、大模型微调和应用经验者优先；\n3. 有相关竞赛经验并获奖者优先。",
+      "description": "在这里，你将有机会参与并负责核心内容场景的各类算法，包括个性化推荐系统、内容生态构建、内容理解等核心算法能力；\n在这里，你将有机会深度参与内容分发算法设计，提升流量匹配的效率和用户粘性；\n在这里，你将有机会参与建设包括召回、粗排、精排、重排、混排等推荐算法，打造集团和业界一流的内容算法；\n在这里，你将有机会深度参与LLM和多模态大模型在搜推领域的应用，在丰富的用户产品中，探索AI技术在电商领域最前沿的应用；\n在这里，你将有机会参与设计多模态内容理解和推荐分发系统，推动解决内容的一致性和标准化问题。\n\n加入我们，你将与来自不同部门的优秀人才合作，不仅能够获得专业的培训和指导，还可以在工作中不断挑战自我，在职业生涯中不断成长和发展，享受工作中的乐趣和成就感。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677aAiNxPTsXl8864",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140018,
+      "name": "研发工程师C/C++",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349468000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 本科及以上学历，计算机相关专业；\n2. 热爱计算机及互联网技术，精通但不限于C/C++等编程语言中的一种或几种，有良好的编程习惯；\n3. 熟悉网络编程和多线程编程，对TCP/IP/HTTP等网络协议有一定的理解；\n4. 对数据结构、算法有一定了解，具备良好的逻辑思维能力；\n5. 具备学习并运用AI工具提升研发效能的能力；对前沿技术探索富有热情，能够结合实际工作需求，积极投入AI与传统技术融合的创新实践，并主动参与AI相关的研发项目。\n6. 学习能力强，不畏挑战，喜欢钻研，有良好的沟通能力和团队协同能力，善于独立思考并反思总结；\n\n\n【加分项】\n1. 有互联网公司实习经验，参与过互联网软件等相关产品开发项目优先；\n2. 在相关领域国际顶级会议、期刊发表论文，或相关学术会议组织的权威比赛中获奖优先；\n3. 热衷于ACM，在校期间参与过大学生数学建模竞赛、“挑战杯”，机器人足球比赛等优先；\n4. 作为骨干参与过学生网站的建设和开发优先；\n5. 熟悉AI相关技术（如深度学习、机器学习、自然语言处理等），有相关项目经验或课程学习经历优先；\n6. 对新技术保持敏锐的洞察力，积极参与开源项目或技术社区，主动学习并实践新技术优先。",
+      "description": "在这里，你将参与行业领先的技术项目，与优秀的团队一起成长，探索技术的深度和广度，持续学习和掌握新技术，提升自身技术水平实现个人职业发展的飞跃。\n作为团队核心成员，你将参与C/C++软件系统的全周期开发工作，包括需求分析、技术选型、系统设计、编码实现及性能优化。在日常工作中，你将负责确保系统稳定性与高效运行，并与团队协作完成集成、测试和上线，解决关键技术问题，提升用户体验。\n\n加入我们，你将有机会：\n深入探索底层技术，感受代码在海量用户侧运行的魅力；\n践行A新技术的前沿应用，参与工程技术方案设计与实现，推动前沿技术与业务的深度融合；\n与顶尖团队一起工作，共同打造高效、智能、创新的解决方案，感受技术改变世界的无限可能！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677kcaLTuuHhV5669",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140002,
+      "name": "数据研发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349468000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 本科及以上学历，计算机、数据等相关专业；\n2. 具备扎实的专业基础，熟悉一门数据处理语言，如SQL、JAVA、Python、Perl等，熟悉unix或者linux操作；\n3. 具备较强的动手能力、良好的沟通能力和团队合作，主动积极，乐于面对挑战；\n4.  学习能力强，对新事物保有好奇心，并能快速适应新环境。\n\n【加分项】\n1. 有参与数据处理、分析、挖掘等相关项目的经验；\n2. 对Hadoop、Hive、Hbase等分布式平台有一定的理解；\n3. 对AI、AI应用框架有一定的理解；\n4. 使用python编程，并有实际LLM或者agent应用探索经验。",
+      "description": "如果你想参与最先进的数据湖、流批一体的数据架构建设，通过架构的不断演进，提升大数据体系的效率；\n如果你想参与EB级别数据体量的采集、存储、处理，通过规范体系的大数据体系建设，支持电商各类数据业务场景；\n如果你想参与大数据产品的研发，发挥你的商业sense，通过数据分析和算法来洞察数据背后的机会，来探索大数据商业化；\n如果你想参与大数据AI copilot、AI自动取数、AI自动数据分析，通过AI+大数据的力量，让数据价值最大化。\n那就加入我们吧！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677ZcRPeUhiqG9584",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140031,
+      "name": "终端开发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349466000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 本科及以上学历，计算机、软件、通信等专业优先；\n2. 掌握计算机原理、数据结构、设计模式、网络编程、多线程、UI框架等基本开发知识；\n3. 熟悉至少一门终端相关语言（JavaScript、Java/Kotlin、Swift/Objective-C、C/C++等）；\n4.  能够从需求理解到技术实现的全链路独立工作，具备代码优化、性能调优的实战能力；\n5. 具备跨职能协作能力，善于沟通，乐于总结分享。\n\n【加分项】\n1. 具备一定的AI知识储备，对AI领域的最新发展保持关注和实践；\n2. 有丰富的AI工具组合使用经验，形成个人AI工作流；\n3. 具备与AI进行多轮迭代优化的能力，能够通过精准的上下文工程引导AI产出高质量的技术方案和代码；\n3. 有大型互联网公司终端开发实习或项目经历；\n4.  有自己的技术作品或在开源社区中有活跃贡献。",
+      "description": "如果你，期望参与淘天集团产品线终端（Web/Android/iOS/鸿蒙/PC等）功能的端到端交付，打造最酷的用户产品；\n如果你，期望参与终端性能、技术架构等方面的改进与优化，打造最极致的用户体验；\n如果你，期望参与终端技术解决方案、工具库、框架、平台的研发，与AI协作持续提升终端研发效率和质量； \n如果你，期望探索AI与终端技术的深度融合，在人机交互、智能化UI、端AI等前沿领域拓展技术边界；\n那还犹豫什么，赶紧加入我们，成为AI时代的终端技术先锋！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677cVjDIntcHh7159",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140019,
+      "name": "算法工程师-计算机视觉",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349464000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、本科及以上学历，计算机、人工智能、电子与通信等相关专业；\n2、熟悉计算机视觉、机器学习、图像/视频分析与处理、多模态内容理解、AIGC等相关领域技术和应用；\n3、具备极佳的工程实现能力，熟练掌握C/C++、Java、Python等至少一门语言；\n4、学习能力强，对新事物有好奇心，对所在领域有热情，善于独立思考并反思总结；\n5、良好的沟通能力和团队协同能力，善于合作，乐于分享。\n\n【加分项】\n1、在校园内或互联网公司有相关实习或项目经历；\n2、在ICCV、CVPR等国际顶级会议、期刊上发表论文，或在相关学术会议组织的权威比赛中获奖。",
+      "description": "如果你，期望参与淘天集团海量图像/视频数据的理解、分发、生成等方面的算法研究、系统研发和产品开发；\n如果你，期望参与图像/视频相关算法的前沿技术探索，包括机器学习及深度学习在内容理解和AIGC中的应用，以及计算机视觉与自然语言处理、计算机图形学等相关领域的联合创新；\n如果你，期望和聪明、皮实、乐观、自省、追求卓越和自我驱动的优秀战友一起，共同开创视觉技术的新格局；\n那还在等待什么，赶紧加入我们吧！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677MxfvcHsXPN1040",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140062,
+      "name": "基础平台研发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349461000,
+      "workLocations": [
+        "北京"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、本科及以上学历、计算机/自动化/电子信息/通信等相关专业；\n2、具备扎实的计算机理论基础，对数据结构及算法有较强的功底；\n3、具备优秀的系统开发/调试/优化能力，熟练掌握C/C++、Java、Python的一种或者两种语言；\n4、具备良好的学习能力、独立解决问题的能力，有责任心肯钻研、乐于挑战，善于沟通合作、总结分享；\n【加分项】\n  1、有大型互联网公司相关岗位实习及项目开发经历；\n  2、在相关领域国际顶级会议、期刊发表论文，或相关学术会议组织的权威比赛中获奖；",
+      "description": "在这里，你可以经历互联网领域最前沿的工程技术探索，兼顾技术深度与业务价值实现，探索研究业界最新的技术方向；\n在这里，你将经历超大规模的分布式计算、海量数据的实时处理、复杂业务变化和创新等带来的全方位技术挑战；\n在这里，你将承担面向电商、营销与广告等业务场景需求的基础平台相关的技术研发工作，用技术服务数以百万计的商家并持续提升消费者体验；\n在这里，你将参与包括但不限于分布式系统、AI基础设施、云原生Serverless、数据库、中间件、研发效能平台等方面的架构设计与深度优化；\n加入我们，你将体验简单、可依赖的团队文化，以及求真务实、追求极致的工程师文化，并给你提供广阔的施展天地。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677AFMkbNBvac1120",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140055,
+      "name": "算法工程师-搜索推荐（AI增强）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349460000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 计算机科学/人工智能/机器学习等相关领域的硕士或博士，具备扎实的编程基础（Python/C++/Java），熟悉常用算法与数据结构。\n2. 掌握机器学习基础理论，了解搜推广系统/自然语言处理/多模态等至少一个领域。\n3. 对AI技术充满好奇心，主动关注大模型、搜推广系统、NLP、强化学习等领域前沿进展。\n4. 遇事沉稳，不急不躁，心理素质过硬，有担当、有韧性，表达能力强。\n\n【加分项】\n1. 有相关搜推广系统机器学习、大模型训练/微调等相关领域研究及实践经验优先。\n2. 在顶级会议或高水平期刊发表过论文，或有复现前沿论文的经验者优先。\n3. 在算法竞赛中获得优异成绩（ACM-ICPC/挑战赛TOP10等）优先。",
+      "description": "在当前业界的搜索推荐系统中，召回、粗排、精排、重排、混排等算法已有相对成熟的一套框架推动搜推业务进入深水区。AI的发展为搜推场景注入了新的可能性，具体来说，我们希望同学加入解决以下业务问题：\n\n1. AI对搜推场景的算法优化\n    a. 通过大模型（LLM、多模态大模型）的推理能力、世界知识能力，提升对用户的理解。\n    b. 通过大模型（LLM、多模态大模型）SFT、RL、RAG等技术手段，实现对用户需求更好的承接。\n    c. 研究大模型和经典搜推算法的融合方案，提升场景整体效果和用户体验。\n    d. 直面淘宝数亿用户、百亿级行为数据的挑战，落地大模型应用。\n2. 下一代AI搜推系统构建\n    a. 通过分布式训练、模型压缩、低延迟推理等技术，面向工业级应用完成千亿级参数大模型的高效训练与部署。\n    b. 尝试生成式AI、多智能体协作等前沿方向，推动AI技术在电商领域的创新应用。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677kSkdowsCrn4192",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140041,
+      "name": "算法工程师-AIGC方向",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349456000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、硕士及以上学历，计算机、人工智能、电子与通信等相关专业；\n2、熟悉diffusion相关的技术原理和发展脉络，有图像/视频生成相关经验；\n3、具备极佳的工程实现能力，熟练掌握C/C++、Java、Python等至少一门语言；\n4、学习能力强，对新事物有好奇心，对所在领域有热情，善于独立思考并反思总结；\n5、良好的沟通能力和团队协同能力，善于合作，乐于分享。\n\n【加分项】\n1、在校园内或互联网公司有相关实习或项目经历；\n2、在ICCV、CVPR、ECCV、NeurIPS等国际顶级会议、期刊上发表论文，或在相关学术会议组织的权威比赛中获奖。",
+      "description": "如果你，期望参与淘天集团海量文本/图像/视频数据的理解与生成等方面的算法研究、系统研发和产品开发；\n如果你，期望参与跟踪、探索AIGC方向的前沿技术，打磨SOTA通用/垂域基座模型，提升下游应用的效果，打造团队的技术先进性，提高团队技术影响力；\n如果你，期望和聪明、皮实、乐观、自省、追求卓越和自我驱动的优秀战友一起，共同开创视觉技术的新格局；\n那还在等待什么，赶紧加入我们吧！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677ImvXWLytHA7423",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140022,
+      "name": "算法工程师-视觉AIGC",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349453000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n● 学历背景：本科及以上学历，计算机科学、人工智能、电子与通信等相关专业优先；\n● 技术能力：\n熟悉计算机视觉、机器学习、图像/视频分析与处理、多模态内容理解、AIGC等相关领域技术和应用；\n具备扎实的工程实现能力，熟练掌握C/C++、Java、Python等至少一门编程语言；\n了解并使用过torch、tensorflow等深度学习开发工具；\n● 学习与思考：拥有极强的学习能力，对新技术充满好奇心，善于独立思考并总结经验；\n● 沟通与协作：具备良好的沟通能力和团队合作精神，乐于分享知识，能够高效协同完成复杂任务。\n\n【加分项】\n● 在校园内或互联网公司有相关实习或项目经历，尤其是涉及图像生成编辑、内容理解、视频生成编辑或多模态学习的项目；\n● 在ICCV、CVPR、NeurIPS等国际顶级会议或期刊发表过论文，或在相关学术竞赛（如Kaggle、ImageNet等）中取得优异成绩；\n● 对扩散模型、生成式AI、虚拟试穿等前沿技术有深入研究或实践经验。",
+      "description": "如果你渴望投身于AI技术驱动的未来，并希望通过算法与系统研发改变亿级用户的内容体验，那么这里将是你实现梦想的最佳舞台！在淘天集团，我们正在构建一个基于海量图像/视频数据的智能生态，覆盖内容理解、匹配分发、生成等多个核心方向。作为团队的一员，你将参与以下前沿领域的探索与实践：\n● AIGC（AI-Generated Content）创新：探索扩散模型(SD、flux系列)、自回归生成(AR)、强化学习、多模态生成技术等前沿方法，打造下一代智能化内容生成工具，赋能电商、娱乐、广告等多个场景。\n● 跨领域联合创新：结合计算机图形学、物理仿真和大语言模型等技术，推动虚拟试穿、3D内容生成、基于文本描述的通用图像编辑、动态视频生成编辑等应用落地，开创视觉技术的新格局。\n在这里，你不仅能够接触到行业最顶尖的数据资源，还能与一群聪明、皮实、乐观、自省、追求卓越的伙伴一起，探索未知、突破边界，共同定义视觉技术的未来！\n\n为什么选择我们？\n● 海量数据与真实场景：依托淘天集团丰富的业务场景，你将有机会在亿级图像/视频数据上验证你的算法，并看到它们如何直接影响用户的生活。\n● 前沿技术与创新氛围：我们鼓励大胆尝试、快速迭代，支持你在机器学习、深度学习、计算机视觉、AIGC等领域的深入研究。\n● 成长与发展机会：无论你是希望深耕技术成为领域专家，还是逐步转型为技术管理者，我们都会为你量身定制适合的成长计划。\n● 顶级资源支持：无论是计算资源、数据资源，还是与行业顶尖专家的合作机会，我们都将全力支持你的成长。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677HjTdZqtUjo8004",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140042,
+      "name": "算法工程师-视频理解与AIGC生成方向",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349447000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】 \n1. 硕士及以上学历，计算机、人工智能、电子与通信等相关专业； \n2. 熟悉Diffusion和AR自回归相关的技术原理和发展脉络，有图像/视频生成，多模态理解，或图像编辑等研究方向经验； \n3. 具备极佳的工程实现能力，熟练掌握C/C++、Java、Python等至少一门语言；\n4. 学习能力强，对新事物有好奇心，对所在领域有热情，善于独立思考并反思总结；\n5. 良好的沟通能力和团队协同能力，善于合作，乐于分享。 \n\n 【加分项】 \n1. 在校园内或互联网公司有相关多模态理解，或视频生成/编辑方向项目经历；\n2. 在ICCV、CVPR、ECCV、NeurIPS等国际顶级会议、期刊上发表论文，或在相关学术会议组织的权威比赛中获奖。",
+      "description": "如果你，期望参与淘天集团海量文本、图像、视频、音频等多模态理解与生成的算法研究和产品开发，赶快加入我们吧。\n在这里，我们会探索AIGC方向的前沿技术，打磨SOTA通用和垂域生成模型，提升下游应用效果，为电商场景提供视频生产、视频增强处理、直播智能看点等产品能力。\n在这里，有海量的业务数据以及充足的算力资源，来面对具有挑战性的业务场景和学术任务。\n在这里，你将和聪明、皮实、乐观、自省、追求卓越和自我驱动的优秀战友一起，共同开创视觉技术的新格局！ ",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677PtFlDbaZAy4568",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140043,
+      "name": "研发工程师-算法工程化",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349446000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【职位要求】\n1、本科及以上学历，数学、信息安全、网络安全、计算机、软件、人工智能、通信等相关专业。\n2、熟练掌握C/C++，计算机基础扎实，有较好的工程实现能力。\n3、对于机器学习和数学有较强的理解能力，有机器学习领域经验（计算机视觉、语音、NLP、推荐系统）者优先。\n4、热衷于数据结构和算法、在ACM大赛成绩优异者优先。\n5、熟悉异构计算和高性能计算，有GPU软硬件优化经验者优先。\n6、了解模型训练、推理的基本原理，熟悉MNN、TNN、TensorRT、CoreML或其他至少一种推理框架。",
+      "description": "在这里，你将参与淘宝图片、视频、直播等丰富的内容业务场景，为用户的内容创作AIGC、消费体验提供更多的创意和能力。\n在这里，你将与算法同学深度合作，进行算法和推理系统的联合深度优化，为各类算法模型在淘天的产品中应用提供有力的支撑。\n在这里，你将会跟踪前沿技术（如模型量化），深度探索性能优化与工程效率的提升方案。\n加入我们，你将会面对新的内容场景，通过技术深耕，和其他优秀的同学一起，改善全世界数十亿人的购物、娱乐和交互的体验。探索未知，挑战未来，来吧，我们等你加入！\n\n【职位职责】包括但不限于：\n1、参与机器学习全生命周期（训练、推理、MLOps、CI/CD、AB testing）组件的开发与优化。\n2、设计和实现机器学习系统所需要的大规模分布式计算系统。\n3、设计高性能的推理系统与高利用量的弹性资源调度系统。\n4、在机器学习系统的前沿领域（如模型量化）参与应用驱动的研究。\n5、收集理解淘天AI的需求并转化为技术系统设计。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677BSEBnwHJqI6352",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140025,
+      "name": "算法工程师-三维重建和生成",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349443000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、本科及以上学历，计算机视觉、计算机图形学、机器学习等相关专业；\n2、具备计算机图形学和计算机视觉理论基础，熟悉几何重建、NeRF建模、可微渲染、Diffusion、Gaussian Splatting、3DGS场景生成等相关领域技术；\n3、具备极佳的工程实现能力，熟练掌握C++/Java/Python等至少一门语言；\n4、敢于突破现状，勇于探索新思路、新技术，能够积极主动地进行协助沟通，配合团队共同完成目标；\n5、对新技术有强烈的好奇心和学习能力，能够快速掌握并应用前沿技术。\n【加分项】\n在相关领域国际会议发表多篇论文或作为重要角色在权威比赛中取得优秀成绩优先。",
+      "description": "如果你，渴望参与结合视频生成等大模型技术的3D模型编辑技术研究，包括3D数字人妆容编辑、发型编辑、服饰编辑等涉及3D高稳定性以及一致性的编辑算法；\n如果你，渴望参与Physical AI、3D场景生成等结合视频大模型以及3D生成技术的前沿技术研究，包括将图像转换可自由探索的3DGS场景，将视频转换成连续视角、可交互的空间视频等WFM算法；\n如果你，渴望参与结合3D先进信息的视频生成大模型技术研究，包括结合3D数字人实现姿态、表情可控的短视频生成等；\n那还犹豫什么，赶紧加入我们吧，你将与来自不同部门的优秀人才合作，不仅能够获得专业的培训和指导，还可以在工作中不断挑战自我，在职业生涯中不断成长和发展，享受工作中的乐趣和成就感。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677mJCNRyExhv1414",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140066,
+      "name": "基础平台研发工程师（T-Star Lab 26届秋招）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349441000,
+      "workLocations": [
+        "北京"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、硕士及以上学历、计算机/自动化/电子信息/通信等相关专业；\n2、具备扎实的计算机理论基础，对数据结构及算法有较强的功底；\n3、具备优秀的系统开发/调试/优化能力，熟练掌握C/C++、Java、Python的一种或者两种语言；\n4、具备良好的学习能力、独立解决问题的能力，有责任心肯钻研、乐于挑战，善于沟通合作、总结分享。\n\n【加分项】\n1、 有大型互联网公司相关岗位实习及项目开发经历；\n2、 在相关领域国际顶级会议、期刊发表论文，或相关学术会议组织的权威比赛中获奖。\n\n【面向人群】\n1、毕业时间在 2025年11月-2026年10月的海内外高校硕博毕业生。\n*中国大陆（内地）以毕业证为准，中国港澳台及海外地区以学位证为准\n2、包括但不限于计算机、软件工程、人工智能、网络安全、信息与通信工程、电子科学、自动化、量子计算、数学以及其他前沿交叉学科等相关专业。",
+      "description": "T-Star计划是阿里巴巴淘天集团顶尖人才招聘和培养项目，继承“阿里星〞的使命与愿景，面向全球招募顶尖技术人才。首次开设实习生专项招聘，面向2025年10月后毕业的校优秀技术同学。期待你们在淘天，通过极具挑战的前沿课题与亿级规模的海量数据、应用场景，探索和实践最前沿的Al技术，在有价值的业务场景落地技术成果。\n\n\n在这里，你可以经历互联网领域最前沿的工程技术探索，兼顾技术深度与业务价值实现，探索研究业界最新的技术方向；\n在这里，你将经历超大规模的分布式计算、海量数据的实时处理、复杂业务变化和创新等带来的全方位技术挑战；\n在这里，你将承担面向电商、营销与广告等业务场景需求的基础平台相关的技术研发工作，用技术服务数以百万计的商家并持续提升消费者体验；\n在这里，你将参与包括但不限于分布式系统、AI基础设施、云原生Serverless、数据库、中间件、研发效能平台等方面的架构设计与深度优化；\n加入我们，你将体验简单、可依赖的团队文化，以及求真务实、追求极致的工程师文化，并给你提供广阔的施展天地。来吧，我们等你加入！\n",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677cARxQHZsSJ3379",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140044,
+      "name": "算法工程师-视频编解码",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349434000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1. 硕士及以上学历，计算机等相关专业，有视频或图像编码和处理研究背景；\n2. 熟悉视频编解码标准，如HEVC、VVC、AV1. AVS系列、NNVC/EVC等，有相关标准提案优先考虑；\n3. 精通C++和C编程，有使用视频编码开源软件或标准参考软件的经验，如X265，VVENC, VTM，HM优先考虑； \n4.  熟悉智能编码，有基于深度学习、大模型的视频编码研究经验优先考虑；\n5. 有出色的学习能力、分析研究及创新能力；\n6. 良好的沟通能力和团队协同能力，善于合作，乐于分享。\n\n【加分项】\n1. 有互联网公司相关部门实习经历；\n2. 在相关领域国际顶级会议、期刊发表论文，或在相关学术会议组织的权威比赛中获奖。",
+      "description": "在这里，你将参与下一代视频编码标准NNVC/EVC的设计和算法研究；\n在这里，你将参与视频编码（包括但不限于HEVC/VVC/AV1/AVS3）优化：通过信号处理和机器学习的快速编码决策、数据结构、并行框架设计，优化编码速度，同时在有竞争力的视频编码内核基础上，探索基于语义的内容自适应编码优化；\n在这里，你将参与智能编码的研究，包括针对AIGC生成视频的编解码，以及基于深度学习、多模态大模型的视频编解码；\n加入我们，迎接未来的视频洪流的挑战，同时为用户提供无处不在的沉浸式高品质视频服务，布局下一代多媒体标准开发和沉浸式多媒体体验创新（如虚拟现实、增强现实、沉浸式音视频等）\n来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677LTqxMqKFrq1374",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140045,
+      "name": "算法工程师-视频增强与AI处理",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349433000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】 \n1、本科及以上学历，有较好的工程实现能力，精通C/C++、Python等至少一门编程语言；\n2、良好的数据基础、较强的逻辑分析能力；\n3、学习能力强，对AI有充满热情，对新事物保有好奇心，并能快速适应新环境；\n4、良好的沟通能力和团队协同能力；能与他人合作，共同完成目标；对所在领域有热情，善于独立思考并反思总结。\n\n【加分项】\n1、有相关岗位实习及项目开发经历；\n2、有实际成果并发表在国际顶级会议、期刊；或相关权威比赛中获奖。",
+      "description": "在这里，你将参与淘宝直播及短视频等丰富的内容业务场景，围绕“更清晰、更好看、更好玩”，和其他优秀的同学一起，为用户提供极致的体验；\n在这里，你将负责为用户提供最优的画质，负责视频增强相关算法研发，包括但不限于视频去压缩伪影、视频去噪、色彩增强、视频去抖、视频去模糊、超分辨率、视频插帧等算法；\n在这里，你将负责人脸美化相关算法研发，包括但不限于检测、关键点、生成、分割等算法；\n在这里，你将负责特效互动相关算法研发，包括但不限于人脸、人体、人手、物体相关2D和3D等算法；\n在这里，你将会持续关注相关领域的前沿算法，并针对实际场景进行优化，把算法落地应用到实际项目中。\n\n加入我们，你将会面对新的内容场景，通过技术深耕，致力于行业领先的音视频技术创新和应用，帮助创造极致的消费者体验。你的工作将服务于改善全世界数十亿人的购物、娱乐和交互的体验。探索未知，挑战未来，来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677QKNPUODdeN2454",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140040,
+      "name": "算法工程师-视频编解码（T-Star Lab 26届秋招）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349433000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、硕士及以上学历，计算机等相关专业，有视频或图像编码和处理研究背景；\n2、精通C++和C编程，并熟悉视频编解码标准，如AVC、HEVC、VVC、AV1、AVS系列，有相关标准提案，或使用视频编码开源软件或标准参考软件（如X264，X265，VVENC, VTM，JEM，HM，SHM，JM和JSVM）的经验优先考虑；\n3、熟练掌握超分辨率、去模糊、降噪及色彩增强等方向的经典画质增强算法或无参视频质量评价算法；\n4、熟悉手机端的图像、视频算法的算法开发，包括人脸人体关键点，三维人脸人体重建，美颜、美妆等；\n5、熟悉扩散模型及其在视频图像处理、编码、生成中的应用，有相关项目经验或在高影响力开源项目中作出核心贡献； \n6、有出色的学习能力、分析研究及创新能力、优异的学术产出。 \n\n【加分项】 \n在NTIRE、AIM、AIS， MSU等权威竞赛获奖者，或在ICCV、CVPR、ECCV、TPAMI、T-CSVT、T-IP 等顶级会议和期刊发表论文者优先考虑；\n\n面向人群：\n1、毕业时间在 2025年11月-2026年10月的海内外高校硕博毕业生。\n*中国大陆（内地）以毕业证为准，中国港澳台及海外地区以学位证为准\n2、包括但不限于计算机、软件工程、人工智能、网络安全、信息与通信工程、电子科学、自动化、量子计算、数学以及其他前沿交叉学科等相关专业。",
+      "description": "T-Star计划是阿里巴巴淘天集团顶尖人才招聘和培养项目，继承“阿里星〞的使命与愿景，面向全球招募顶尖技术人才。首次开设实习生专项招聘，面向2025年10月后毕业的校优秀技术同学。期待你们在淘天，通过极具挑战的前沿课题与亿级规模的海量数据、应用场景，探索和实践最前沿的Al技术，在有价值的业务场景落地技术成果。\n\n\n在这里，你将参与贡献大型电商场景下与音视频体验和成本相关的一系列研发工作；  \n在这里，你将参与视频编码（包括但不限于HEVC/VVC）优化：通过基于信号处理和机器学习的快速编码决策、数据结构、并行框架设计，优化编码速度，同时在有竞争力的视频编码内核基础上，探索基于语义的内容感知编码优化，深度学习编码，AIGC编码等前沿课题，在保障画质体验的前提下，尽可能节省带宽；  \n在这里，你将参与海量图像和视频的增强修复工作：运用前沿技术，包括但不限于模型结构优化、数据仿真和增强策略优化、知识蒸馏以及模型压缩，在限定带宽环境对任意失真的视频进行高效处理，力求最好的画质。同时，跟踪业界最新进展和技术趋势（包括AIGC）并融入特定的场景，提出创新方案，帮助平台提供逼近广电级别的视频画质；  \n在这里，你将参与视频编码与处理联合优化：在标准编码框架的基础上，借助AI领域的新技术成果来研究视频信号的表征、编码与处理，将视频前后处理与编码联合优化，提升端到端压缩效果；\n在这里，你将参与美颜等视频美化技术的研究工作，包括人脸检测、关键点、肤色美白、面部塑形、化妆效果模拟等。这些技术将应用于直播和短视频等多样化场景，并确保其在真实视频场景的有效整合。你还将专注于基于3D人脸建模和AI算法的智能美颜技术，推动这些技术的大规模落地；\n在这里，你将参与UGC视频生产剪辑依赖的多类当下最前沿的图像视频生成与编辑，包括图像风格化，人像分割与实例分割，人脸属性，图像可控生成，图像视频化等，为视频剪辑提供更丰富的素材和更多的玩法；  \n在这里，你将有机会参与最前沿的音视频质量评价算法工作，包括无参考的视频质量评价，人脸美学评价，音频质量评价，为多媒体算法的迭代和平台音画质的体验提供基础工具； \n在这里，你将帮助淘宝直播等大型的视频传输场景设计QoS算法，追求超低延时、极速播放等用户体验，并支持各种弱网环境下的最优的视频流畅度和优雅的画质降级。\n",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677ZXBychpswD6711",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140038,
+      "name": "算法工程师-数字人形象生成与驱动（T-Star Lab 26届秋招）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349432000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、计算机/电子/多媒体技术等相关专业的硕士及以上学历；\n2、在视频生成、多模态大模型、LLM等技术方向有较深理解和实践；\n3、具备极佳的工程实现能力，熟练掌握C++/Java/Python等至少一门语言；\n4、良好的学习能力和产品理解能力，对AIGC在手淘具体业务场景的落地有想法和热情。\n\n【加分项】\n在相关领域国际会议发表多篇有影响力的一作CCF-A论文；\n作为主要参与者参与有业界影响力的技术工作。\n\n面向人群：\n1、毕业时间在 2025年11月-2026年10月的海内外高校硕博毕业生。\n*中国大陆（内地）以毕业证为准，中国港澳台及海外地区以学位证为准\n2、包括但不限于计算机、软件工程、人工智能、网络安全、信息与通信工程、电子科学、自动化、量子计算、数学以及其他前沿交叉学科等相关专业。",
+      "description": "T-Star计划是阿里巴巴淘天集团顶尖人才招聘和培养项目，继承“阿里星〞的使命与愿景，面向全球招募顶尖技术人才。首次开设实习生专项招聘，面向2025年10月后毕业的校优秀技术同学。期待你们在淘天，通过极具挑战的前沿课题与亿级规模的海量数据、应用场景，探索和实践最前沿的Al技术，在有价值的业务场景落地技术成果。\n\n\n如果你，期望在阿里巴巴生态的广阔场景中，借助海量用户数据和先进的技术能力，打造千人千面的个性化数字人形象生产系统，为亿级用户提供高度定制化的虚拟形象服务；\n如果你，期望参与最前沿的高表现力肢体表情驱动技术研发，通过先进的动作捕捉、表情合成和实时渲染技术，实现数字人自然流畅的表情和肢体动作，赋予数字人更真实的情感表达能力；\n如果你，期望攻克数字人生成中的核心技术难题，例如基于扩散模型的高质量数字人生成、材质与纹理的高度还原、服饰动态效果的真实模拟，以及在复杂交互场景中保持人物和环境的一致性和自然度；\n如果你，期望深入探索多模态统一大模型的应用，将图像、文本、音频等多模态信息融合，构建具备精细理解能力和强大生成能力的数字人系统，解决业界尚未突破的技术瓶颈；\n加入我们，你的成果将直用于电商领域的核心场景，直播，客服，导购，影响数以亿计的用户，推动电商领域的数字化创新，并带来巨大的商业和社会价值。让我们一起定义未来数字人的无限可能！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677CQmqpQYDon3751",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140028,
+      "name": "基础平台研发工程师-深度学习引擎",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349431000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、计算机科学与技术、软件工程、电子信息工程、自动化、数学等相关专业优先。  \n2、 熟悉C++/Python等编程语言，具备扎实的代码功底和算法基础。  \n3、对深度学习框架（如TensorFlow、PyTorch、MNN等）有一定了解，熟悉神经网络的基本原理和常见模型结构。  \n4、了解移动端开发或嵌入式开发相关知识，有性能优化经验者优先。  \n5、对计算机视觉、图像处理、语音识别等领域有浓厚兴趣，并有一定的实践经验。  \n6、具备良好的逻辑思维能力和问题解决能力，能够快速学习新技术。  \n7、具备团队协作精神，能够高效沟通并推动项目进展。\n\n【加分项】\n1、有实际参与开源项目（如Pytorch、ONNX、MNN等）的经验，或在GitHub上有高质量的技术项目展示。  \n2、有移动端AI应用开发经验，熟悉Android/iOS平台的开发流程。  \n3、熟悉模型压缩、量化、剪枝等技术，能够进行模型优化。  \n4、有高性能计算（HPC）或GPU/CPU异构计算相关经验。  \n5、有大语言模型部署和优化经验。",
+      "description": "在这里，你将了解前沿的移动端深度学习框架，从事高效、轻量化的AI模型开发与优化，收获从理论到实践的全栈技术成长，以及与行业顶尖团队协作的宝贵经验。同时，你还将深入参与大模型在移动端的部署与优化，探索如何在资源受限的设备上实现高性能推理，收获从模型压缩到硬件加速的端到端解决方案能力。\n如果你希望参与移动端AI应用的核心技术研发，负责高性能推理引擎的设计与实现，接触跨平台的模型部署与性能调优，学习最前沿的AI技术并提升解决实际问题的能力；如果你渴望深入大模型的移动端落地场景，探索模型量化、剪枝、蒸馏等技术的实际应用，并通过创新方法突破设备算力与内存限制，那么MNN团队将是你的不二之选！\n加入我们，一起定义未来AI在移动端的无限可能！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677xgYLcFsroR8150",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140023,
+      "name": "全栈工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349429000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】 \n1. 熟悉iOS（Swift/Objective-C）或Android（Kotlin/Java）或HarmonyOS（ArkTS/C++）开发体系，熟悉内存管理/多线程/网络优化；熟悉常用的数据结构和算法；\n2. 熟悉客户端开发环境（XCode/AndroidStudio/DevEco）及性能调优工具（Instruments/Systrace），具备独立解决疑难问题的能力； \n3. 理解移动端架构设计（模块化/组件化/动态化），具备一定iOS/Android/HarmonyOS跨端开发经验； \n4.  有Java开发经验。熟悉Java语言，具有扎实Java功底。熟悉Java高级特性和类库、掌握Spring，Mybatis，Springboot等常用的Java框架； \n5. 具备独立工作能力和解决问题的能力、善于沟通、勤于思考、乐于合作、善于总结分享；有强烈的责任心和团队合作精神，积极融入团队；\n \n【加分项】 \n1. 有大型互联网公司相关岗位实习及项目开发经历； \n2. 在相关领域国际顶级会议、期刊发表论文或在相关学术会议组织的权威比赛中获奖。\n3. 了解深度学习框架（PyTorch/TensorFlow），掌握提示词工程(PE)、工具调用（Tool Calling）、LongContext等关键技术，具备Agent系统开发经验",
+      "description": "在这里，你可以深度参与亿级DAU移动端产品开发，构建高性能/高可用性的客户端架构，支撑亿万级在线用户的稳定流畅使用； \n在这里，你可以机会使用SwiftUI/Compose/ArkTS等业界前沿的开发范式，主导技术方案设计与开发实践，打造极致流畅的交互体验； \n在这里，你可以面向iOS/Android/HarmonyOS演进三端跨平台架构，面向多终端打造自适应布局与动效，不断提升多屏使用体验；\n在这里，你有机会可以接触最前沿的AI技术和工具，并运用于提升用户购物体验与工程效率；\n在这里，你可以设计端到端技术方案和架构，构建高可靠性、高可用性、高可扩展性的体系结构，满足日趋复杂的业务需求；\n在这里，你会深入理解业务，参与产品的开发和维护，完成从需求到设计、开发和上线等整个项目周期内的工作，为用户提供丰富而有价值的产品。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677qGspYgqDaZ4766",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140024,
+      "name": "算法工程师-三维重建和生成（T-Star Lab 26届秋招）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349428000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、硕士及以上学历，计算机视觉、计算机图形学、机器学习等相关专业；\n2、具备计算机图形学和计算机视觉理论基础，熟悉三维重建、动作驱动、3D大模型、3D GS编辑等相关领域技术；\n3、具备极佳的工程实现能力，熟练掌握C++/Java/Python等至少一门语言；\n4、宽阔的技术视野，敢于突破现状，勇于探索新思路、新技术，能够积极主动地进行协助沟通，共同达成高目标\n5、在相关领域国际会议发表多篇论文或作为重要角色在权威比赛中取得优秀成绩优先\n\n【加分项】\n在相关领域国际会议发表多篇论文或作为重要角色在权威比赛中取得优秀成绩优先\n\n面向人群：\n1、毕业时间在 2025年11月-2026年10月的海内外高校硕博毕业生。\n*中国大陆（内地）以毕业证为准，中国港澳台及海外地区以学位证为准\n2、包括但不限于计算机、软件工程、人工智能、网络安全、信息与通信工程、电子科学、自动化、量子计算、数学以及其他前沿交叉学科等相关专业。",
+      "description": "T-Star计划是阿里巴巴淘天集团顶尖人才招聘和培养项目，继承“阿里星〞的使命与愿景，面向全球招募顶尖技术人才。首次开设实习生专项招聘，面向2025年10月后毕业的校优秀技术同学。期待你们在淘天，通过极具挑战的前沿课题与亿级规模的海量数据、应用场景，探索和实践最前沿的Al技术，在有价值的业务场景落地技术成果。\n\n\n如果你，期望参与行业领先的3D商品建模方案，探索3D重建大模型算法，让手机拍摄稀疏图片高质量建模成为可能；\n如果你，期望参与端侧实时3D真人数字人方案，探索人体重建、驱动和编辑算法，让构建数字人IP和用户数字分身轻松获取；\n如果你，期望参与学术前沿的3D内容生成方案，探索基于3D模型的空间内容生成算法，让规模化生成制作3D内容触手可及；\n如果你，期望参与基于苹果Vision Pro等新XR设备，发挥创意想法，探索下一个全民级的沉浸感体验应用；\n如果你，期望将AI技术应用落地，转化为用户尖叫的产品体验；\n\n那还犹豫什么，赶紧加入我们吧，你将与来自不同部门的优秀人才合作，不仅能够获得专业的培训和指导，还可以在工作中不断挑战自我，在职业生涯中不断成长和发展，享受工作中的乐趣和成就感。来吧，我们等你加入！\n",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969612677GRjKRbqskj3323",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900140015,
+      "name": "算法工程师-数字人驱动",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761926400000,
+        "to": 1793376000000
+      },
+      "modifyTime": 1756349426000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 计算机视觉、人工智能等相关专业的硕士或博士；\n2. 扎实的算法和编程能力，熟练掌握Pytorch, C++/Python中至少一门语言；\n3. 有3D/Diffusion/GAN/视频生成的一项或多项相关经验, 对相关算法模型和优化有深刻理解；\n4. 有CCF-A类会议数字人方向论文发表者优先。",
+      "description": "研究探索数字人形象前沿技术，结合淘天业务，在淘宝直播，短视频等场景中应用。包含但不限于：\n\n1. 负责数字人形象驱动前沿算法研究突破，包含2D Character Animation，2D Talking Head，lipSync等；\n2. 负责数字人形象生成前沿算法研究突破，数字人形象真实度通过图灵测试；\n3. 负责图像视频编辑的前沿技术研究突破，包括但不限于，数字人形象属性编辑、前背景和谐化、重光照等技术方向。\n\n加入我们，你将与来自不同部门的优秀人才合作，不仅能够获得专业的培训和指导，还可以在工作中不断挑战自我，在职业生涯中不断成长和发展，享受工作中的乐趣和成就感。来吧，我们等你加入！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "淘天集团2026届秋季应届生招聘",
+      "batchId": 100000040001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "淘天集团"
+      ],
+      "circleCodeList": [
+        "60001"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    }
+  ]
+}

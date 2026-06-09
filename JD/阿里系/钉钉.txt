@@ -1,0 +1,82 @@
+请求网址
+https://talent.dingtalk.com/position/search?_csrf=ed0814fd-9a06-4aed-a71f-7f5a37d28f75
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-security-policy-report-only
+default-src 'self';style-src 'self' 'unsafe-inline' dev.g.alicdn.com g.alicdn.com at.alicdn.com *.test.youku.com *.taobao.net webapi.amap.com;script-src 'report-sample' 'self' 'unsafe-eval' 'unsafe-inline' *.dingtalk.com *.cnzz.com *.alicdn.com market.wapa.taobao.com g.alicdn.com dev.g.alicdn.com ynuf.alipay.com log.mmstat.com s.tbcdn.cn vip.laiwang.com wswukong.laiwang.com local.alipcsec.com:6691 *.taobao.net cfd.aliyun.com restapi.amap.com webapi.amap.com retcode.alicdn.com cfall.aliyun.com gw.alipayobjects.com ynuf.aliapp.org;connect-src 'self' *.dingtalk.com wss://*.dingtalk.com ynuf.alipay.com dev.g.alicdn.com g.alicdn.com retcode.taobao.com dingtalk-cspase-sh.oss-cn-shanghai.aliyuncs.com dingtalk-cspase-sz.oss-cn-shenzhen.aliyuncs.com arms-retcode.aliyuncs.com arms-retcode.aliyuncs.com ynuf.aliapp.org px-intl.ucweb.com px.ucweb.com gm.mmstat.com preview-lippi-space-zjk.oss-accelerate.aliyuncs.com wgo.mmstat.com wss://alidocs-body.oss-accelerate.aliyuncs.com wss://pre-collab.dingtalk.com;frame-src 'self' h5.m.taobao.com qiye.aliyun.com log.laiwang.com dev.g.alicdn.com g.alicdn.com login.dingtalk.com login2.dingtalk.com *.dingtalk.com mailsso.mxhichina.com wvjbscheme: alipaybridge: alipaymonitor: mmstat.alicdn.com res.mmstat.com ynuf.aliapp.org alidocs.oss-cn-zhangjiakou.aliyuncs.com;font-src 'self' at.alicdn.com dev.g.alicdn.com g.alicdn.com data: *.taobao.net i.alicdn.com;img-src 'self' data: *.dingtalk.com *.aliimg.com *.alicdn.com *.mmstat.com ynuf.alipay.com arms-retcode.aliyuncs.com pin.aliyun.com fourier.alibaba.com retcode.taobao.com *.cnzz.com dingtalk-cspase-sh.oss-cn-shanghai.aliyuncs.com dingtalk-cspase-sz.oss-cn-shenzhen.aliyuncs.com restapi.amap.com kcart.alipay.com preview-lippi-space-zjk.oss-cn-zhangjiakou.aliyuncs.com px-intl.ucweb.com px.ucweb.com alidocs.oss-cn-zhangjiakou.aliyuncs.com;media-src 'self' *.dingtalk.com cloud.video.taobao.com videocdn.taobao.com tbm-auth.alicdn.com dev.g.alicdn.com g.alicdn.com;report-uri https://csp.dingtalk.com/csp;
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:17:39 GMT
+eagleeye-traceid
+2132f32317809678588836702e8c02
+expires
+0
+pragma
+no-cache
+server
+Tengine
+strict-transport-security
+max-age=0
+timing-allow-origin
+*
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-xss-protection
+1; mode=block
+:authority
+talent.dingtalk.com
+:method
+POST
+:path
+/position/search?_csrf=ed0814fd-9a06-4aed-a71f-7f5a37d28f75
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+227
+content-type
+application/json
+cookie
+cna=tU3jIRcUiXACATzQUd6YU95c; dd_home_locale=zh-cn; dd_l=zh_CN; wolai_client_id=mNxmRQkLLg2SaN12FdstCR; xlly_s=1; SSO_LANG_V2=zh-CN; prefered-lang=zh; recruit-careers_USER_COOKIE_V3=ST180.peh8s0DU1OrDpwFm49nwqL-FzUCQ8FWdMMGB5TI1NIJ-jHm-4c26LjGOg0RlTqZJbkCHMc6Wy1mtWGeQqI-ETLWTCbQsXKwEBuyhLm0TvyO1GM_bw1Wkrg-RYEofIm_ObVDyxncD3Zzg631uN9x4XbaScvyip-nUHGLKqOvY8RkQ4-0B2rQc-VbvQwKqIPXTM32KwbGOtSqNmwOCmH1oz2QmUTN4SIygWGlvBJ_Eg6NAPeA6hoo7MxUfQDGVEhA3sBxOM6scE6sUnYS_KhioqJRtSRF3aUWpM-kIAJwFx8_W3XZ6-7vbOJO0VmmNewRu7dDI2fZUiyS7TAevhRtqjN5Xp9dvDlAClLFtyLdY6SdS_t3F5LCkoGkZrja4Iep41fqaBXZ4RsnEN1bo9h70VZxDF7lZND6949VFyt-5Km7OCHTzlzuEMJt1FWVofx2fJ0Bt8H-gcy9FL8bJw-fkbYrVD5S7BlbirYm-DlopAMyL_6XhUv94zkwgKxy0L0Gl.nNpl1-g_zlSJ2rnCI0etrKZz0p1yeAY-icw0nA7u6EgQVxVIlI8XE6UJwFQfTCSqUbc2ruTvo7IZLvYTZm0w6doM4rV4bqEDnHsndi6nVpC30V-82idHGmK5MWNxnv1BiZ-V5qsRKnPqe4uaofenRNKW98ao238mHUI6pmAX3hwxsL5DmvTHiaMG-PkiOuzwgQdJGIDf1dWZkM8NxJxhTInzjIk8hQhZHdYZgiCsUzQy92FI51423SL2BlfNUmAdhngjFGnkGZF52j2WAh-NwO_icmLCwcKilT9ON750-XvK4tLoOKe_D1qFGHV_nSwP08xXgb6FhqthuhbdB-Tp2Q; recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3ODUzNDI1LCJ0b2tlbiI6ImM0NGUwYTVkZTdhNjQ4YWJiMDRmYjk4NTk0OGFiNTUzNDIwNmRjMDEifQ.fwJ6cauf2aR7GTU68eYGKnKt_5QOJMoPi79kI4rdlGAoqci-Aqzyc6NTx_W3CWdTo9G0ViTLO5yRRdro2DEP8GnWXy3noR_25lfnQrwnMo1g86Q7sD5JJ1Bpb_lzylpW7DrLDw6RNs5p2Imqo37eSboJcype03y8ADpb-9YL4UZHIS4icqKGv6a0EO0x8M-zTqLneQ4GTCct1nbElfYRQD--sdU59MinuQAa8B9jXjkuVBaFiafomahKqnsUR9-zjZME4I3L2B-6w-YV9qqU8qKgt-8tfcxh4ajv-Itml-AXzy_GKaUgS27lW695tdUpaEhBTMxG7eo5jHP1KLANqg; SESSION=Mjk2OUQ2QzQyMDQyMUUyQTI0MTdGQjNFNUQyNjY0NEM=; XSRF-TOKEN=ed0814fd-9a06-4aed-a71f-7f5a37d28f75; tfstk=g77n2TqLPM-BeNHaoY8QjJ0YG2rtOeTWgT3JeUpzbdJsyW68OgAyIt5p2wpJr7XeBwpd9eWoqtvGJW1py4JyQ_JKJMp8rTXMIUCppLhCftCqJwEBy4YBPUyYHrUv96TWzrxnDGDI_BO8yD8r8eTNLO-aUrUAO6lpTSCakgHgrSdyUU-eLdJwCQmeTTuU75Aywvor8T5asdOEYQRr8fRwGQ8yUT8zs1J6ZURFUUPG_dOrpMle3aSP7-Nr4kKdzi7MtHvVsogxlduvAK5eI4y5-B2X36Jiz4vXf6uCs6enl1LC_tAApPuhns_1ICW4rRY5CgWyZOzjeesAdZtG1ouNtev60I7aaqJR-GC2IEcz81YHKn7pmrVc31fPDhbTgrTH8pSJR_h0p1bhp6_Gwbow-eIMmwY4lvJRXsbkZaw7Stff5OAN3z2F4tiZ0w4tPCPR70iWYCOMHXvUJOqX-QSUs5mfVHR6iKFgs0iWYCOMH5Vic8te1IvA.; isg=BAEBdNm7D3dm52A4jL8UVnWXEE0bLnUg23MwvmNWnohiSiMcrX338dRMKL4MxQ1Y
+origin
+https://talent.dingtalk.com
+priority
+u=1, i
+referer
+https://talent.dingtalk.com/off-campus/position-list?lang=zh&search=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36

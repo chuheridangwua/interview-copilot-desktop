@@ -1,0 +1,86 @@
+请求网址
+https://talent.amap.com/position/search?_csrf=a7029ecd-892a-49f8-bdcb-6f8e3c60452a
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:16:43 GMT
+eagleeye-traceid
+0bf85ada17809678032613533e0b80
+expires
+0
+pragma
+no-cache
+s-brt
+160
+s-rt
+161
+server
+Tengine
+strict-transport-security
+max-age=0
+ups-target-key
+alsc-info-recruit-careers-amap.vs.amap.com
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-protocol
+HTTP/2.0
+x-xss-protection
+1; mode=block
+:authority
+talent.amap.com
+:method
+POST
+:path
+/position/search?_csrf=a7029ecd-892a-49f8-bdcb-6f8e3c60452a
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+227
+content-type
+application/json
+cookie
+cna=r0a1IeGOSxgCATzQUd5jaiPL; passport_login=MzgxNTUyODQ1LGFtYXBBU1NkRXF4ZHkscGdvaXRna3Vkb2tlNzZndmozNDc0eTZmNGdqeGxqNzcsMTc3NDM0MjUyMyxOVGszWXpneFlXTmpaREJsTkRrek16bGpOV0kwWkRSa05HRXpPREl3TUdVPQ%3D%3D; xlly_s=1; SSO_LANG_V2=zh-CN; prefered-lang=zh; recruit-careers_USER_COOKIE_V3=ST180.cWCQtYKkKCJnM6l_QidaepLMoFUPfisqMs_Yi6Yy3jF-jHm-4c26LjGOg0RlTqZJbkCHMc6Wy1mtWGeQqI-ETLWTCbQsXKwEBuyhLm0TvyO1GM_bw1Wkrg-RYEofIm_ObVDyxncD3Zzg631uN9x4XbaScvyip-nUHGLKqOvY8RkQ4-0B2rQc-VbvQwKqIPXTM32KwbGOtSqNmwOCmH1oz2QmUTN4SIygWGlvBJ_Eg6NAPeA6hoo7MxUfQDGVEhA3sBxOM6scE6sUnYS_KhioqJRtSRF3aUWpM-kIAJwFx8_W3XZ6-7vbOJO0VmmNewRu7dDI2fZUiyS7TAevhRtqjN5Xp9dvDlAClLFtyLdY6SdS_t3F5LCkoGkZrja4Iep41fqaBXZ4RsnEN1bo9h70VZxDF7lZND6949VFyt-5Km7OCHTzlzuEMJt1FWVofx2fJ0Bt8H-gcy9FL8bJw-fkbYrVD5S7BlbirYm-DlopAMyL_6XhUv94zkwgKxy0L0Gl.sQCmUR50h3zOVIyHpFBXdZAjxjZBQhHg-gEnPTJX3qWcGq2A2mXx-mIa8cseB_E9dyZXxnXlnuBeA8Gw1m2mQR6mEG2fEljbfq0AHuKS01VWNiJ3XUXinCrp6gom_k2MAwTY29gBo_iOEz1PZ60wfDpOW2sVBU36oljvC3iDpdycB9NbNXccQZf_Bc3keWLfxE8tRSkXGfVYfevqARFPdpFIVwRiYsO6kTT73DszOGXwzn71ki_LDwUedkjqM3pJJSzTKrxLFeST-verUA2m8HYGz_llh6Mh23JXM6i31S26_3mYZjmbORLmyLI8NmzU-B8cfMVup4ApZ41oMeuR_g; recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3Nzk4MjI2LCJ0b2tlbiI6IjM0ZTE4YTdkNWNhMTQ5N2U4YzM0YzA3NzZmYzUwODUzNDIwNmRjMDEifQ.TUhenjbBLd4e9bMrIhDBYwag0LfQUoG9aZkZzlK0UooIG4TdTVhtcT7UzXERbAVw45kpCdAKdfjIwhVtmaH7-eQfYWHkAGhfZ7HtAkhDOCjGf6OP06zWOgsTAIXKjf5KQgok738oCPjWygBgoNRDDYuQ2hF9qI-w-5P575qP6IFFVkh9NTl5RNnq7LoGAZ3M4dS11ZMlt9hwjPINWAr2ncoZRQAvdnT6OJnDVuFVJZnE94CYRBgLy6PsQTQ2ZbzXEFZBIaVEwlj4O5jHThcYTpgNjxgO3nHvOrZZYqSq4xC8MYXyWurT9I6WWu_zRrrM6FoiqoemBind4yvdKwHhfA; SESSION=RTMzOERFN0Q0NzMzMTUzODlFNUQzRTJFODAxMjQ1QjE=; XSRF-TOKEN=a7029ecd-892a-49f8-bdcb-6f8e3c60452a; tfstk=gIUtmxtYv9XgYtbCeFj3madrSl53kMVaORPWoxDMcJeLa-30jSD0vqe3HxmfQV4YpJwumc6NbrFbZSksnVDGkjwgLmm_nlDjGVz3jEDGQqFbEqBlEabu_5orlTXoBl-Uv4G6CC9Df2MIojB84du__5u2TBvfqkNNDYwOjfgbh2MIGjuj1fG19HGodFGX5j9C9jkIlfiXfWOIabT6cjwbO6hqdxgjf-gC9jkIhqgjpFItpCGpkkJWJmyv2XTXlyhtAMVndaVTRfntF5aHlEOq6cH71v6GFNQqASoYuI8xC5Zz3bw6CTmaGkeK6qQHf4NLc8hU5avtTlVQZvNJNUNZWuU-5lBeYV2TR2a_2ITb9VHZAXnpB9H77WarRDb5wWaUI5zLiI_jt8DQ_PgAP_ut5AgKTrXe5xEQcPmZud6obSZLpf354dUuyt0DEYhDf6Cp0nosT5dPVDx-_2ur9Yft6n-qcXlKE6Cp0nosTXHl6dK20mGF.; isg=BFdXcsNR8Ymc3XUsXQ6K5ImL5suhnCv-QaGG-KmENCaN2HYat2_UTYT-PnhGNwN2
+origin
+https://talent.amap.com
+priority
+u=1, i
+referer
+https://talent.amap.com/off-campus/position-list?lang=zh&search=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36

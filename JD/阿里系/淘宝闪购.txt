@@ -1,0 +1,22 @@
+请求网址
+https://talent.ele.me/position/search?_csrf=877e639a-d67c-4b38-bda8-a426665b11e7
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+strict-origin-when-cross-origin
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:14:44 GMT
+eagleeye-traceid
+213e073f17809676840047489e9bec
+eagleeyex-alsc-lpower
+0

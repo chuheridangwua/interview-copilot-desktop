@@ -1,0 +1,1239 @@
+{
+  "company": "阿里巴巴",
+  "origin": "https://talent-holding.alibaba.com",
+  "searchUrl": "https://talent-holding.alibaba.com/position/search?_csrf=3c56414c-4fd2-4eb5-83a8-9df0c21f46f6",
+  "totalCount": 20,
+  "exportedCount": 20,
+  "fetchedAt": "2026-06-09T01:46:53.144Z",
+  "items": [
+    {
+      "trackId": "SSP1780969610640QLUIoVAGFH1573",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900160004,
+      "name": "数据研发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761991347000,
+        "to": 1793440947000
+      },
+      "modifyTime": 1780022102000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 较强的动手能力和学习能力，熟悉一门数据处理语言，如SQL、JAVA、Python、Perl等，熟悉unix或者linux操作；\n2. 具备扎实的专业基础，良好的沟通能力和团队合作，主动积极，乐于面对挑战；\n3. 学习能力强，对新事物保有好奇心，并能快速适应新环境。\n\n【加分项】\n1. 有参与数据处理、分析、挖掘等相关项目的经验；\n2. 对Hadoop、Hive、Hbase等分布式平台有一定的理解。\n",
+      "description": "如果你想参与阿里大数据的采集、存储、处理，通过分布式大数据平台加工数据，支持业务管理决策；\n如果你想参与阿里大数据体系的模型设计、开发、维护，通过元数据、质量体系有效的管理和组织EB级的数据；\n如果你想参与阿里大数据产品的研发，发挥你的商业sense，通过数据分析和算法来洞察数据背后的机会，来探索大数据商业化；\n如果你想接触世界领先的大数据处理与应用的技术和平台，获得大数据浪潮之巅的各类大牛的指导；\n那就加入我们吧！",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640iXFghLnMfd4687",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199904720001,
+      "name": "算法工程师-多模态算法（音乐方向）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761963672000,
+        "to": 1793413272000
+      },
+      "modifyTime": 1777009482000,
+      "workLocations": [
+        "北京"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1.计算机、电子信息、人工智能、自动化等相关专业本科及以上学历，2026年应届毕业生；\n2.对多模态大模型/AI生成有浓厚兴趣，具备相关课程学习、科研项目或竞赛经验（涉及语音/音频/文本生成、多模态理解等方向均可）；\n3.掌握AI生成模型核心算法，熟悉 Transformer、DiT、Flow-Matching等一种或多种框架，具有模型训练、调优实操经验；\n4.掌握多模态表征基础技术，具备自监督表征相关知识，了解高质量数据解码方案，对数据质量有较强的感知与把控能力；\n5.具备多模态理解模型开发经验，熟悉主流多模态大模型基本原理；\n6.编程能力扎实，熟练使用Python，熟悉主流大模型训练框架；具备良好的科研能力，能够主动跟进领域前沿技术，有相关论文发表或竞赛获奖经历者优先；\n7.对AI/多模态技术有浓厚兴趣，具备数据处理能力及一定的项目实践经验。",
+      "description": "1.负责多模态大模型算法研发工作，承担语音/音频生成、理解等核心技术的研发与优化；\n2.独立或协作研发多模态内容理解模型，主导搭建高精度、细粒度的内容描述体系，负责数据标注与管理工作；\n3.主导或参与训练数据集的搭建、清洗、整理与标注，推动模型迭代优化，开展数据集相关技术调研；\n4.推进多模态大模型在核心业务中的落地应用，负责技术实用化过程中的效果评估与问题解决；\n5.持续跟踪多模态大模型、音频AI领域前沿技术，参与团队技术研讨，推动前沿技术在业务中的应用转化。\n",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640OhYsjKufVQ8541",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199904280009,
+      "name": "大规模分布式训练推理加速及核心基础设施软硬协同优化-阿里星",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1762009713000,
+        "to": 1790867313000
+      },
+      "modifyTime": 1776179714000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 分布式系统、计算机体系结构、编译优化或通信与计算协同设计方向的硕/博士研究生。\n2. 具备AI训推计算性能分析与优化的经验，能深入分析AI模型在GPU平台上的性能瓶颈，提出并实施优化方案。针对分布式训练和推理系统，进行性能调优，提升系统的吞吐量和效率。\n3. 熟悉业界常见的优化栈（cuda/rocm/cutlass/ck/triton等），在高效的内存管理、通信优化（NvLink/Infiniband/RoCEv2等）关键技术上有实操经验。\n4. 分布式系统研发经验是加分项：设计和实现高效的分布式训练和推理框架，解决大规模分布式系统中的通信、同步和负载均衡问题。探索新型的分布式架构，提升系统的可扩展性和容错性。\n5. 前沿技术研究：跟踪AI Infra领域的最新研究进展，探索新的硬件架构、算法和系统优化技术。发表高水平学术论文，参与国际顶级会议（如ISCA、MICRO、OSDI、SOSP、ATC、NSDI等）。",
+      "description": "随着大模型与生成式AI的爆发式增长，AI基础设施正面临前所未有的性能、规模与效率挑战。该岗位致力于培养构建下一代AI系统底座的领军人才，具备软硬协同、跨层优化的知识面和技术深度，支撑集团核心AI业务的训练推理提效、集群资源调度及异构算力协同优化，推动AI技术的边界突破。核心问题包括但不限于：\n1. 极致性能优化：探索算法、训推引擎和基础设施的co-design协同突破效率瓶颈，最大化算力、网络和存储等硬件性能。\n2. 高性能网络：负责设计、实现、维护AI和高性能计算所需要的高性能网络通信框架和大模型推理场景的性能优化，聚焦模型通信场景的能力建设，完善集合通信、点对点通信等通信方式与推理框架的联合方案设计，推动提升推理性能。\n3. 智能资源调度：针对大规模分布式的LLM/多模态理解生成训练推理等新兴计算场景，优化多集群多地域的异构调度编排能力，实现分钟级模型分发、训推任务弹性伸缩等。\n4. 其他随着AI模型、训推范式、算力硬件等迭代演进而出现的AI系统优化工程挑战和业界难题。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "AI Infra",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640qGGOUWbfbc3788",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199904420002,
+      "name": "未来生活大语言和多模态大模型研究与应用-阿里星",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1762003423000,
+        "to": 1790861023000
+      },
+      "modifyTime": 1776173239000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 计算机科学/人工智能/机器学习等相关领域的硕士或博士，具备扎实的编程基础（Python/C++/Java），熟悉常用算法与数据结构。\n2. 掌握机器学习基础理论，了解搜、推、广系统/自然语言处理/多模态等至少一个领域。\n3. 有PyTorch/TensorFlow等框架使用经验，参与过算法竞赛（Kaggle/天池等）或开源项目者优先。\n4. 对AI技术充满好奇心，主动关注大模型、搜推广系统、NLP、强化学习等领域前沿进展。\n5. 在顶级会议或高水平期刊发表过论文，或有复现前沿论文的经验者优先。\n6. 具备较强的问题拆解能力，能通过数据分析定位业务痛点并提出创新思路。\n7. 良好的沟通能力，能与工程师、产品经理高效协作，将技术方案转化为业务价值。\n8. 对电商场景有基本认知，愿意深入理解用户需求与商业逻辑。\n\n【加分项】\n1. 有大模型训练/微调经验（如Llama、GPT、多模态模型）或搜推广算法相关项目经历。\n2. 有海量数据处理经验或者大厂实习经验。\n3. 在算法竞赛中获得优异成绩（ACM-ICPC/挑战赛TOP10等）或者顶会论文发表。",
+      "description": "相关研究课题细分方向如下：\n1. 大模型（LLM&VLM）预训练Scaling Law曲线优化，高效训练和推理大模型结构设计。\n2. 大模型知识编辑、知识幻觉、电商垂域强化。\n3. 大模型复杂指令跟随、RFT训练、大规模高效微调。\n4. 大模型强化学习算法优化、训推一体架构设计。\n5. 大模型多源Reward建设、复杂问题推理优化。\n6. 图像/视频/音频与文本的跨模态对齐训练，全模态大模型训练。\n7. 图像理解和生成统一建模，探索原生多模态。\n8. 基于大模型的语音识别、语音合成、以及端到端模型。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "基础模型",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640XbtglwwqFN8923",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900160006,
+      "name": "算法工程师-大语言模型",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761992652000,
+        "to": 1793442252000
+      },
+      "modifyTime": 1776135551000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 熟练掌握深度学习、机器学习、自然语言处理的基础知识，熟悉常用模型的原理、特点及应用，能够结合需要解决的问题选择适当的模型，并设计合理的技术方案； \n2. 良好的科研能力，有成果发表在ICLR、ACL、NeurIPS、EMNLP、TACL等国际顶级会议、期刊者优先；有大规模语言模型（LLMs）方面经验者优先；\n3. 熟悉TensorFlow、PyTorch等深度学习框架，熟悉Transformer、BERT、GPT、RNN、LSTM等典型深度学习模型的原理和实现；\n4. 熟悉Python、C++、Java等至少一门编程语言，熟悉Linux环境；\n5. 具备优秀的数据和逻辑分析能力、团队意识和沟通能力、自我驱动和抗压能力，具有强烈的求知欲和技术热情。\n\n【加分项】 \n1. 在高影响力的开源项目中，做出过核心贡献；\n2. 在数学建模相关国际和国家级比赛中获奖；\n3. 在ACM ICPC等相关国际编程大赛中获奖。",
+      "description": "具体职责包括但不限于： \n1. 负责自然语言处理尤其是大模型领域的前沿技术创新研发；推动语言模型、知识表示、机器翻译、长思维链推理、对话系统、文本生成等关键技术和核心问题的解决，形成高引用论文和高价值专利，积极探索相关技术落地应用； \n2. 负责追踪最新技术和热点，优化、改进现有技术和系统，提升系统的性能和效率，在内外部业务场景验证，形成业内领先的技术服务能力和体系； \n3. 负责业务技术需求的支持，针对业务场景的真实需求，设计合理的技术方案和路线，通过技术创新和业务验证，实现业务价值和效率的提升。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640HLsAjNHrtY3338",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199901880002,
+      "name": "算法工程师-自然语言处理",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1767159738000,
+        "to": 1793425338000
+      },
+      "modifyTime": 1773988405000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】 \n1、熟练掌握深度学习、机器学习、自然语言处理的基础知识，熟悉常用模型的原理、特点及应用，能够结合需要解决的问题选择适当的模型，并设计合理的技术方案； \n2、良好的科研能力，有成果发表在ICLR、ACL、NeurIPS、EMNLP、TACL等国际顶级会议、期刊者优先；有大规模语言模型（LLMs）方面经验者优先；\n3、熟悉TensorFlow、PyTorch等深度学习框架，熟悉Transformer、BERT、GPT、RNN、LSTM等典型深度学习模型的原理和实现；\n4、熟悉Python、C++、Java等至少一门编程语言，熟悉LINUX环境；\n5、优秀的团队意识和沟通能力，优秀的自我驱动和抗压能力，强烈的求知欲和技术热情，优秀的数据和逻辑分析能力。\n【加分项】 \n1、在高影响力的开源项目中，做出过核心贡献。",
+      "description": "具体职责包括但不限于： \n1、负责自然语言处理，尤其是大模型领域的前沿技术创新研发；推动语言模型、知识表示、机器翻译、对话系统、文本生成等关键技术和核心问题的解决，形成高引用论文和高价值专利，积极探索相关技术落地应用； \n2、负责追踪最新技术和热点，优化、改进现有技术和系统，提升系统的性能和效率，在内外部业务场景验证，形成业内领先的技术服务能力和体系； \n3、负责业务技术需求的支持，针对业务场景的真实需求，设计合理的技术方案和路线，通过技术创新和业务验证，实现业务价值和效率的提升。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640lGGSvPxzPo4472",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199903280020,
+      "name": "账务核算专员-橙翼",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761992965000,
+        "to": 1790850565000
+      },
+      "modifyTime": 1773742563000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "１、会计、金融、财务管理等财务类专业优先。\n２、熟悉基本的会计原则和财务知识，对财务共享服务有一定了解。 \n３、精通Microsoft Office软件，尤其是Excel，具备良好的数据分析能力。 \n４、具备良好的沟通能力和团队协作精神，能够快速适应团队环境。 \n５、英语水平良好，能够阅读和理解英文财务文档，具备英语口语能力加分。 \n６、细致认真，责任心强，能够独立完成分配的任务。",
+      "description": "1、熟悉资产负债表科目核算性质以及会计准则，能基于业务信息完成账务核算数据的加工，并通过财务系统核算入账。\n2、能基于财务数据以及操作指引，协助进行数据收集和分析，协助完成财报报表或者统计报表的编制。\n3、基于核算操作以及对业务的理解，对接内部及外部审计人员，协助完成审计类工作。\n４、学习并使用集团内部财务软件和系统，提高工作效率和数据处理能力。 \n５、参与财务流程优化项目，提出改进建议，提升财务共享服务账务核算效率。 \n６、完成上级分配的其他临时任务。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "职能类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": "For 琼琼& 叶可的试卷用",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640TUjpbOpgsc2743",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199903200042,
+      "name": "财务专员-橙翼",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761992638000,
+        "to": 1790850238000
+      },
+      "modifyTime": 1770966779000,
+      "workLocations": [
+        "杭州",
+        "西安"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "１、财务管理、会计学、税务、英语等相关专业优先。 \n２、熟悉基本的会计原则和财务知识，对财务共享服务有一定了解。 \n３、精通Microsoft Office软件，尤其是Excel，具备良好的数据分析能力。 \n４、具备良好的沟通能力和团队协作精神，能够快速适应团队环境。 \n５、英语水平良好，能够阅读和理解英文财务文档，具备英语口语能力加分。 \n６、细致认真，责任心强，能够独立完成分配的任务。",
+      "description": "１、协助团队成员处理发票审核、费用报销等财务事务，确保票据合规性和税务准确性。\n２、协助完成日常财务数据录入和账目核对工作，确保数据的准确性和及时性。 \n３、协助团队成员完成异常问题的追踪、记录和解决，推动异常问题的标准化和规范化处理。\n４、参与财务报表的编制过程，协助进行数据收集和分析，为财务报告提供支持。 \n５、学习并使用集团内部财务软件和系统，提高工作效率和数据处理能力。 \n６、参与财务流程优化项目，提出改进建议，提升财务共享服务效率。 \n7、完成上级分配的其他临时任务。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "职能类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640CTTtLlpNPQ7972",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900160005,
+      "name": "算法工程师-多模态",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761992779000,
+        "to": 1793442379000
+      },
+      "modifyTime": 1768964238000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 熟练掌握深度学习、机器学习、计算机视觉、自然语言处理的基础知识，熟悉常用模型的原理、特点及应用，能够结合需要解决的问题选择适当的模型，并设计合理的技术方案； \n2. 良好的科研能力，有成果发表在ICLR、ICCV、CVPR、ECCV、NeurIPS、ICML、TPAMI等国际顶级会议、期刊者优先；有Visual-Language Model和大规模语言模型（LLMs）方面经验者优先；\n3. 熟悉TensorFlow、PyTorch等深度学习框架，熟悉Transformer、ResNet、AlexNet等典型深度学习模型的原理和实现； \n4. 熟悉Python、C++、Java等至少一门编程语言，熟悉linux环境； \n5. 具备优秀的数据和逻辑分析能力、团队意识和沟通能力、自我驱动和抗压能力，具有强烈的求知欲和技术热情。\n\n【加分项】 \n1. 在高影响力的开源项目中，做出过核心贡献。",
+      "description": "1. 负责多模态AI核心技术的研发，结合大语言模型前沿发展，打造多模态通用AI能力并探索其在具身智能方面的应用；\n2. 追踪多模态AI最新技术和热点，优化、改进现有技术和系统，提升系统的性能和效率，在内外部业务场景验证，形成业内领先的技术服务能力和体系； \n3. 负责多模态AI的业务技术需求支持，针对业务场景的真实需求，设计合理的技术方案和路线，通过技术创新和业务验证，实现业务价值和效率的提升。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640ftbjFjzfLL9344",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900160003,
+      "name": "前端开发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761991508000,
+        "to": 1793441108000
+      },
+      "modifyTime": 1764310690000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、熟练使用各种Web前端技术，包括HTML(5)/CSS(3)/Javascript等，并有相关的项目开发经验或成果；\n2、熟悉前端工程化，用过git，gulp或webpack等工具，最好有自己的github仓库；\n3、有基于Ajax应用的开发经验，有NodeJS/Java开发经验，或者有移动端开发经验；\n4、深刻理解Web标准，对可用性、可访问性等相关知识有实际的了解；\n5、对算法、数据结构、建模有一定了解；\n6、学习能力强，对新事物保有好奇心，并能快速适应新环境；\n7、良好的沟通能力和团队协同能力，能与他人合作，共同完成目标；\n8、对所在领域有热情，相信方法总比困难多，善于独立思考并反思总结。\n\n【加分项】\n1、有大型互联网公司相关岗位实习及项目开发经历；\n2、在相关领域国际顶级会议、期刊发表论文，或相关学术会议组织的权威比赛中获奖。 ",
+      "description": "在这里，\n你将有机会与交互设计师一起，美化产品线Web功能的设计；\n有机会与视觉设计师一起，完成产品线Web功能的开发与实现；\n有机会做全栈式开发；\n有机会做移动端开发；\n有机会做性能、架构等方面的改进与优化；\n有机会自己亲手打造一个产品的从设计到发布；\n你还将加入到我们业内最前沿Web技术的研究与开发中。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640KBupLQDWFE3944",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199901920001,
+      "name": "算法工程师-算法工程",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761976527000,
+        "to": 1793426127000
+      },
+      "modifyTime": 1764310680000,
+      "workLocations": [
+        "北京"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【必备项】\n1、有极佳的工程实现能力，精通C/C++、Java、Python等至少一门编程语言；\n2、良好的数据敏感能力、较强的逻辑分析能力；\n3、学习能力强，对新事物保有好奇心，并能快速适应新环境；良好的沟通能力和团队协同能力；能与他人合作，共同完成目标；对所在领域有热情，善于独立思考并反思总结。\n\n【加分项】\n1、热衷于数据结构和算法、在ACM大赛成绩优异者优先；\n2、有实际成果并发表在国际顶级会议、期刊者优先；\n3、熟悉常用机器学习算法，有linux下开发经验的，大规模数据处理经验优先。\n\n一段全新、有意思的旅程正待开启！为了更全面的展现你自己，你还可以在简历中附上你认为自己最有意思的爱好、特长、经历，或是对未来有意思的畅想，没有限制，此项非必填。加入我们，一起打开有意思的未来！\n",
+      "description": "我们的技术团队，\n\n致力于为阿里业务提供高效、稳定的AI基础设施，算法工程基于对算法、引擎和高性能算力资源的理解，为超大规模的分布式训练/推理等AI业务提速、降本，协同AI引擎、调度系统、高性能网络及异构硬件的co-design，突破LLM/AIGC等机器学习任务的算力和性能瓶颈; 为阿里大模型业务的迭代、落地提供高效率的算力底座，系统性评测AI算法的效率和性能热点，准确评估算法在计算、存储、网络通信及I/O方面的资源需求及演进趋势，探索优化加速方案并系统化落地，万卡规模高性能数据中心的AIOps智能运维，自动化诊断和规避软硬件故障，支撑算法稳定迭代，开源AI框架、自研AI芯片平台的适配和性能调优；\n\n与该领域密切相关的技术方向：AI infra, GPU资源调度，高性能RDMA网络，大模型训练/部署，软硬件联合优化，算法性能评测/调优，aiops/chatops。\n\n\n我们的技术团队，\n致力于深度学习从特征计算到训练及预估引擎端到端的平台建设(XDL)，包括当前重点发展的图表征学习，正在定义大数据AI技术的未来；以广告/推荐/搜索引擎平台支持包括淘宝、天猫、菜鸟、优酷乃至海外电商在内整个集团的推荐与搜索的业务，也支撑集团的商业营销平台阿里妈妈，同时也通过阿里云对外部客户提供相应的搜索和推荐产品，我们支持各种深度学习网络的灵活拆分，支持超TB的模型，驱动异构计算和实时计算的发展，不断追求效率的极致，更重要的是，我们还拥有多项领先的算法技术，是阿里巴巴技术驱动商业变革的核心引擎。 \n\n与该领域密切相关的技术方向：统一的索引/图/模型存储召回/排序/预测的图化执行/在线图计算/路径索引与检索/在线引擎Serverless/图表征学习与向量匹配/全链路算法迭代平台/DL特征计算与建模框架/DL训练与预测加速/端上智能/结构化搜索/图像搜索/搜索与推荐云服务。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640RVRCUxBMgz3225",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900180001,
+      "name": "IT服务工程师-杭州/广州",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761991547000,
+        "to": 1793441147000
+      },
+      "modifyTime": 1762416888000,
+      "workLocations": [
+        "广州",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1、大学本科及以上学历，电子、计算机、通信等相关工科专业；\n2、具备良好的客户服务意识，并在某领域有一定技术优势，做事踏实，积极向上，具备较强的抗压能力和良好的责任心，跟进解决客户的问题；\n3、学习能力强，对新事物保有好奇心，并能快速适应新环境，主动思考，尝试使用创新的方式和方法提高工作效率和效果；\n4、良好的沟通能力和团队协同能力，与他人合作，共同完成目标；\n5、对IT领域有热情，善于独立思考并反思总结。\n\n【加分项】拥有相关认证ACA、ITIL、COBIT、ISO 20000、Cisco、Microsoft、Apple等优先。\n",
+      "description": "1、熟练掌握公司基础办公所需软硬件技术问题或需求的解决方案，技术知识包括但不仅限于：办公硬件-PC或笔记本、外设办公设备、操作系统、安全软件、账号、办公网络、网络准入、会议支持（音视频连线、直播链路、大屏操控等）、办公软件产品等；\n2、根据业务发展方向，严格按标准规范执行，确保服务过程合规与专业，同时通过一线工作及时反馈效果，促进标准规范持续改进；\n3、理解并会用好各项数据指标变化，运用科学的方法和工具进行数据分析，发现执行过程中的问题，并提出有效改改方案，使各项指标保持健康水位；\n4、能够在指导下制定简单的项目计划，包括时间表、资源分配，过程中具备基本风险识别能力，并参与制定风险应对措施；\n5、持续学习领域专业知识，并能够将新技术与新思想有效运用到工作中，提出工具改善的需求，以及产品规划，争取资源投入，实行工具改进与总体服务质量提升。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640wTQDUPcmon5604",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900120006,
+      "name": "基础平台研发工程师（C/C++/Java/Golang/Python）",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761991131000,
+        "to": 1793440731000
+      },
+      "modifyTime": 1760957798000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 热爱编程，熟悉掌握但不限于C/C++/Java/Golang/Node.JS等编程语言中的一种或几种；\n2. 基础知识扎实，熟悉计算机系统结构、操作系统内核、网络、分布式系统、算法等领域； \n3. 具备优秀程序员的基本素养，遇到问题可以一查到底，善用工具，对工程效率有自己的见解； \n4. 学习能力强，对新事物保有好奇心，不断突破技术瓶颈，乐于探索未知领域；\n5. 有良好的沟通能力和团队协同能力，善于独立思考并反思总结。\n\n【加分项】\n1. 在github等开源社区具备有较大影响力的技术项目，作为Collaborator/Committer/Member优先；\n2. 作为重要角色参与领域内有含金量的比赛并取得成绩（比如ACM）；\n3. 发表顶刊顶会（参考CCF-A），担当一作/并列/二作；\n4. 获得过业界有影响力的专利。\n",
+      "description": "负责云计算和大数据基础技术研发，包括但不限于以下方向： \n1. 云原生基础设施技术，包括研发面向百万级服务器的应用容器网络、面向AI超算的100G/200G/400G大规模高性能网络及通信基础设施建设，面向电商、AI、大数据等核心互联网应用场景的高性能计算、存储服务器研发、数据中心，以及构建超大规模的基础设施智能化集群管理和运维系统（例如研发运维平台、资源调度、监控报警、AIOPS等技术方向)；\n2. 系统软件研发，包括操作系统/内核、JVM、编译器、Docker/安全容器、ETCD/Zookeeper分布式协调系统、网络&存储虚拟化等技术方向；\n3. 负责阿里巴巴中间件产品的研发与维护，包括但不限于服务、消息、缓存、数据库、微服务框架等；负责 AI /高性能计算所需要的高性能分布式通信框架；负责阿里巴巴全局高可用产品的研发与维护，包括但不限于单元化架构、容灾、快恢、演练等；负责不断提升应用运行时的研发效率和分析诊断效率；探索 Serverless、AIGC 等新场景下的解决方案；\n4. MySQL、Postgre SQL、MongoDB、Redis、HBase等开源数据库内核的改进，TDDL等分布式数据库中间件研发及大规模集群运维平台建设；\n5. 参与大型技术平台的开发和维护，完成从需求到设计、开发和上线等整个项目周期内的工作。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640lHWdrYgMJN5237",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900120005,
+      "name": "研发工程师C/C++",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761990458000,
+        "to": 1793440058000
+      },
+      "modifyTime": 1759993806000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 热爱计算机及互联网技术，熟悉掌握C/C++等编程语言，有良好的编程习惯；\n2. 熟悉网络编程和多线程编程，对TCP/IP、HTTP等网络协议有一定的理解；\n3. 熟悉Unix/Linux/Win32环境下编程，熟练使用调试工具，并熟悉某种脚本语言；\n4. 对数据结构、算法有一定了解；\n5. 学习能力强，不畏挑战，喜欢钻研，有良好的沟通能力和团队协同能力，善于独立思考并反思总结。\n\n【加分项】\n1. 有互联网公司实习经验，参与过互联网软件等相关产品开发项目；\n2. 在相关领域国际顶级会议、期刊发表论文，或相关学术会议组织的权威比赛中获奖；\n3. 热衷于ACM，在校期间参与大学生数学建模竞赛、“挑战杯”、机器人足球比赛等，或作为骨干参与过学生网站的建设和开发。\n",
+      "description": "如果你对基础技术感兴趣，热衷于高性能分布式技术；如果你喜欢研究搜索技术，对电子商务产品技术感兴趣；如果你热衷于客户端开发...那就加入我们吧！\n\n具体职责包括但不限于：\n1. 参与基础软件的设计、开发和维护，如分布式文件系统、缓存系统、Key/Value存储系统、数据库、Linux操作系统等；\n2. 参与世界级规模的分布式服务端程序的系统设计，为阿里巴巴的产品提供强有力的后台支持，在海量的网络访问和数据处理中，设计并设施最强大的解决方案；\n3. 参与搜索引擎各个功能模块的设计和实现，构建高可靠性、高可用性、高可扩展性的体系结构，满足日趋复杂的业务需求；\n4. 参与产品的开发和维护，完成从需求到设计、开发和上线等整个项目周期内的工作；\n5. 参与项目为用户提供丰富而有价值的桌面或无线软件产品。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640YxzuLRPsuA7548",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900640007,
+      "name": "算法工程师-大数据处理",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761996721000,
+        "to": 1793532721000
+      },
+      "modifyTime": 1757418007000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1.计算机、数学、统计、人工智能、大数据等相关专业硕士及以上学历，有数据算法相关实践经验，具备多模态/跨模态数据处理项目经验；\n2.熟悉深度学习算法框架（如TensorFlow/PyTorch），在多模态数据处理、表征学习、大模型应用等领域有实现经验；\n3.具备扎实的数学建模能力，擅长设计数据驱动的算法解决方案，对算法性能优化和工程实现有深刻理解；\n4.熟悉大规模数据处理全流程，具备海量数据特征工程、算法优化及质量评估经验，有数据治理与质量管控经验者优先；\n5.热爱数据科学研究，具备优秀的逻辑思维能力和技术创新意识，精通Python/Java等至少一种编程语言，有大规模数据算法开发经验者优先；\n6.在推荐系统、计算机视觉、自然语言处理等多模态应用场景中有深入实践的候选人，具备顶会论文（AAAI/ICML/NeurIPS等）、竞赛或开源项目贡献经历者优先。",
+      "description": "1.构建集团核心数据资产体系，结合业务需求与数据算法能力，主导大数据的处理、解析、分析、挖掘、研发及优化工作；\n2.负责集团海量全模态（文本/图像/视频/音频）及跨模态数据的标签体系设计、特征提取、模式挖掘与内容理解，设计高精度、低资源消耗的多模态数据智能分析处理方案；\n3.研发基于深度学习与大模型的跨模态数据融合算法框架，构建多模态数据协同分析模型，支撑业务场景下的数据价值挖掘与知识发现；\n4.主导数据智能平台算法模块开发，构建支持海量、全模态数据处理的高可用数据中台；\n5.踪多模态算法、大模型及前沿数据处理技术，推动创新算法在实际业务场景的落地应用。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640wFNcXtQDLj7843",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900160007,
+      "name": "算法工程师-机器学习",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761990832000,
+        "to": 1793440432000
+      },
+      "modifyTime": 1755585541000,
+      "workLocations": [
+        "北京",
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 熟悉常用机器学习算法，熟悉模式识别、深度学习、增强学习、联邦学习等相关领域；\n2. 极佳的工程实现能力，精通C/C++、Java、Python等至少一门编程语言；\n3. 有数理分析方面良好的素养以及数理统计概率论基础；\n4. 良好的数据敏感能力，较强的逻辑分析能力；\n5. 学习能力强，对新事物保有好奇心，并能快速适应新环境；良好的沟通能力和团队协同能力；能与他人合作，共同完成目标；对所在领域有热情，善于独立思考并反思总结。\n\n【加分项】\n1. 有实际成果并发表在国际顶级会议、期刊者优先，有在KDDCUP、ImageNet、MSCOCO、ICDAR等权威比赛中取得优异成绩者优先；\n2. 有deep learning经验、linux下开发经验、大规模数据处理经验者优先。\n",
+      "description": "我们专注于大数据之上的机器学习算法研究与应用，如果你了解机器学习、深度学习、强化学习、迁移学习、主动学习、特征提取与稀疏学习、等级学习等相关知识，对人工智能抱有极大的热情，勇于挑战各种实际应用难题，欢迎加入我们！ \n\n具体职责包括但不限于：\n1. 负责机器学习、深度学习领域的技术研发工作，包括但不限于神经元网络模型设计与优化、强化学习、迁移学习、主动学习、维度降低、核方法、谱方法、特征提取与稀疏学习、等级学习、推荐、随机优化等的算法和系统研发等； \n2. 负责机器学习尤其是深度学习前沿问题的探索与研究，结合未来实际应用场景，提供全面的技术解决方案； \n3. 负责提供分布式的算法解决方案，大幅提升算法计算规模和性能； \n4. 负责提供大数据分析建模方案，沉淀行业解决方案，协助拓展业务边界。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640GRFLTgPAGa2653",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900080008,
+      "name": "客户端开发工程师",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761991604000,
+        "to": 1793441204000
+      },
+      "modifyTime": 1755502878000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 热爱计算机科学和互联网技术，有参与改变互联网产品的冲劲；\n2. 扎实的数据结构和算法基础，精通至少一门编程语言，包括：Objective-C、Swift、C、C++；\n3. 深入理解macOS或Windows操作系统的网络框架；\n4. 有不错的编程能力和良好的编码风格；\n5. 对新技术保持热情，有强烈的好奇心。",
+      "description": "1. 负责开发、迭代优化数字化办公平台PC端应用程序；\n2. 参与应用性能、体验优化及质量监控评估体系建设；\n3. 参与客户端基础组件及架构设计，推进研发效率；\n4. 参与客户端和服务端的交互协议的设计、实现和优化。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640LfYlAUSXfY1076",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900320051,
+      "name": "基础平台研发工程师-数据湖引擎",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761980241000,
+        "to": 1790837841000
+      },
+      "modifyTime": 1755154917000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 热爱编程，熟悉掌握但不限于C/C++/Java/Golang/Node.JS等编程语言中的一种或几种；\n2. 基础知识扎实，熟悉计算机系统结构、操作系统内核、网络、分布式系统、算法等领域； \n3. 具备优秀程序员的基本素养，遇到问题可以一查到底，善用工具，对工程效率有自己的见解； \n4. 学习能力强，对新事物保有好奇心，不断突破技术瓶颈，乐于探索未知领域；\n5. 有良好的沟通能力和团队协同能力，善于独立思考并反思总结。\n\n【加分项】\n1. 在github等开源社区具备有较大影响力的技术项目，作为Collaborator/Committer/Member优先；\n2. 作为重要角色参与领域内有含金量的比赛并取得成绩（比如ACM）；\n3. 发表顶刊顶会（参考CCF-A），担当一作/并列/二作；\n4. 获得过业界有影响力的专利。",
+      "description": "负责云计算和大数据基础技术研发，包括但不限于以下方向： \n1. 云原生基础设施技术，包括研发面向百万级服务器的应用容器网络、面向AI超算的100G/200G/400G大规模高性能网络及通信基础设施建设，面向电商、AI、大数据等核心互联网应用场景的高性能计算、存储服务器研发、数据中心，以及构建超大规模的基础设施智能化集群管理和运维系统（例如研发运维平台、资源调度、监控报警、AIOPS等技术方向)；\n2. 系统软件研发，包括操作系统/内核、JVM、编译器、Docker/安全容器、ETCD/Zookeeper分布式协调系统、网络&存储虚拟化等技术方向；\n3. 负责阿里巴巴中间件产品的研发与维护，包括但不限于服务、消息、缓存、数据库、微服务框架等；负责 AI /高性能计算所需要的高性能分布式通信框架；负责阿里巴巴全局高可用产品的研发与维护，包括但不限于单元化架构、容灾、快恢、演练等；负责不断提升应用运行时的研发效率和分析诊断效率；探索 Serverless、AIGC 等新场景下的解决方案；\n4. MySQL、Postgre SQL、MongoDB、Redis、HBase等开源数据库内核的改进，TDDL等分布式数据库中间件研发及大规模集群运维平台建设；\n5. 参与大型技术平台的开发和维护，完成从需求到设计、开发和上线等整个项目周期内的工作。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": "阿里巴巴集团&笔试对接专项测试2026",
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640cWJpUBPRdr9247",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900180006,
+      "name": "算法工程师-多组学",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761991947000,
+        "to": 1793441547000
+      },
+      "modifyTime": 1754278563000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 博士及以上学历，计算机、生物信息、人工智能、生物统计等相关专业背景；\n2. 有至少两类组学数据（如转录组、蛋白组、代谢组等）的数据收集和处理数据经验，熟悉常见的生物信息学数据库；\n3. 具备良好的编程能力（Python优先），熟练掌握主流AI框架（PyTorch/TensorFlow）；\n4. 有较强的科研能力与原型搭建能力，能快速实现并验证模型创新想法。\n\n【加分项】\n1. 曾在顶级AI会议、生物&医疗相关顶尖期刊发表有关多模态、组学、生物信息相关研究文章；\n2. 有大语言模型、多模态模型或生物大模型研发和训练经验；熟悉Transformer、图神经网络等主流模型架构；\n3. 有免疫组学、癌症相关机理研究经验;\n4. 有跨学科协作项目或科研-产业结合项目经验;\n5. 有生物相关技术实验和落地能力，如数据标注、数据集构建、评测体系搭建等经验。",
+      "description": "1. 负责基于多模态的生物组学基础模型的研发，融合图像、文本、表格、序列、结构等多模态生物信息，构建具备通用推理与知识迁移能力的生物基础大模型；\n2. 跟踪多模态AI与多组学融合建模领域的前沿技术，持续优化异构数据对齐、跨模态融合、领域适配等关键算法模块，提升基础模型精度、泛化能力与可解释性；\n3. 通过结合转录组、蛋白组、代谢组等典型组学数据，结合生物学基础原理，设计创新技术路线，验证模型在癌症早筛、疾病治疗、药物靶点发现等场景的实际价值。\n",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    },
+    {
+      "trackId": "SSP1780969610640oteSbHymcB6293",
+      "positionUrl": null,
+      "bucket": "DEFAULT",
+      "id": 199900120009,
+      "name": "算法工程师-基因组",
+      "status": "recruit",
+      "categories": null,
+      "publishTime": null,
+      "graduationTime": {
+        "from": 1761991947000,
+        "to": 1793441547000
+      },
+      "modifyTime": 1754278536000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": [
+        "远程"
+      ],
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 计算机科学、生物信息学、或相关领域的硕士或博士研究生；\n2. 在多组学数据整合、深度学习、大模型、和生物信息学等领域至少具有两项实质性的研究经验；\n3. 在基因组学、转录组学、表观基因组学或多组学分析、深度学习或大模型算法等方向发表论文（第一作者或重要合作作者）；\n4. 熟练掌握深度学习和大模型框架，有较强的编程能力，或具备多组学数据分析的实际操作能力；\n5. 具备创新的、经过验证的问题解决能力，具有强烈的好奇心和探究精神，能够独立开展研究并能融入团队协作。\n\n【加分项】\n1. 曾在顶级AI会议、生物&医疗相关顶尖期刊发表有关多模态、组学、生物信息相关研究文章；\n2. 有大语言模型、多模态模型或生物大模型研发和训练经验；熟悉Transformer、图神经网络等主流模型架构；\n3. 有免疫组学、癌症相关机理研究经验;\n4. 有跨学科协作项目或科研-产业结合项目经验;\n5. 有生物相关技术实验和落地能力，如数据标注、数据集构建、评测体系搭建等经验。",
+      "description": "我们专注于医学和生命科学领域AI算法开发、生物信息分析和应用。如果你了解深度学习、生物信息与计算生物学、生物大模型等相关知识，并对AI应用于医学和生命科学抱有极大的热情，勇于挑战各种实际应用难题，欢迎加入我们！\n\n1. 在多组学数据整合、深度学习、生物大模型、生物信息学等领域进行核心研发工作；\n2. 与临床合作伙伴和生物医学研究者深入合作，在疾病检测、诊断及治疗上进行问题定义，以创新的AI技术解决提出的临床问题；\n3. 进行高质量的研究工作，撰写高质量论文，并在顶级会议或期刊上发表。",
+      "experience": null,
+      "degree": null,
+      "department": null,
+      "project": null,
+      "positionType": null,
+      "code": null,
+      "categoryName": "技术类",
+      "categoryType": "freshman",
+      "batchName": "阿里控股2026届秋季应届生招聘",
+      "batchId": 100000060001,
+      "batchWillingCount": null,
+      "channels": [
+        "campus_group_official_site",
+        "campus_intranet_site_referral"
+      ],
+      "operations": [
+        {
+          "operationName": "COLLECT_POSITION",
+          "clickable": true,
+          "remark": null,
+          "contents": null
+        }
+      ],
+      "isTongyi": false,
+      "circle": null,
+      "circleNames": [
+        "阿里巴巴控股集团"
+      ],
+      "circleCodeList": [
+        "60000"
+      ],
+      "niuKeProjectName": null,
+      "useInternal": null,
+      "isLingYang": null,
+      "tongyi": false
+    }
+  ]
+}

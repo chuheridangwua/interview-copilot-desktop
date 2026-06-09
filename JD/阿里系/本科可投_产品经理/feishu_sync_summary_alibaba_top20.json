@@ -1,0 +1,396 @@
+﻿{
+    "generated_at":  "2026-06-09 10:20:04",
+    "dry_run":  false,
+    "base_token":  "IF3UbUejZaSTDTsE5IkckdPFn4c",
+    "table_id":  "tblVEj5n5JATZhY0",
+    "existing_count":  30,
+    "desired_count":  20,
+    "action_count":  20,
+    "update_count":  0,
+    "create_count":  20,
+    "actions":  [
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "钉钉",
+                        "role_name":  "钉钉-AI产品经理-开放平台",
+                        "link":  "https://talent.dingtalk.com/off-campus/position-detail?positionId=100011660008\u0026track_id=SSP1780969973639kiVYVWUqXc9873",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "62",
+                        "rank":  "1"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "业务技术-大模型平台产品经理-杭州",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100007800011\u0026track_id=SSP1780969975591vvttHqdMvw8770",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "135",
+                        "rank":  "2"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "淘宝平台事业部-AI产品经理-阿里资产",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100013680001\u0026track_id=SSP1780969975591RkiCsndLoS8123",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "190",
+                        "rank":  "3"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "淘宝平台事业部-AI产品经理-内控治理",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100013700004\u0026track_id=SSP1780969975591cZtyHxoLKB3084",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "162",
+                        "rank":  "4"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-高级产品经理-企业采购平台",
+                        "link":  "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100014960002\u0026track_id=SSP1780969970339kDmHfZpzas5528",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "2",
+                        "rank":  "5"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-高级产品经理-HR域",
+                        "link":  "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100011300005\u0026track_id=SSP1780969970339RgiMQVmnQh2905",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "15",
+                        "rank":  "6"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "天猫事业部-运营AI产品经理-杭州",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100017480001\u0026track_id=SSP1780969975591uAaCKBXJaQ8321",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "167",
+                        "rank":  "7"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里巴巴",
+                        "role_name":  "ATH-AI创新事业部-Qoder 产品经理-AI 创新方向",
+                        "link":  "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100011623001\u0026track_id=SSP1780969970339xkqHhdXdAo6581",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "13",
+                        "rank":  "8"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "淘宝秒杀-AI AGENT产品经理-杭州",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100014040012\u0026track_id=SSP1780969975591IBuAxcIVWE1704",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "175",
+                        "rank":  "9"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-AI产品经理-AI Agent",
+                        "link":  "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100013760001\u0026track_id=SSP1780969970339sCiGPXLQiS3569",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "16",
+                        "rank":  "10"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里巴巴",
+                        "role_name":  "阿里控股-AI产品经理-不动产管理",
+                        "link":  "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100015840002\u0026track_id=SSP1780969970339yNCMzoVCVR3887",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "11",
+                        "rank":  "11"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里国际",
+                        "role_name":  "阿里国际站-AI 产品经理 — Agentic Platform-Accio Work",
+                        "link":  "https://aidc-jobs.alibaba.com/off-campus/position-detail?positionId=100021895007\u0026track_id=SSP1780969971970DYaaanebLM9975",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "30",
+                        "rank":  "12"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里巴巴",
+                        "role_name":  "ATH-AI创新事业部-Qoder 产品经理-AI Coding 方向",
+                        "link":  "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100004023017\u0026track_id=SSP1780969970339MJBjQjZwkx9132",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "6",
+                        "rank":  "13"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "智能算法产品事业部-运营平台产品经理-杭州",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100011700028\u0026track_id=SSP1780969975591EsrluNkhhG4247",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "120",
+                        "rank":  "14"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "天猫事业部-天猫国际AI产品经理（营销\u0026数据）-杭州",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100012000010\u0026track_id=SSP1780969975591ZnVyeGSVAd5313",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "143",
+                        "rank":  "15"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "高德",
+                        "role_name":  "高德-AI产品经理（商家成长方向）-信息业务中心",
+                        "link":  "https://talent.amap.com/off-campus/position-detail?positionId=100016040002\u0026track_id=SSP1780969973968fwRFrmitiH2580",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "73",
+                        "rank":  "16"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "淘天",
+                        "role_name":  "淘宝平台事业部-AI产品经理-平台物流",
+                        "link":  "https://talent.taotian.com/off-campus/position-detail?positionId=100000980008\u0026track_id=SSP1780969975591KBYRUUHUJa8339",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "191",
+                        "rank":  "17"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里云",
+                        "role_name":  "ATH事业群-AI原生应用产品经理-杭州",
+                        "link":  "https://careers.aliyun.com/off-campus/position-detail?positionId=100011383005\u0026track_id=SSP1780969973185WsnUfNqrVu6957",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "49",
+                        "rank":  "18"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-AI产品经理-to B方向",
+                        "link":  "https://talent-holding.alibaba.com/off-campus/position-detail?positionId=100013600010\u0026track_id=SSP1780969970339stuKBXXGKW2373",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "9",
+                        "rank":  "19"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "钉钉",
+                        "role_name":  "悟空事业部-Agent平台产品经理-企业悟空",
+                        "link":  "https://talent.dingtalk.com/off-campus/position-detail?positionId=100018500002\u0026track_id=SSP1780969973639fnlaHBZijl9486",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\本科可投_产品经理\\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+                        "source_row":  "58",
+                        "rank":  "20"
+                    }
+                ],
+    "results":  [
+                    {
+                        "action":  "create",
+                        "company":  "钉钉",
+                        "role_name":  "钉钉-AI产品经理-开放平台",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "业务技术-大模型平台产品经理-杭州",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "淘宝平台事业部-AI产品经理-阿里资产",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "淘宝平台事业部-AI产品经理-内控治理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-高级产品经理-企业采购平台",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-高级产品经理-HR域",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "天猫事业部-运营AI产品经理-杭州",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里巴巴",
+                        "role_name":  "ATH-AI创新事业部-Qoder 产品经理-AI 创新方向",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "淘宝秒杀-AI AGENT产品经理-杭州",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-AI产品经理-AI Agent",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里巴巴",
+                        "role_name":  "阿里控股-AI产品经理-不动产管理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里国际",
+                        "role_name":  "阿里国际站-AI 产品经理 — Agentic Platform-Accio Work",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里巴巴",
+                        "role_name":  "ATH-AI创新事业部-Qoder 产品经理-AI Coding 方向",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "智能算法产品事业部-运营平台产品经理-杭州",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "天猫事业部-天猫国际AI产品经理（营销\u0026数据）-杭州",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "高德",
+                        "role_name":  "高德-AI产品经理（商家成长方向）-信息业务中心",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "淘天",
+                        "role_name":  "淘宝平台事业部-AI产品经理-平台物流",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里云",
+                        "role_name":  "ATH事业群-AI原生应用产品经理-杭州",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "阿里巴巴",
+                        "role_name":  "企业智能事业部-AI产品经理-to B方向",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "钉钉",
+                        "role_name":  "悟空事业部-Agent平台产品经理-企业悟空",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    }
+                ],
+    "result_count":  20
+}

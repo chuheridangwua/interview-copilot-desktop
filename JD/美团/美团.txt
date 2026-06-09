@@ -1,0 +1,299 @@
+获取列表
+
+请求网址
+https://zhaopin.meituan.com/api/official/job/getJobList
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+strict-origin-when-cross-origin
+content-encoding
+gzip
+content-type
+application/json
+date
+Tue, 09 Jun 2026 03:56:01 GMT
+expires
+Thu, 01 Jan 1970 00:00:00 GMT
+m-traceid
+4522796739840644763
+server
+openresty
+set-cookie
+ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 03:56:01 GMT; Max-Age=38880000
+set-cookie
+misId=4548637876; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 03:56:01 GMT; Max-Age=38880000
+vary
+Accept-Encoding
+:authority
+zhaopin.meituan.com
+:method
+POST
+:path
+/api/official/job/getJobList
+:scheme
+https
+accept
+application/json
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+523
+content-type
+application/json
+cookie
+com.sankuai.recruitment.official.website_strategy=; _lxsdk_cuid=19e496f5010c8-09a760777f6b35-26061151-240000-19e496f5011c8; _lx_utm=utm_source%3Dgoogle%26utm_medium%3Dorganic; weixinType=1; weixinCode=061NnGGa176mQL01PXFa15coVN2NnGGm; unionLoginType=weixin; unionLoginToken=kSQLFdjG6DOVkHd1UMVeMXeFr9LtgDYwDLs0TBmQtlbhqlMEH5Era0OUzrQmKl63sa9ihCGq+wPVqIJSkssNa5SMceYjtuLGUnHwZG4OIM13Eti36NhR/+CWUsgJDwKbE0j9Sr7k+liH0DLzsPGCXLDwSUxTYy7xyxJxHYqT4Q/o3iEzuhT6dTuEZwlVSUZVRTrGzDnhh85b+8G0OY/CEoXcGLOpYk2l3d03d7ayvjfakcdeVqPHTqx5BRnxELfxafHSpDZOhMX8nvDNP3lKOZfMLkdvOGba+gEEhEX9Vcsf9i0u96hA6qIQIW7k1y1GHY15R/KlVWbUdjex7MR1DL0lQBnNacFVxZM8JLl48DNBbKILiOo3fZvqWF0cZasL0sOyIzW6pUkqLj9Urwk9dDJ5T5THtV8vBV7+bE/8EnyFd1tprDs55DxV1m4lulrjXxRC3PjewRAry9MYxzsOnA==; weixinCodeBack=061NnGGa176mQL01PXFa15coVN2NnGGm; ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; JSESSIONID=node01emog9cqh7nov1uvykp8wd0b8i1917.node0; misId=4548637876; com.sankuai.mcopilot.nocode.deploy1_strategy=; com.sankuai.recruitment.officialwebsite.mobile_strategy=; _lxsdk_s=19eaa7d7255-d1a-8de-f61%7C%7C45; logan_session_token=orh1m7x5ilte0g9d3nfk
+origin
+https://zhaopin.meituan.com
+priority
+u=1, i
+referer
+https://zhaopin.meituan.com/web/share-position?token=c6ab1e83799a47d8b74143c2e0713657&jobShareType=1&share_source=cplink&keyword=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+x-requested-with
+XMLHttpRequest
+
+{"page":{"pageNo":1,"pageSize":10},"jobUnionIds":["3285026405","4254863736","1466951634","4285596871","4476108218","2978735823","2431837310","4487581555","4302139093","3750031159","4518447096","4518445342","3771069370","3604450999","4479586282","4517801293","4041386111","4151489050","4480704667","3139280187","3057805095","3506281745","4301295312","4517224406","3848257556","4381199673","4491091941"],"jobShareType":"1","keywords":"产品经理","cityList":[],"department":[],"jfJgList":[],"u_query_id":"","r_query_id":""}
+
+获取详情
+
+请求网址
+https://zhaopin.meituan.com/api/official/job/getJobDetail
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+strict-origin-when-cross-origin
+content-encoding
+gzip
+content-type
+application/json
+date
+Tue, 09 Jun 2026 03:59:58 GMT
+expires
+Thu, 01 Jan 1970 00:00:00 GMT
+m-traceid
+-4614091198954691372
+server
+openresty
+set-cookie
+ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 03:59:57 GMT; Max-Age=38880000
+set-cookie
+misId=4548637876; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 03:59:57 GMT; Max-Age=38880000
+vary
+Accept-Encoding
+:authority
+zhaopin.meituan.com
+:method
+POST
+:path
+/api/official/job/getJobDetail
+:scheme
+https
+accept
+application/json
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+46
+content-type
+application/json
+cookie
+com.sankuai.recruitment.official.website_strategy=; _lxsdk_cuid=19e496f5010c8-09a760777f6b35-26061151-240000-19e496f5011c8; _lx_utm=utm_source%3Dgoogle%26utm_medium%3Dorganic; weixinType=1; weixinCode=061NnGGa176mQL01PXFa15coVN2NnGGm; unionLoginType=weixin; unionLoginToken=kSQLFdjG6DOVkHd1UMVeMXeFr9LtgDYwDLs0TBmQtlbhqlMEH5Era0OUzrQmKl63sa9ihCGq+wPVqIJSkssNa5SMceYjtuLGUnHwZG4OIM13Eti36NhR/+CWUsgJDwKbE0j9Sr7k+liH0DLzsPGCXLDwSUxTYy7xyxJxHYqT4Q/o3iEzuhT6dTuEZwlVSUZVRTrGzDnhh85b+8G0OY/CEoXcGLOpYk2l3d03d7ayvjfakcdeVqPHTqx5BRnxELfxafHSpDZOhMX8nvDNP3lKOZfMLkdvOGba+gEEhEX9Vcsf9i0u96hA6qIQIW7k1y1GHY15R/KlVWbUdjex7MR1DL0lQBnNacFVxZM8JLl48DNBbKILiOo3fZvqWF0cZasL0sOyIzW6pUkqLj9Urwk9dDJ5T5THtV8vBV7+bE/8EnyFd1tprDs55DxV1m4lulrjXxRC3PjewRAry9MYxzsOnA==; weixinCodeBack=061NnGGa176mQL01PXFa15coVN2NnGGm; ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; JSESSIONID=node01emog9cqh7nov1uvykp8wd0b8i1917.node0; misId=4548637876; com.sankuai.mcopilot.nocode.deploy1_strategy=; com.sankuai.recruitment.officialwebsite.mobile_strategy=; logan_session_token=943a36a2i799uh0oaf8j; _lxsdk_s=19eaa7d7255-d1a-8de-f61%7C%7C48
+origin
+https://zhaopin.meituan.com
+priority
+u=1, i
+referer
+https://zhaopin.meituan.com/web/position/detail?jobUnionId=4301295312&token=c6ab1e83799a47d8b74143c2e0713657&jobShareType=1&highlightType=social
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+x-requested-with
+XMLHttpRequest
+
+{"jobUnionId":"4301295312","jobShareType":"1"}
+
+
+获取列表2
+
+请求网址
+https://zhaopin.meituan.com/api/official/job/getJobList
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+strict-origin-when-cross-origin
+content-encoding
+gzip
+content-type
+application/json
+date
+Tue, 09 Jun 2026 04:07:37 GMT
+expires
+Thu, 01 Jan 1970 00:00:00 GMT
+m-traceid
+-8000986434832565330
+server
+openresty
+set-cookie
+ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 04:07:37 GMT; Max-Age=38880000
+set-cookie
+misId=4548637876; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 04:07:37 GMT; Max-Age=38880000
+vary
+Accept-Encoding
+:authority
+zhaopin.meituan.com
+:method
+POST
+:path
+/api/official/job/getJobList
+:scheme
+https
+accept
+application/json
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+278
+content-type
+application/json
+cookie
+com.sankuai.recruitment.official.website_strategy=; _lxsdk_cuid=19e496f5010c8-09a760777f6b35-26061151-240000-19e496f5011c8; _lx_utm=utm_source%3Dgoogle%26utm_medium%3Dorganic; weixinType=1; weixinCode=061NnGGa176mQL01PXFa15coVN2NnGGm; unionLoginType=weixin; unionLoginToken=kSQLFdjG6DOVkHd1UMVeMXeFr9LtgDYwDLs0TBmQtlbhqlMEH5Era0OUzrQmKl63sa9ihCGq+wPVqIJSkssNa5SMceYjtuLGUnHwZG4OIM13Eti36NhR/+CWUsgJDwKbE0j9Sr7k+liH0DLzsPGCXLDwSUxTYy7xyxJxHYqT4Q/o3iEzuhT6dTuEZwlVSUZVRTrGzDnhh85b+8G0OY/CEoXcGLOpYk2l3d03d7ayvjfakcdeVqPHTqx5BRnxELfxafHSpDZOhMX8nvDNP3lKOZfMLkdvOGba+gEEhEX9Vcsf9i0u96hA6qIQIW7k1y1GHY15R/KlVWbUdjex7MR1DL0lQBnNacFVxZM8JLl48DNBbKILiOo3fZvqWF0cZasL0sOyIzW6pUkqLj9Urwk9dDJ5T5THtV8vBV7+bE/8EnyFd1tprDs55DxV1m4lulrjXxRC3PjewRAry9MYxzsOnA==; weixinCodeBack=061NnGGa176mQL01PXFa15coVN2NnGGm; ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; JSESSIONID=node01emog9cqh7nov1uvykp8wd0b8i1917.node0; misId=4548637876; com.sankuai.mcopilot.nocode.deploy1_strategy=; com.sankuai.recruitment.officialwebsite.mobile_strategy=; _lxsdk_s=19eaa7d7255-d1a-8de-f61%7C%7C62; logan_session_token=o73qay10byf2vq6qsh6m
+origin
+https://zhaopin.meituan.com
+priority
+u=1, i
+referer
+https://zhaopin.meituan.com/web/social?token=c6ab1e83799a47d8b74143c2e0713657&keyword=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+x-requested-with
+XMLHttpRequest
+
+{"page":{"pageNo":1,"pageSize":10},"jobShareType":"1","keywords":"产品经理","cityList":[],"department":[],"jfJgList":[],"jobType":[{"code":"3","subCode":[]}],"typeCode":[],"specialCode":[],"u_query_id":"ef8fc770cbe1667478d500e91b4d6240","r_query_id":"178097806014024631965"}
+
+详情2
+请求网址
+https://zhaopin.meituan.com/api/official/job/getJobDetail
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+strict-origin-when-cross-origin
+content-encoding
+gzip
+content-type
+application/json
+date
+Tue, 09 Jun 2026 04:08:14 GMT
+expires
+Thu, 01 Jan 1970 00:00:00 GMT
+m-traceid
+-1454071988818597598
+server
+openresty
+set-cookie
+ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 04:08:14 GMT; Max-Age=38880000
+set-cookie
+misId=4548637876; Path=/; Domain=.meituan.com; Expires=Thu, 02-Sep-2027 04:08:14 GMT; Max-Age=38880000
+vary
+Accept-Encoding
+:authority
+zhaopin.meituan.com
+:method
+POST
+:path
+/api/official/job/getJobDetail
+:scheme
+https
+accept
+application/json
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+46
+content-type
+application/json
+cookie
+com.sankuai.recruitment.official.website_strategy=; _lxsdk_cuid=19e496f5010c8-09a760777f6b35-26061151-240000-19e496f5011c8; _lx_utm=utm_source%3Dgoogle%26utm_medium%3Dorganic; weixinType=1; weixinCode=061NnGGa176mQL01PXFa15coVN2NnGGm; unionLoginType=weixin; unionLoginToken=kSQLFdjG6DOVkHd1UMVeMXeFr9LtgDYwDLs0TBmQtlbhqlMEH5Era0OUzrQmKl63sa9ihCGq+wPVqIJSkssNa5SMceYjtuLGUnHwZG4OIM13Eti36NhR/+CWUsgJDwKbE0j9Sr7k+liH0DLzsPGCXLDwSUxTYy7xyxJxHYqT4Q/o3iEzuhT6dTuEZwlVSUZVRTrGzDnhh85b+8G0OY/CEoXcGLOpYk2l3d03d7ayvjfakcdeVqPHTqx5BRnxELfxafHSpDZOhMX8nvDNP3lKOZfMLkdvOGba+gEEhEX9Vcsf9i0u96hA6qIQIW7k1y1GHY15R/KlVWbUdjex7MR1DL0lQBnNacFVxZM8JLl48DNBbKILiOo3fZvqWF0cZasL0sOyIzW6pUkqLj9Urwk9dDJ5T5THtV8vBV7+bE/8EnyFd1tprDs55DxV1m4lulrjXxRC3PjewRAry9MYxzsOnA==; weixinCodeBack=061NnGGa176mQL01PXFa15coVN2NnGGm; ssoUnionLoginToken=061NnGGa176mQL01PXFa15coVN2NnGGm; JSESSIONID=node01emog9cqh7nov1uvykp8wd0b8i1917.node0; misId=4548637876; com.sankuai.mcopilot.nocode.deploy1_strategy=; com.sankuai.recruitment.officialwebsite.mobile_strategy=; logan_session_token=nidpho7u68osct1lh9fk; _lxsdk_s=19eaa7d7255-d1a-8de-f61%7C%7C65
+origin
+https://zhaopin.meituan.com
+priority
+u=1, i
+referer
+https://zhaopin.meituan.com/web/position/detail?jobUnionId=4131315764&token=c6ab1e83799a47d8b74143c2e0713657&highlightType=social
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+x-requested-with
+XMLHttpRequest
+
+{"jobUnionId":"4131315764","jobShareType":"1"}

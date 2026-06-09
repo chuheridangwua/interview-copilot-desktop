@@ -1,0 +1,648 @@
+{
+  "company": "阿里国际",
+  "origin": "https://aidc-jobs.alibaba.com",
+  "pageUrl": "https://aidc-jobs.alibaba.com/off-campus/position-list?lang=zh&search=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86",
+  "searchKey": "产品经理",
+  "totalCount": 16,
+  "exportedCount": 16,
+  "fetchedAt": "2026-06-09T01:52:54.601Z",
+  "items": [
+    {
+      "trackId": "SSP1780969971970RDDXEGJfta2605",
+      "positionUrl": "/off-campus/position-detail?positionId=100000515013&track_id=SSP1780969971970RDDXEGJfta2605",
+      "bucket": "DEFAULT",
+      "id": 100000515013,
+      "name": "LAZADA-电商平台交易支付产品经理-杭州",
+      "status": null,
+      "level": "LAZADA-P32",
+      "categories": null,
+      "publishTime": 1778299196000,
+      "graduationTime": null,
+      "modifyTime": 1778299197000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "本科及以上学历，2年以上电商行业产品经理经验；\n熟悉东南亚各国的支付形态，有电商平台支付收银台产品经验优先；\n具备良好的数据分析能力，能够通过数据驱动产品决策；\n沟通协调能力强，具备团队合作精神及抗压能力；\n工作态度积极主动，具备创新意识优先。",
+      "description": "负责电商平台支付相关功能的设计与优化，包括交易及付款流程闭环并提升体验；\n需具备基础的支付产品能力，熟悉东南亚各国基本支付产品形态，并可以提出优化的产品策略；\n独立完成产品需求文档（PRD）撰写，并推动开发、测试及上线；\n与开发、运营等团队高效协作，确保产品按时落地并达成目标；\n分析用户行为及市场趋势，挖掘产品改进点，提出创新方案。",
+      "experience": {
+        "from": 2,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "LAZADA",
+      "project": null,
+      "positionType": null,
+      "code": "GP100000515013",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970OBkGWQhDgx7259",
+      "positionUrl": "/off-campus/position-detail?positionId=100022975017&track_id=SSP1780969971970OBkGWQhDgx7259",
+      "bucket": "DEFAULT",
+      "id": 100022975017,
+      "name": "阿里国际站-产品经理（CRM）-数字营销",
+      "status": null,
+      "level": "P7",
+      "categories": [
+        "产品类-平台型"
+      ],
+      "publishTime": 1779106750000,
+      "graduationTime": null,
+      "modifyTime": 1779106750000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "- 本科及以上学历；\n- 2年以上互联网产品经理工作经验，有CRM 或销售产品相关工作经验者优先。\n- 有产品线主导 / 项目 Owner 经历，有独立负责完整产品模块或产品线的成功案例；\n- 拥有出色的跨团队沟通与协作能力，能协同业务及研发等团队完成项目交付。",
+      "description": "从整体上主导CRM产品的AI化和销售动线设计，可以有效设计CRM围绕AI的整体框架推动相关能力构建。\n- 产品规划与设计：独立负责CRM AI创新领域整条产品线的规划与设计，主导产品从 0→1 创新突破及从1到N的持续迭代，输出清晰的产品路线图；\n- AI Agent产品落地：推动AI Agent能力在CRM场景中的应用落地，深入理解销售人员工作场景，设计能够切实优化销售工作方式的AI产品方案；\n- 主导跨部门项目推进，协调设计、研发、业务等多方资源，确保项目高质量按时交付；\n- 前瞻性洞察，持续关注行业前沿技术趋势，形成前瞻性观点并有效影响团队方向，将前沿技术能力转化为产品竞争力。",
+      "experience": {
+        "from": 2,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100022975017",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970HdspjPWxlx2881",
+      "positionUrl": "/off-campus/position-detail?positionId=100022915030&track_id=SSP1780969971970HdspjPWxlx2881",
+      "bucket": "DEFAULT",
+      "id": 100022915030,
+      "name": "阿里国际-高级产品经理（物流采购）-杭州",
+      "status": null,
+      "level": "P6",
+      "categories": [
+        "产品类-平台型"
+      ],
+      "publishTime": 1778749742000,
+      "graduationTime": null,
+      "modifyTime": 1778749742000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【职位要求】：\n1、本科及以上学历，物流管理、供应链管理或相关专业，有物流行业背景优先。\n2、2年以上产品经理经验，有相关于采购或供应链系统的产品经验。\n3、熟悉物流采购流程，对风控合规有深入理解和实践经验。\n4、具备出色的沟通和协调能力，能够与技术团队、业务部门和供应商有效合作。\n5、具有良好的数据分析能力，能够从数据中洞察业务需求，推动产品迭代和优化。\n",
+      "description": "【职位描述】：\n1、负责物流采购系统（SRM）的产品规划和设计，确保系统满足物流行业的采购流程需求。\n2、深入理解物流行业的采购流程，提出创新解决方案，优化采购效率和成本控制。\n3、具备敏锐的风控合规意识，确保产品设计符合相关法规和行业标准，降低业务风险。\n4、主导供应商管理模块的开发，设计高效、透明的供应商交互流程，提升供应链协作。\n5、负责供应商结算功能的优化，确保结算流程准确、及时，提高财务运营效率。\n、",
+      "experience": {
+        "from": 1,
+        "to": null
+      },
+      "degree": "master",
+      "department": "AE&天淘物流",
+      "project": null,
+      "positionType": null,
+      "code": "GP100022915030",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970QTrUGQhYhP5371",
+      "positionUrl": "/off-campus/position-detail?positionId=100013355003&track_id=SSP1780969971970QTrUGQhYhP5371",
+      "bucket": "DEFAULT",
+      "id": 100013355003,
+      "name": "阿里国际-风控产品经理-杭州",
+      "status": null,
+      "level": "P7",
+      "categories": [
+        "产品类-平台型"
+      ],
+      "publishTime": 1779156095000,
+      "graduationTime": null,
+      "modifyTime": 1779156096000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 产品经理能力：\n    a) 三年以上安全产品相关从业经验，熟悉安全产品的基本工作原理，清楚安全产品的相关能力要求，能够独立设计一款安全产品；\n    b) 有成熟平台产品的经验，有较好的产品架构能力，与完整的产品未来发展思路；\n    c) 具有一定的数据分析和数据决策能力，帮助产品体系在定位与业务理解上发挥作用；\n    d) 有较强的跨部门的能力与团队协调能力，优秀的突破困境与创变精神，AI sense或有AI使用经验优先。\n2. 熟悉安全业务，至少具备以下一项:\n    a)  反垃圾注册，盗号，撞库，新人券防控\n    b) 活动防控，拉新，渠道治理，套现\n    c) 商品合规，禁限售\n    d) 内容合规，盗图\n    e) 信息安全，应用安全，办公安全\n3. 产品运营，数据分析能力，有以下能力者优先:\n    a) 有安全产品相关研发经验，设计过面向大中型业务的安全防御、风控产品；\n    b) 熟悉日志、数据分析，能帮助业务一起分析恶意行为，提出自己的见解，转换成产品设计解决业务问题；\n    c) 了解安全运营的流程和心智，能够通过数据分析找到产品关键设计，提升安全运营的整体效率。",
+      "description": "1. 产品线能力建设：负责相关安全产品的规划，核心业务逻辑构建，用户运营流设计；对相关安全核心能力进行抽象和建设，构建具备行业领先水平的安全产品/解决方案。不限于以下产品线：\n    * 风险事件审核\n    * 账号安全\n    * 活动反作弊\n    * 渠道拉新反作弊\n    * 商品内容安全\n    * 金融风控及合规\n    * 物流&基础安全\n    * 业务合规\n2. 产品中台化建设：负责安全产品线的中台化设计，构建产品从认知、解决方案设计、接入、运营配置、效果监控、拦截挑战、事件反馈等一整套产品服务体系",
+      "experience": {
+        "from": 3,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100013355003",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970GXOZtWsptn7344",
+      "positionUrl": "/off-campus/position-detail?positionId=1083509&track_id=SSP1780969971970GXOZtWsptn7344",
+      "bucket": "DEFAULT",
+      "id": 1083509,
+      "name": "品牌业务发展中心-产品专家/高级产品经理-杭州",
+      "status": null,
+      "level": "P7",
+      "categories": [
+        "产品类-用户型"
+      ],
+      "publishTime": 1701871193000,
+      "graduationTime": null,
+      "modifyTime": 1732011396000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 大学本科及以上学历，5年以上产品设计经验，有会员及营销相关产品经验者优先；\n2. 具备复杂业务思考能力、架构能力，平台化产品体系的规划设计、推进落地能力；\n3. 具备敏锐的数据分析、洞察能力，善于沟通，乐观积极，思维活跃；\n4. 优秀的执行力，面对挑战，能快速决策分析，调动资源集中突破。",
+      "description": "1. 负责建设家装家居家电品牌及商家在淘宝平台的行业产品解决方案，对家居家装家电产业有深度理解，结合平台能力建设符合家居家装行业的导购及营销产品解决方案；\n2. 分析商家在平台经营情况及消费者购买体验，持续探索并创新解决方案，推动商家经营提效，提升消费者端体验及转化；\n3. 挖掘产品功能数据表现，结合行业趋势，合理优化调整产品策略，为产品迭代负责；\n4. 结合市场需求，沉淀家装家居家电产业化的运营手段，设计优化行业垂直场景消费者端购物体验；",
+      "experience": {
+        "from": 5,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP1083509",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970xDCKlcfWqE5220",
+      "positionUrl": "/off-campus/position-detail?positionId=1093401&track_id=SSP1780969971970xDCKlcfWqE5220",
+      "bucket": "DEFAULT",
+      "id": 1093401,
+      "name": "全球速卖通事业部(AliExpress)-交易&逆向产品经理-杭州",
+      "status": null,
+      "level": "P6",
+      "categories": [
+        "产品类-平台型"
+      ],
+      "publishTime": 1779334839000,
+      "graduationTime": null,
+      "modifyTime": 1779334839000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1.有交易、逆向、资金产品设计经验尤佳，有地址经验加分；\n2.有较强的商业敏感性和业务规划能力，具备良好的分析判断能力；出色的逻辑思考能力，分析和解决问题的能力； 思路开拓，且关注产品用户体验；\n3.清晰的语言和文字表达能力，以及相应的产品需求管理工具使用。出色的跨团队协调和工作经历，并有较多跨团队项目实施经验；\n4.英文听说读写流利",
+      "description": "1、速卖通平台交易&逆向业务流程相关产品设计，为交易履行中的各参与方体验负责；\n2、通过需求搜集、需求方案设计、项目资源管控，进行需求过程管理；\n3、在产品设计上支持业务发展，能够站在买家、卖家和交易各参与方的角度梳理完整的业务场景和需求，创新的设计适合不同国家业务特点、不同业务模式的产品；\n4、根据用研分析和数据分析，对于产品过程进行优化及改进。",
+      "experience": {
+        "from": 2,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP1093401",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970bHqhaMIpVF9202",
+      "positionUrl": "/off-campus/position-detail?positionId=100003715007&track_id=SSP1780969971970bHqhaMIpVF9202",
+      "bucket": "DEFAULT",
+      "id": 100003715007,
+      "name": "阿里国际站-交易&金融产品团队-AI交易产品经理",
+      "status": null,
+      "level": "P7",
+      "categories": [
+        "产品类-用户型"
+      ],
+      "publishTime": 1773304638000,
+      "graduationTime": null,
+      "modifyTime": 1773304641000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1、本科及以上学历，5年以上数据及AI产品独立负责经验，主导过AI产品的全流程设计与规模化运营落地。\n2、精通AI技术在跨境电商交易场景的应用，有跨境电商平台交易类AI产品经验优先；\n3、具备扎实的产品方法论，能够独立完成战略规划、复杂业务场景拆解、原型设计及PRD撰写，有跨区域、多角色协同的复杂交易产品设计经验。\n4、具有良好的数据分析能力，能够从数据中发现问题并提出解决方案。\n5、对市场敏感，具备创新思维，能持续推动产品的创新和升级，对跨境交易行业趋势和AI技术创新有强烈的探索欲与前瞻性。",
+      "description": "1、负责AI交易产品的规划与设计，推动AI技术在交易场景中的应用，提升交易效率和用户体验。\n2、与AI研发团队紧密合作，理解交易业务逻辑，构建智能化交易解决方案。\n3、分析市场趋势和用户需求，不断优化产品功能，确保产品的市场竞争力。\n4、协调跨部门资源，推动产品开发、上线及迭代，确保项目按时保质完成。\n5、跟踪产品上线后的数据表现，进行效果评估，为产品优化提供数据支持。",
+      "experience": {
+        "from": 3,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100003715007",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970DYaaanebLM9975",
+      "positionUrl": "/off-campus/position-detail?positionId=100021895007&track_id=SSP1780969971970DYaaanebLM9975",
+      "bucket": "DEFAULT",
+      "id": 100021895007,
+      "name": "阿里国际站-AI 产品经理 — Agentic Platform-Accio Work",
+      "status": null,
+      "level": "P6",
+      "categories": [
+        "产品类-用户型"
+      ],
+      "publishTime": 1775874565000,
+      "graduationTime": null,
+      "modifyTime": 1775874565000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1、硬核的实战动手能力 (Hands-on)：你是 AI 产品的重度玩家。必须熟练掌握各种 AI 原生编程辅助工具。如果你有过自己通过 AI 辅助编程上线过产品的经历，或者能独立利用 AI 工具解决复杂业务逻辑问题，我们将非常看重。\n2、极强的用户产品思维：具备敏锐的用户共情能力和商业直觉。能够从杂乱的用户反馈中提取系统性的机会，坚持“用户痛点驱动”而非“技术驱动”。\n3、多边形战士属性 (Polymath)：具备产品经理的业务敏感度、初级工程师的逻辑落地能力以及 Owner 的拼劲。不设边界，能解决产品落地过程中的任何障碍。\n4、Agentic 洞察力：对 AI Agent 的发展趋势有极强的好奇心和深刻见解。能够思考 AI 到底该如何从“对话”走向“行动”。\n5、卓越的沟通与韧性：具备优秀的跨职能协同能力。具备优秀的英语阅读及翻译能力者优先，以便参与国际化业务。\n6、Owner 精神：渴望在 AI 浪潮中构建真正有影响力的作品，能适应从 0 到 1 充满挑战的创业环境。\n\n为什么选择 Accio Work (Alibaba International)？\n站在 AI 变革的前线：你将直接参与构建通用的 Agentic Platform，定义未来人类与 AI 协同工作的新范式。\n大平台下的内部创业：享受阿里巴巴国际站的全球资源和算力支持，同时拥有初创团队的灵活性与极速迭代空间。\n与顶尖 AI Native 团队并肩：这里聚集了一群“AI First”的极客。我们日常就在用 Agent 协作，你将身处前沿的 AI 工作环境。\n高成长的职业路径：在 AI 这个确定、具想象力的赛道，获得“定义新品类”的职业背书。",
+      "description": "我们是 Accio Work，隶属于 阿里巴巴国际站 (Alibaba International)。我们正在打造一个 通用型 Agentic Platform，是一支能真正理解意图、操作工具、执行端到端复杂任务的 AI Agent 团队，致力于通过 AI 重新定义未来的生产力。\n\n在这里，产品经理的职责是发现真实的痛点，并用 AI 的手段去“消灭”它。\n\n你将负责：\n\n1、用户痛点挖掘与 PMF 探索\n一切从用户出发：深入研究不同行业及个人用户的实际工作流程，精准识别那些“低效、高门槛、让人痛苦”的真实环节，并定义 Agent 的核心价值主张；\n负责从需求调研到 PMF 验证的全过程，通过不断的实验和数据反馈，找到产品真正的爆发点。\n\n2、场景定义与用户价值交付\n寻找 AI Agent 能发挥威力的业务场景，定义 Agent 的核心行为模式，确保它能以极高的可靠性完成用户交付的任务；\n持续打磨用户体验，确保 Agent 的动作流程逻辑自洽，真正为用户创造价值。\n\n3、Hands-on 极速落地与原型构建\n动手能力是核心考量：你需要直接利用 AI 原生辅助开发工具进行功能原型（MVP）的搭建、测试与跑通；\n与算法和工程团队紧密配合，直接参与逻辑调优，将产品想法快速转化为可运行的产品能力，实现“Vibe Coding”式的极速迭代。\n\n4、行业化与场景化拓展\n探索产品在不同垂直领域的应用潜力（电商领域背景是巨大的加分项），推动平台能力在多样化场景下的高效落地。",
+      "experience": {
+        "from": 1,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100021895007",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970PyZKEcNeUc5253",
+      "positionUrl": "/off-campus/position-detail?positionId=100022935026&track_id=SSP1780969971970PyZKEcNeUc5253",
+      "bucket": "DEFAULT",
+      "id": 100022935026,
+      "name": "阿里国际站-资金业务发展&产品团队-AI资金&金融产品经理",
+      "status": null,
+      "level": "P7",
+      "categories": [
+        "产品类-平台型"
+      ],
+      "publishTime": 1779330193000,
+      "graduationTime": null,
+      "modifyTime": 1779330194000,
+      "workLocations": [
+        "深圳",
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1、本科及以上学历，5年以上AI产品独立负责经验，主导过Native AI产品的全流程设计与规模化运营落地。\n2、精通AI技术在电商、B端商家场景的应用，熟悉资金交易业务流程，有原生AI产品成功案例经验优先。\n3、具备扎实的产品方法论，能够独立完成战略规划、复杂业务场景拆解、原型设计及PRD撰写，有跨区域、多角色协同的复杂资金金融产品设计经验。\n4、具备数据分析能力，熟练使用数据分析工具，对数据敏感，能从数据中提炼关键信息。\n5、具备良好的市场洞察力和用户洞察能力，能够准确把握产品方向，对跨境电商行业趋势和AI技术创新有强烈的探索欲与前瞻性。",
+      "description": "1、负责AI资金产品的规划与设计，推动AI技术在资金&金融场景中的应用，提升服务效率和用户体验。\n2、与AI研发团队紧密合作，理解跨境电商和资金业务逻辑，构建智能资金金融解决方案。\n3、分析市场趋势和用户需求，不断优化产品功能，确保产品的市场竞争力。\n4、协调跨部门资源，推动产品开发、上线及迭代，确保项目按时保质完成。\n5、跟踪产品上线后的数据表现，进行效果评估，为产品优化提供数据支持。",
+      "experience": {
+        "from": 5,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100022935026",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970OjNtUIugJs9308",
+      "positionUrl": "/off-campus/position-detail?positionId=100022955035&track_id=SSP1780969971970OjNtUIugJs9308",
+      "bucket": "DEFAULT",
+      "id": 100022955035,
+      "name": "阿里国际-物流产品经理-杭州",
+      "status": null,
+      "level": "P5",
+      "categories": [
+        "综合类-物流"
+      ],
+      "publishTime": 1780465969000,
+      "graduationTime": null,
+      "modifyTime": 1780465970000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1、本科及以上学历，有3年以上跨境工作经验。\n2、良好的项目管理能力，能够有效推动项目进度，确保产品质量和交付时间。\n3、具备良好的沟通和协调能力，能够与各团队有效协作，解决跨部门问题。\n4、对跨境物流行业有深刻理解，关注行业动态，具备创新思维和敏锐的市场洞察力。\n5、积极乐观皮实。",
+      "description": "1、负责欧洲重点国家及欧潜国家的全链路产品规划与设计，掌握竞对信息，增加国家物流竞争力。\n2、提升物流全链路履约时效，通过各段握手咬合，解决卡点问题，输出设计方案。\n3、物流成本控制，在保障时效和体验的前提下，输出成本节降方案并落地。\n4、国家维度整体消费者体验提升，寻找机会点，分析及解决相应问题。\n5、根据业务需求，与各协同方沟通，协助推进横向项目落地。",
+      "experience": {
+        "from": 3,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "AE&天淘物流",
+      "project": null,
+      "positionType": null,
+      "code": "GP100022955035",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970NuaAZrNKLl5711",
+      "positionUrl": "/off-campus/position-detail?positionId=100022955021&track_id=SSP1780969971970NuaAZrNKLl5711",
+      "bucket": "DEFAULT",
+      "id": 100022955021,
+      "name": "全球速卖通事业部(AliExpress)-搜推机制产品经理-杭州",
+      "status": null,
+      "level": "P7",
+      "categories": [
+        "产品类-用户型"
+      ],
+      "publishTime": 1779087553000,
+      "graduationTime": null,
+      "modifyTime": 1779087553000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 本科及以上学历，5年以上互联网产品经验，有流量策略/搜推产品/电商产品/行业实操经验者优先。\n2、较强的逻辑思维能力、商业理解和数据分析能力，英语可做工作语言优先。\n3. 优秀的逻辑思维、数据分析和决策能力，能够基于数据进行产品优化和策略调整。\n4. 良好的商业理解能力，对行业趋势和技术发展保持敏感，能不断进行创新性的策略探索。",
+      "description": "1.负责AE搜推流量机制产品的迭代，包括分析用户搜索的使用场景，挖掘用户痛点与需求，升级迭代不同场景的策略。\n2. 分析搜索数据和趋势，识别关键业务指标，并制定分人群、场景、国家的精细化策略，全链路提升场域效率。\n3.结合国家下核心策略，负责搜索在行业垂直方向上的解决方案制定，通过搜索的机制、服务升级、供给成长等策略落地，实现业务价值和用户价值的共同增长。\n4. 与算法工程团队密切合作，推动搜索相关功能的开发和上线，提升搜推的体验和效率。",
+      "experience": {
+        "from": 5,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100022955021",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970qRppxzBiev4330",
+      "positionUrl": "/off-campus/position-detail?positionId=300024222&track_id=SSP1780969971970qRppxzBiev4330",
+      "bucket": "DEFAULT",
+      "id": 300024222,
+      "name": "全球速卖通事业部(AliExpress)-商品产品经理（天淘海外）-杭州",
+      "status": null,
+      "level": "P6",
+      "categories": [
+        "产品类-商业型"
+      ],
+      "publishTime": 1778049163000,
+      "graduationTime": null,
+      "modifyTime": 1778049163000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 3年以上工作经验，具备电商平台商品领域经验，具备AI应用经验的优先\n2. 数据意识强，能基于数据持续分析并总结优化策略和驱动产品改进\n3. 拿结果和协同能力强，与内外部团队有效沟通，推动跨团队协作和项目顺利实施\n4. 为人乐观皮实，能承受阶段性瓶颈带来的压力并持续向目标努力\n5. 英语好、有海外留学、海外公司工作经验者优先",
+      "description": "1. 负责天猫淘宝海外商品中心多语言素材处理能力建设，建立商品文本翻译、素材处理&美化的产品功能\n2. 能基于国家/行业竞对视角，跟踪分析当前商品质量，深入调研前台应用痛点，提供符合市场的产品能力\n3. 持续关注商品素材处理的badcase及前台应用效果，优化消费者体验，形成数据--应用--数据正循环\n4. 拥抱未来，探索AI在商品领域应用，将行业顶尖技术在实际业务中充分应用",
+      "experience": {
+        "from": 3,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP300024222",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970JBuzXMBJHh3593",
+      "positionUrl": "/off-campus/position-detail?positionId=100022915034&track_id=SSP1780969971970JBuzXMBJHh3593",
+      "bucket": "DEFAULT",
+      "id": 100022915034,
+      "name": "阿里国际站-AI产品经理/专家-杭州",
+      "status": null,
+      "level": "P6",
+      "categories": [
+        "产品类-用户型"
+      ],
+      "publishTime": 1779357427000,
+      "graduationTime": null,
+      "modifyTime": 1779357427000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1、3年以上电商相关产品经验；\n2、AI 产品的重度玩家，熟练掌握各种 AI 原生工具，有过自己通过 AI 辅助编程上线过产品的经历或者能独立利用 AI 工具解决复杂业务逻辑问题优先；\n3、对 AI Agent 的发展趋势有极强的好奇心和深刻见解，能够思考 AI 到底该如何从“对话”走向“行动”；\n4、具备良好的沟通协作能力，责任心强、主动学习能力强，有较强的抗压能力；\n5、能熟练使用英语进行日常交流，有留学或者国际化工作经验者优先，有海外知名电商平台或者SaaS平台工作经验者优先；",
+      "description": "1、负责面向亚太市场B类买家（包括电商平台商家、Dropshipping商家等）设计与建设AI Agent产品，负责对接各类B类采购平台、C类电商平台及社交媒体渠道，并围绕用户在选品、采购、铺货、经营等核心场景中的痛点，打造本地化/智能化的一站式多平台经营Agent解决方案；\n2、深度挖掘用户痛点设计具备自动化执行与智能决策能力的Agent工作流，负责从需求调研到 PMF 验证的全过程，通过不断的实验和数据反馈找到产品真正的爆发点；\n3、推动以数据为导向的商业决策和产品优化，挖掘商业机会、提升商业效率；\n4、联动运营与国家/区域前线等各相关部门，提供相关产品功能支持；",
+      "experience": {
+        "from": 3,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100022915034",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970EWFZZOgpuV2379",
+      "positionUrl": "/off-campus/position-detail?positionId=100021895010&track_id=SSP1780969971970EWFZZOgpuV2379",
+      "bucket": "DEFAULT",
+      "id": 100021895010,
+      "name": "阿里国际站-用户产品经理（AI+商详）-亚太市场-杭州",
+      "status": null,
+      "level": "P6",
+      "categories": [
+        "产品类-用户型"
+      ],
+      "publishTime": 1780481989000,
+      "graduationTime": null,
+      "modifyTime": 1780481989000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "1. 专业背景：本科及以上学历，2-4年互联网产品工作经验；具备B2B电商平台、跨境电商或国际化产品经验者优先。\n2. 业务能力：具备扎实的产品规划与落地能力，能够拆解高复杂度业务场景；拥有优秀的跨团队协作能力，能高效协同研发、运营及海外本地化团队。\n3. 国际化视野：具备敏锐的跨文化洞察力，有海外留学、工作或生活经历者优先。\n4. 数据与技术敏感度：具备扎实的数据分析能力，能通过数据驱动决策；对AI技术（LLM、多模态）在电商场景的应用有浓厚兴趣和实践经验者加分。",
+      "description": "1. 深耕亚洲国别化本地体验：聚焦亚洲核心市场，深入洞察买家采购偏好与文化习惯。协同支付、物流及行业团队，推动商详链路和交易链路的深度本地化改造，提升转化率。\n2. 建设多模态AI翻译能力：协同算法团队迭代定制化AI模型，重点突破商品文本、图片及视频的多模态翻译与语义理解能力，制定多语体验衡量标准，不断拉升小语种翻译体验。\n3. 数据驱动的产品漏斗转化优化：独立负责商详和多语的产品规划，建立以业务结果为核心的评估体系。通过A/B Test、漏斗分析及用户调研，验证产品价值并推动复杂项目从0到1落地，对最终业务增长结果负责。",
+      "experience": {
+        "from": 3,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100021895010",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970bNNSYruIXA5256",
+      "positionUrl": "/off-campus/position-detail?positionId=100018795002&track_id=SSP1780969971970bNNSYruIXA5256",
+      "bucket": "DEFAULT",
+      "id": 100018795002,
+      "name": "阿里国际-高级AI产品经理（业财）-杭州",
+      "status": null,
+      "level": "P6",
+      "categories": [
+        "产品类-平台型"
+      ],
+      "publishTime": 1778557138000,
+      "graduationTime": null,
+      "modifyTime": 1778557138000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "职位要求\n1）5年以上财务产品或商业分析产品经验，有零售、电商或快消行业背景，熟悉自营采购、库存周转、物流链路。\n2）具备扎实的财务知识（如成本会计、损益结构、预算管控）和数据思维，能独立设计指标体系与归因逻辑；理解机器学习基本原理及大模型（LLM）技术边界，能与算法团队高效对话。\n3）出色的跨团队协作与推动力，能与算法、工程、财务及业务方高效沟通，将复杂问题产品化。\n4）具备AI产品化落地经验者优先：有Prompt Engineering、RAG或Agent场景落地经验，能够评估AI技术在财务风控、智能对账等场景的可行性与ROI。\n5）英语沟通能力为加分项。",
+      "description": "团队介绍：\n供应链产技团队负责阿里海外零售供应链的建设和优化，业务覆盖全球，支持了千亿级别的零售行业、以及数以千万计的商品。我们利用世界领先的ERP系统和库存管理技术，帮助客户管理库存，提高配送效率，保障订单准时送达，提升广大消费者的购物和服务体验。我们还拥有先进的履约和供应链技术，帮助客户精细化管理每一个环节，从而助力商品能够实现全球畅销。在这里，你将和我们一起，采用领先的数字化及人工智能等技术持续解决商业活动中的现实问题，不断创造价值，为消费者带来更加美好的体验！\n职位描述\n1）负责设计并落地面向零售业务的智能财务产品体系，聚焦采购成本优化、库存损益预测与经营效益分析。\n2）深度协同供应链、商品运营与财务团队，将业务规则与财务逻辑转化为可自动执行的产品能力。\n3）推动财务数据资产化，打造实时、可解释、可行动的经营决策看板，支撑品类选品、定价及清仓策略。\n4）探索大模型在财务场景的应用，如自动生成采购风险评估报告、智能对账、异常成本归因等创新功能。",
+      "experience": {
+        "from": 5,
+        "to": null
+      },
+      "degree": "bachelor",
+      "department": "阿里集团",
+      "project": null,
+      "positionType": null,
+      "code": "GP100018795002",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    },
+    {
+      "trackId": "SSP1780969971970ZmWJUnGAGx5638",
+      "positionUrl": "/off-campus/position-detail?positionId=100022915003&track_id=SSP1780969971970ZmWJUnGAGx5638",
+      "bucket": "DEFAULT",
+      "id": 100022915003,
+      "name": "LAZADA-商家结算产品经理-杭州",
+      "status": null,
+      "level": "LAZADA-P32",
+      "categories": null,
+      "publishTime": 1777268666000,
+      "graduationTime": null,
+      "modifyTime": 1777268667000,
+      "workLocations": [
+        "杭州"
+      ],
+      "interviewLocations": null,
+      "regionEnNameMap": {},
+      "technologyNameIdMap": {},
+      "tags": null,
+      "requirement": "【任职要求】\n1、本科及以上学历，金融、会计、电子商务、计算机或相关专业优先；\n2、1年以上互联网产品经验，有电商、支付、财务结算或B端产品背景者优先；\n3、熟悉电商平台结算逻辑，了解对账、清分、结算（reconciliation, clearing & settlement）流程；\n4、具备较强的数据分析能力，熟练使用 SQL、Excel 或数据分析工具；\n5、优秀的沟通协调能力，能跨团队推动项目落地；\n6、英语读写流利，具备与国际团队协作的能力\n【Requirements】\n1、Bachelor’s degree or above in Finance, Accounting, E-commerce, Computer Science, or related fields;\n2、1+ years of experience in internet product management; prior experience in e-commerce, payments, financial settlements, or B2B products is preferred;\n3、Strong understanding of e-commerce settlement workflows, including reconciliation, clearing, and fund settlement;\n4、Proficient in data analysis with hands-on experience in SQL, Excel, or other analytical tools;\n5、Excellent communication and cross-functional collaboration skills;\n6、Fluent in English (reading and writing), with ability to work in a global team environment",
+      "description": "1、负责 Lazada 平台商家结算产品的规划与优化，涵盖结算周期、对账逻辑、资金结算流程等；\n2、深入理解跨境电商业务模式，设计清晰、高效、合规的结算规则与系统机制；\n3、与财务、技术、风控、运营及海外业务团队紧密协作，推动结算功能的落地与迭代；\n4、分析结算数据异常、延迟付款等问题，提出产品化解决方案，提升结算准确率与商家体验；\n5、制定结算相关的用户文档、规则说明及商家通知模板，确保信息透明可追溯；\n6、关注行业趋势与竞品动态，持续优化结算系统的自动化、智能化水平。\n\n【Job Responsibilities】\nLead the design and optimization of merchant settlement products on the Lazada platform, including settlement cycles, reconciliation logic, and fund disbursement processes;\nDeeply understand cross-border e-commerce business models and define clear, efficient, and compliant settlement rules and system mechanisms;\nCollaborate closely with finance, tech, risk control, operations, and overseas business teams to drive implementation and iteration of settlement features;\nAnalyze common issues such as settlement discrepancies or payment delays, and deliver product-driven solutions to improve accuracy and merchant satisfaction;\nDevelop user-facing documentation, policy guidelines, and notification templates related to settlements to ensure transparency and traceability;\nMonitor industry trends and competitor practices to continuously enhance automation and intelligence in the settlement system.",
+      "experience": {
+        "from": 1,
+        "to": null
+      },
+      "degree": "master",
+      "department": "LAZADA",
+      "project": null,
+      "positionType": null,
+      "code": "GP100022915003",
+      "categoryName": null,
+      "categoryType": null,
+      "batchName": null,
+      "batchId": null,
+      "batchWillingCount": null,
+      "channels": null,
+      "operations": []
+    }
+  ]
+}

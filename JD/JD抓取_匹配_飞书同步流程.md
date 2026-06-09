@@ -88,11 +88,15 @@
 - `JD内容`
 - `原始来源`
 
-### 2. Top10 人工筛选 CSV
+### 2. TopN 人工筛选 CSV
 
 保存路径建议：
 
 `JD/<公司名>/<company>_jobs_top10_人工筛选.csv`
+
+或当需要保留更长投递池时：
+
+`JD/<公司名>/<company>_jobs_top20_人工重排.csv`
 
 建议字段：
 
@@ -106,6 +110,21 @@
 - `Responsibility`
 - `ManualMatchReason`
 - `PotentialGap`
+
+兼容说明：
+
+- 旧流程 CSV 可以是 `Top10`，按腾讯/字节/Baidu 示例列名组织。
+- 新流程 CSV 也可以是 `Top20`，只要同时保留以下同步必需字段即可：
+  - `company`
+  - `RecruitPostName` 或 `title`
+  - `BusinessLine`
+  - `LocationName` 或 `location`
+  - `LastUpdateTime` 或 `publish_date`
+  - `PostURL` 或 `post_url`
+  - `Responsibility`
+  - `Requirement`
+  - `ManualMatchReason`
+  - `PotentialGap`
 
 ### 3. 过滤后岗位 CSV
 
@@ -285,7 +304,7 @@
 - 每个岗位都要写人工匹配原因
 - 最好同时写一条 `PotentialGap` / 注意点，说明短板或面试提醒
 
-### 步骤 6：生成 Top10 CSV
+### 步骤 6：生成 TopN CSV
 
 将人工筛选结果写入新的 CSV 文件，放回对应公司目录。
 
@@ -294,6 +313,7 @@
 - 这个 CSV 是后续同步飞书的直接输入
 - 不要只保留标题和链接
 - 必须保留完整 JD 内容和匹配原因
+- 如果保留的是 `Top20`，也要保证字段完整，不能只留人工排序说明
 
 ### 步骤 7：同步到飞书 `岗位列表`
 
@@ -307,19 +327,25 @@
 
 #### 当前字段映射
 
-Top10 CSV -> 飞书 `岗位列表`
+TopN CSV -> 飞书 `岗位列表`
 
 - `公司` <- 固定写公司名，例如 `腾讯`
+  - 如果 CSV 自带 `company` 列，优先使用行内公司名
 - `地点` <- `LocationName`
 - `状态` <- 默认写 `未投递`
 - `岗位名称` <- `RecruitPostName`
+  - 新流程兼容 `title`
 - `事业部名称` <- 建议拼成 `BGName / ProductName`
   - 如果没有 `ProductName`，只写 `BGName`
+- 也兼容直接使用 `BusinessLine`
 - `JD内容` <- `Responsibility`
+- 如果同步 CSV 已经直接提供 `JD内容`，优先使用现成字段
 - `匹配原因` <- `ManualMatchReason`
   - 如果有 `PotentialGap`，拼到同一字段中
 - `发布日期` <- `LastUpdateTime`
+- 新流程兼容 `publish_date`
 - `链接` <- `PostURL`
+- 新流程兼容 `post_url`
 
 #### 当前字段内容格式
 
@@ -461,6 +487,12 @@ Top10 CSV -> 飞书 `岗位列表`
 
 - `JD/腾讯/tencent_jobs_产品经理_top10_人工筛选.csv`
 
+### 阿里系人工重排序与飞书同步示例
+
+- 人工重排脚本：`JD/阿里系/build_alibaba_ai_pm_manual_top20.py`
+- 人工重排 CSV：`JD/阿里系/本科可投_产品经理/alibaba_family_jobs_产品经理_top20_人工重排.csv`
+- 飞书同步脚本默认已接入：`JD/sync_top_jobs_to_feishu.ps1`
+
 ### 旧流程脚本
 
 以下脚本是本次过程中留下的参考产物，但后续是否直接复用，要以任务实际情况为准：
@@ -472,3 +504,12 @@ Top10 CSV -> 飞书 `岗位列表`
 
 - 这些脚本不应被当成永久真理。
 - 后续新公司优先遵循本 SOP，而不是照搬旧脚本里的字段假设和表结构假设。
+
+
+ARK_API_KEY可以使用46fdf9af-cc79-418a-8639-ae3716226663
+
+注意直接挨个评分就行了，不用担心模型成本
+
+要求研究生或者硕士什么的学历的，直接排除，我是本科生
+
+一定要参考我的简历E:\CLX\project\interview-copilot-desktop\resources\jianli.md，我求职的是AI产品经理，而不是算法开发什么的

@@ -1,0 +1,86 @@
+请求网址
+https://aidc-jobs.alibaba.com/position/search?_csrf=46758a1d-9031-4465-939a-736612e11309
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:12:25 GMT
+eagleeye-traceid
+0bf8c01517809675454875466e0aea
+expires
+0
+pragma
+no-cache
+s-brt
+310
+s-rt
+314
+server
+Tengine
+strict-transport-security
+max-age=0
+ups-target-key
+online-test-aidc-jobs.alibaba.com.vipserver
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-protocol
+HTTP/2.0
+x-xss-protection
+1; mode=block
+:authority
+aidc-jobs.alibaba.com
+:method
+POST
+:path
+/position/search?_csrf=46758a1d-9031-4465-939a-736612e11309
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+174
+content-type
+application/json
+cookie
+cbc=T2gAhO6OxvWPLVHucVd2BUTwY-pBCkRFlmJoY_Fmv3IDBa8B7NACyOlYcVmT1qtCAKY=; t=51c3d42f4581b2d317e9218fff8f8a85; xlly_s=1; SSO_LANG_V2=zh-CN; prefered-lang=zh; XSRF-TOKEN=46758a1d-9031-4465-939a-736612e11309; SESSION=QjJBQkI1MTM1RDA5NTZGOThCOTU5MDFCMjE0RDQ0MDA=; global-recruit-careers_USER_COOKIE_V3=ST180.vif0eM8IS7j-X7jsDCPfu5dYyj0N5m9qpQwoP0Fd8J17QvuysTMzQPO0guYjEOmabVOzu5M_NJpIj1jQ3Y4PD-RG3KQM9NeemJ5l_AlpnbbV6gOQhvL8c78mgHXefBsozP3iD0EdfvyxI-0OtP1j1mBtFobCf4TfsJzMeDHfivT4_DqVEwGwxlpVToTjlNkbAv_x7pO3VKt-xsdm15SLxKtVxc31AYZt5rW6D8cmUdhTBYeGkLsKH5TmiORKrmtmjv4D_4Pid5QdXXzSjzidbLyLkTM1w0KzHMnN8dFc4cWVuPZF2EnN-oxumD-hX_PVl3R6T3AeuZzjRPG_S8p1xiZMSS-u45uxSaog90Zma7B5seSWCqenGxO-_5M00CaBwKQs_YA_G4RPcLfYhxPiYwzecFczlKwb9OZBfexgUWa3RfE64FoBlNsRgeOGr_sgFtTotWxd3F2tgweBN8wm1w4HNwbe0D8xNx2prM3ry5f5OB-M_cNBqbfgzqglpdDb.kTP-ReQ9qKeM4wdU28MvMP4mUR9o84xW63iQK6awhPOoSyQbJYBBuBQow9qQs28qcn5YFsEO-HpIeiAtoqjZTfr9wdmnoWeq1wDwtIPUCpp_vZIeRQULrTP1BOUYv9AigJEV2iXFSX1RPP2lV5y2X0RDuTJeW8swynwWNuv2SpGb7jiFJjJe1FDR5KLPXFeUUcJwhXLeIp833poKIGcWU5aasyebDzC25zBFYexgE7q8CSVreQ29FhX2ZmYG7SV7FC8SR7aR-yBaJsbxTY62wxpIyoAQnG2RWf-IVzWT3ZGN0vRdNDIh3oRpqPhfcrjB_c2Q0kJinU7sdO33hQ4YmA; global-recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3NTE4ODkwLCJ0b2tlbiI6ImEzYWNiZGEzODhjMTQ1MjliMDkyMjkyMjE4ZWIzYjUzNDIwNmRjMDEifQ.ZgM7-d80quy0JJm9e9qbwkG4xb9A2O69UfX1TuNevau3R4iEDBxTsJEhH3GgkCSq635ok0o26HnIwJZoszztKpce08M22aBD1-0FfpRfw16MXOs5tLWuuH_MbR4AyrjCYZARivc8IHxTyKLrFLH8vBwcqj6AfnWCj85y1GQlqafPucOROPNhEunArKRuNn7IBSSn_jddngTBGGTUJjiWCI0cpsi2po8HixG-4LL6fjTAnONeTmrJCghYhEThxZ8FH0GkapqNyd-RW1GP_27TSCOTwPnu9otO8uI2Rtz0d_j-wrK3_h62neZgssr4OVFzO1X0C_B6N8O-xzr-veW3HQ; JSESSIONID=63197CBA60E7FDE7054E4D177C9D1B31; tfstk=gKzSWWOQGLv7Wa5RpL521oF7PQgC_s7Z9BGLsWLy943-RwwgK0FEzMDLcJyYa6jlx2Zbp-mre45HArwLd0kEaYyb9-F3aerrzkabn8Ty8yNHRXFLK_DFZiPuZ20dQOkC77VoGbUjOyiJHqhgMHh-2iuAn0tR9O7N77I-Z2PAQkzJO9hE92h-eDpAGXhZw2L-wsMxOfxpeJ3dGsGI_UhJJDLxDfGZJveKJsNxnXgKwJ3dGSHm9vDvlXIS6713FNWB-iazwxTpJzQnqATmnjc4lbiSB00JJfzjN0MTNPvNNgGYuriZ0BSik5q4ejg1u33TGke_XJjwm4NL2JmbEtxj3oUu9vnW9FPb17Etky5psmwxOc3KcBLLG4DQdz3OWKG0D7rLr8OBJb4z7DMic6LnYqUZXleWt1VxyXenjyWMrYFLsPqZ5Z--WSZLCksycFk6HotBGcYIGA5fGHx3DKoOHSeunrm-ib6NGs9kx0hmGA5fGHxn2jc7_s1XEHf..; isg=BDw8Sa2Oeuh6sk6daIFOC4PUDdruNeBfJgjdqRa8fycX4d1rPEMC7dEfxQmZrhi3
+origin
+https://aidc-jobs.alibaba.com
+priority
+u=1, i
+referer
+https://aidc-jobs.alibaba.com/off-campus/position-list
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36

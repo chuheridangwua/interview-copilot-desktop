@@ -1,0 +1,36 @@
+{
+  "company": "阿里系",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_产品经理_all.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-09",
+  "cutoff_date": "2026-03-09",
+  "source_total": 194,
+  "eligible_total": 166,
+  "scored_total": 166,
+  "top_n": 20,
+  "concurrency": 5,
+  "distribution": {
+    "count": 166,
+    "min": 25,
+    "max": 87,
+    "mean": 54.3,
+    "stddev": 16.32,
+    "p10": 32.0,
+    "p50": 52.0,
+    "p90": 75.5,
+    "buckets": {
+      "0_59": 100,
+      "60_69": 25,
+      "70_79": 35,
+      "80_89": 6,
+      "90_100": 0
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_产品经理_all_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_产品经理_all_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_产品经理_all_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_产品经理_all_top20_模型初筛.csv"
+  }
+}

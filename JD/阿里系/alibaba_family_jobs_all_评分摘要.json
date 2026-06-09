@@ -1,0 +1,36 @@
+{
+  "company": "阿里系",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_all.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-09",
+  "cutoff_date": "2026-03-09",
+  "source_total": 156,
+  "eligible_total": 51,
+  "scored_total": 51,
+  "top_n": 20,
+  "concurrency": 5,
+  "distribution": {
+    "count": 51,
+    "min": 20,
+    "max": 84,
+    "mean": 39.98,
+    "stddev": 14.15,
+    "p10": 25.0,
+    "p50": 35.0,
+    "p90": 62.0,
+    "buckets": {
+      "0_59": 45,
+      "60_69": 3,
+      "70_79": 2,
+      "80_89": 1,
+      "90_100": 0
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_all_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_all_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_all_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_all_top20_模型初筛.csv"
+  }
+}

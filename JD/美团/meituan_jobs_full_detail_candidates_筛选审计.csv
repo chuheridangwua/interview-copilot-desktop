@@ -1,0 +1,32 @@
+﻿company,source_row_index,title,location,publish_date,post_url,business_line,filter_keep,filter_reasons,source_schema
+美团,1,LongCat - 大模型数据运营,北京市、成都市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3285026405&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,2,LongCat - Codesign AI 架构师,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4254863736&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,3,LongCat - Pretrain Infra AI 工程师,北京市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=1466951634&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,4,LongCat - 异构算力 AI 工程师,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4285596871&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,5,LongCat - 大模型数据策略运营,北京市、上海市、成都市,2026-06-01,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4476108218&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,6,LongCat - 高性能算子 AI 工程师,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=2978735823&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,7,LongCat - Agentic RL AI 工程师,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=2431837310&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,8,LongCat - 后训练算法研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4487581555&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,9,LongCat - 通用 agent 算法研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4302139093&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,10,LongCat - Search Agent 算法研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3750031159&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,11,LongCat - 预训练算法研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4518447096&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,12,LongCat - 多模态算法研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4518445342&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,13,LongCat - 语音大模型算法研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3771069370&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,14,LongCat大模型 - 基座 Agent 评测分析研究员,北京市、上海市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3604450999&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,15,LongCat - 大模型推理 AI 工程师（多方向）,北京市、上海市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4479586282&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,16,LongCat - 具身智能算法研究员,北京市、上海市、深圳市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4041386111&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,17,LongCat - 具身图形算法工程师,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4151489050&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,18,LongCat - Agentic Coding算法研究员,北京市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4517801293&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,19,LongCat大模型 - Agent 评测产品经理（欢迎算法/工程转型）,北京市、上海市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4301295312&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,20,LongCat - 数据策略与数据科学算法研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4517224406&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,21,LongCat大模型 - 基座agent评测分析研究员（生产力方向）,北京市、上海市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4381199673&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,22,LongCat大模型 - 多模及具身基座大模型评测研究员,北京市、上海市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3848257556&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,23,LongCat大模型 - 大模型评测平台产品经理,北京市、上海市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3506281745&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,24,LongCat - 多模态交互算法研究员,北京市、上海市、深圳市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3139280187&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,25,LongCat大模型 - 基座大模型评测分析研究员,上海市、北京市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3057805095&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,26,LongCat - 大模型训练 AI 工程师（多方向）,北京市、上海市,2026-05-29,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4480704667&highlightType=social,核心本地商业-基础研发平台,False,要求硕士或研究生及以上学历,meituan_detail_20260609
+美团,27,LongCat - 大模型自进化与自动化研究智能体研究员,北京市、上海市,2026-05-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4491091941&highlightType=social,核心本地商业-基础研发平台,True,,meituan_detail_20260609
+美团,28,产品经理,北京市,2026-04-28,https://zhaopin.meituan.com/web/position/detail?jobUnionId=4131315764&highlightType=social,核心本地商业-美团平台,True,,meituan_detail_20260609
+美团,29,AI应用产品经理（B端）,北京市,2026-05-19,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3343483756&highlightType=social,核心本地商业-美团平台,True,,meituan_detail_20260609
+美团,30,AI产品经理,北京市、上海市,2025-05-02,https://zhaopin.meituan.com/web/position/detail?jobUnionId=3183476736&highlightType=social,大众点评,False,发布日期早于2026-03-09,meituan_detail_20260609
+美团,31,Agent评测产品经理,北京市、上海市,2025-07-01,https://zhaopin.meituan.com/web/position/detail?jobUnionId=2891688499&highlightType=social,核心本地商业-基础研发平台,False,发布日期早于2026-03-09,meituan_detail_20260609

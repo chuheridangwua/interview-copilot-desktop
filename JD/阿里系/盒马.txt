@@ -1,0 +1,86 @@
+请求网址
+https://hire.freshippo.com/position/search?_csrf=0675a23d-e835-4857-bd9c-669fb82e6daf
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:16:12 GMT
+eagleeye-traceid
+2167786d17809677722978357e0bae
+expires
+0
+pragma
+no-cache
+s-brt
+183
+s-rt
+187
+server
+Tengine
+strict-transport-security
+max-age=0
+ups-target-key
+talent.freshippo.com.vipserver
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-protocol
+HTTP/2.0
+x-xss-protection
+1; mode=block
+:authority
+hire.freshippo.com
+:method
+POST
+:path
+/position/search?_csrf=0675a23d-e835-4857-bd9c-669fb82e6daf
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+227
+content-type
+application/json
+cookie
+xlly_s=1; SSO_LANG_V2=zh-CN; prefered-lang=zh; recruit-careers_USER_COOKIE_V3=ST180.pPbR11jUSMOZCkuL0nrR4axTVD73vtn4hbd04ETOajh-jHm-4c26LjGOg0RlTqZJbkCHMc6Wy1mtWGeQqI-ETLWTCbQsXKwEBuyhLm0TvyO1GM_bw1Wkrg-RYEofIm_ObVDyxncD3Zzg631uN9x4XbaScvyip-nUHGLKqOvY8RkQ4-0B2rQc-VbvQwKqIPXTM32KwbGOtSqNmwOCmH1oz2QmUTN4SIygWGlvBJ_Eg6NAPeA6hoo7MxUfQDGVEhA3sBxOM6scE6sUnYS_KhioqJRtSRF3aUWpM-kIAJwFx8_W3XZ6-7vbOJO0VmmNewRu7dDI2fZUiyS7TAevhRtqjN5Xp9dvDlAClLFtyLdY6SdS_t3F5LCkoGkZrja4Iep41fqaBXZ4RsnEN1bo9h70VZxDF7lZND6949VFyt-5Km7OCHTzlzuEMJt1FWVofx2fJ0Bt8H-gcy9FL8bJw-fkbYrVD5S7BlbirYm-DlopAMyL_6XhUv94zkwgKxy0L0Gl.qyqzffiG1U4ZmSnQJfdEvazKXF9WS8oaxSCjFZdFLAPGH0dWiAx4Oday4d1LxO6MRCp-k36SG-Z8WQc4glW6mHswKetjQYkwmIBeKQqclNXmTpJ78OCQCcPJCKEzHEL10rG_t8UhTqt6lq3mErPtTebrOJrRL68vaMNK3Tvz-6y6qdztqtsrzpfK6dXgTvxuyUJ8xBHKIn8_KFihuhF6CPINdOPygArI-wnC03xM8V7n3rnHj5646wVgyfK3r2Kuzb4aaywbYVEQpRGgH9zIy1jbLfC2QlQ2QepNmgd5fsjrM89zYmF5Ax-lhgthtc_u4hst45MvfQlTHSrkHVpjWA; recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3NzY3MDMwLCJ0b2tlbiI6IjllMTA4NDExYzcxYjQ5YWQ4MGQ4ZDkxNTUwZGY0MDUzNDIwNmRjMDEifQ.VWMLvJhBCeUED8J2D92LkJWMFlXQvJqXiKjGxxn6web2e5v-7N_vhbSmhe6mQcCTAx5mzIsQ6oKbMwZIkm5RPPcZTAc8h1WaDMwNUqaaf5NVB-IFzNyZ2D2Iz-kWCbJwqLDDs_A2N6BSHdCB4tduxSy6oT1WS63hn1O9ACPd-iAmPTDVn_eG5P1Q58e0YLAgeFDoshoc7o2Rg7dZZKEzw9Psr8CJPllS_CozPW0_VBA1gqavBhXADdX-lj84HGVn4vs8sWyfUTYkbPHjzM-LsCBw0FoyzZIHVR3pKh86j-jM-K-2B767SvioToBOOG1JIOhS-VuraYeNNqh6IGvgig; SESSION=NjNENzJFMDJEQzY4QUM0NUMzMzQxMDhBNTlBNjJBODY=; XSRF-TOKEN=0675a23d-e835-4857-bd9c-669fb82e6daf; tfstk=gaaq2WmVuZQqYC63TW0NY7DS4ygxkVWBoPMss5ViGxD05oiM7YyI1oMb5NPg68nglqNbURyUdm4fDSNMS5D-CxMbcfbaE8im5oMjsIUzLFTfHiFM7VgGd9_CRShjWVXB1j9AQKhxidb6mcVokfiVoOnORSFvZIJGOubCbLybVjDgImDoEfDoiIx0ILAoefhMnfYca7D-EjxMocxkZjG9oA2iS_Poef0iiRmca7D-sVDip4UguUkqmstwVl7kUxoqKSDy87UxifKYgY8MSzrj0vYIUFYgzjVt5m-H8GM3vxiI48bWuVPo_-M7KwYrrDrL1fyVuE0bquUxlz6e9myZUD4S4avrazPQxbFPY_Pz7xo3o0R6lq0qsRma298IgqZrYrrA6LV0dxrnk5OFh7oU4DhoqC-mlkNQWD4cupHSvfyjFJbHz4mG4KJtZ8jLWoJMbmc-av1PaMHs_65YYY0JXhnlwbkCT6-9Xmc-av1PahKtq8hrd65F.; isg=BOjoT74NFqy3OzopM_DMmdoiudb6EUwbaqQJFaIZH2NW_YlnTCJkqOY78ZUNSgTz
+origin
+https://hire.freshippo.com
+priority
+u=1, i
+referer
+https://hire.freshippo.com/off-campus/position-list?lang=zh&search=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36

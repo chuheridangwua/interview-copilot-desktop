@@ -1,0 +1,100 @@
+{
+  "fetchedAt": "2026-06-09T01:46:55.568Z",
+  "pageSize": 100,
+  "captureDir": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系",
+  "outputDir": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系",
+  "combinedCount": 156,
+  "combinedCsvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\alibaba_family_jobs_all.csv",
+  "sites": [
+    {
+      "company": "阿里巴巴",
+      "origin": "https://talent-holding.alibaba.com",
+      "totalCount": 20,
+      "exportedCount": 20,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\阿里巴巴_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\阿里巴巴_jobs.raw.json"
+    },
+    {
+      "company": "阿里国际",
+      "origin": "https://aidc-jobs.alibaba.com",
+      "totalCount": 0,
+      "exportedCount": 0,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\阿里国际_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\阿里国际_jobs.raw.json"
+    },
+    {
+      "company": "阿里云",
+      "origin": "https://careers.aliyun.com",
+      "totalCount": 0,
+      "exportedCount": 0,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\阿里云_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\阿里云_jobs.raw.json"
+    },
+    {
+      "company": "钉钉",
+      "origin": "https://talent.dingtalk.com",
+      "totalCount": 44,
+      "exportedCount": 44,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\钉钉_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\钉钉_jobs.raw.json"
+    },
+    {
+      "company": "高德",
+      "origin": "https://talent.amap.com",
+      "totalCount": 0,
+      "exportedCount": 0,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\高德_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\高德_jobs.raw.json"
+    },
+    {
+      "company": "盒马",
+      "origin": "https://hire.freshippo.com",
+      "totalCount": 0,
+      "exportedCount": 0,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\盒马_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\盒马_jobs.raw.json"
+    },
+    {
+      "company": "千问",
+      "origin": "https://talent.quark.cn",
+      "totalCount": 31,
+      "exportedCount": 31,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\千问_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\千问_jobs.raw.json"
+    },
+    {
+      "company": "淘宝闪购",
+      "origin": "https://talent.ele.me",
+      "totalCount": 0,
+      "exportedCount": 0,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\淘宝闪购_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\淘宝闪购_jobs.raw.json"
+    },
+    {
+      "company": "淘天",
+      "origin": "https://talent.taotian.com",
+      "totalCount": 34,
+      "exportedCount": 34,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\淘天_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\淘天_jobs.raw.json"
+    },
+    {
+      "company": "通义",
+      "origin": "https://careers-tongyi.alibaba.com",
+      "totalCount": 27,
+      "exportedCount": 27,
+      "totalPages": 1,
+      "csvPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\通义_jobs.csv",
+      "rawJsonPath": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\阿里系\\通义_jobs.raw.json"
+    }
+  ]
+}

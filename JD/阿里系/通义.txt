@@ -1,0 +1,80 @@
+请求网址
+https://careers-tongyi.alibaba.com/position/search?_csrf=378919f8-b85c-4b4b-b8cf-bd8ca97d930d
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+no-referrer-when-downgrade
+cache-control
+no-cache, no-store, max-age=0, must-revalidate
+content-encoding
+gzip
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 01:15:11 GMT
+eagleeye-traceid
+215041cf17809677116017682e1713
+expires
+0
+pragma
+no-cache
+server
+Tengine/Aserver
+strict-transport-security
+max-age=0
+timing-allow-origin
+*
+vary
+Accept-Encoding
+x-content-type-options
+nosniff
+x-frame-options
+SAMEORIGIN
+x-xss-protection
+1; mode=block
+:authority
+careers-tongyi.alibaba.com
+:method
+POST
+:path
+/position/search?_csrf=378919f8-b85c-4b4b-b8cf-bd8ca97d930d
+:scheme
+https
+accept
+application/json, text/plain, */*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+bx-v
+2.5.11
+content-length
+227
+content-type
+application/json
+cookie
+cbc=T2gAhO6OxvWPLVHucVd2BUTwY-pBCkRFlmJoY_Fmv3IDBa8B7NACyOlYcVmT1qtCAKY=; t=51c3d42f4581b2d317e9218fff8f8a85; xlly_s=1; SSO_LANG_V2=zh-CN; prefered-lang=zh; recruit-careers_USER_COOKIE_V3=ST180.6YuKRiGrk31IVYCIoriSMhAdnU83NW0N6LppLQZGxqF-jHm-4c26LjGOg0RlTqZJbkCHMc6Wy1mtWGeQqI-ETLWTCbQsXKwEBuyhLm0TvyO1GM_bw1Wkrg-RYEofIm_ObVDyxncD3Zzg631uN9x4XbaScvyip-nUHGLKqOvY8RkQ4-0B2rQc-VbvQwKqIPXTM32KwbGOtSqNmwOCmH1oz2QmUTN4SIygWGlvBJ_Eg6NAPeA6hoo7MxUfQDGVEhA3sBxOM6scE6sUnYS_KhioqJRtSRF3aUWpM-kIAJwFx8_W3XZ6-7vbOJO0VmmNewRu7dDI2fZUiyS7TAevhRtqjN5Xp9dvDlAClLFtyLdY6SdS_t3F5LCkoGkZrja4Iep41fqaBXZ4RsnEN1bo9h70VZxDF7lZND6949VFyt-5Km7OCHTzlzuEMJt1FWVofx2fJ0Bt8H-gcy9FL8bJw-fkbYrVD5S7BlbirYm-DlopAMyL_6XhUv94zkwgKxy0L0Gl.gHfg2MlNKqRBxK7K9JyIH45y-E0nwcFH96mxgRUW49hGDkjHpNOTqDO1lMiJG0R7A4qeXru3cy7WxgvEKEE6f2Niv7-MJ8Gnb2caKn3j0HCcvX5LWYzTZ2rly_AQfjRndZdqlyJ_nEr3rE8ewd6olpICmA9CBPLxnJWF38HDGhy0_0OVvuAHdEs6V2VJxM6Aj9UqAtEgDMJXDzVpK2f7WfvPHhUX-eN9HhFmf4S0s8d2409wFUo4PpqYHt89PtDJ_YpkAcT270VqvKO7hIPd34b8obUUNBCc2RHDJNLeMwJQsTNbuV9HRnQ-u8U3t6Esz6DpkLcRny5fNtvQPhjOKw; recruit-careers_SSO_TOKEN_V3=ST180.eyJ0aW1lIjoxNzgwOTY3NzA2NDIzLCJ0b2tlbiI6ImYyNzlhZTc2NGZmMjQ3MmQ5ZmQ5YzQwNDA2MzdiNzUzNDIwNmRjMDEifQ.Kat00JfFltSrhwS6Z_YDMN4f42j2d-VB8i0jTvG-U5I02tXBM-FUOKh1aUF1wQcKQ8hpJ-GPUmYVZJsju6mzPMCxFFJ_lu2KmNm653xA0Siv7PnRTtP7AJ-HbDaSWhOZURfNzs19h8Mkin5P8y6gf1JeOt5PYh0IJ4fAeFBzXkA5C0F8bD0ix0FZ7nLvwZZMiYpyVJXs8LSe1KvJcBKfqYcmvXm8zFFMv9HjymWilvunrYPsDzbOjzdEK2t4U4vq9HhXFySr-SsMEcEmeLBhsveGkZR2afDd3axmnrjwsKOgC2buDC9ilrgXZF8S3ZB7t2JA0iBOFAnUDrzxHka4CA; SESSION=RUEzMEU4MzMwOEVDQjc3RDgxRTMyNzYwRTFEQ0I4QzY=; XSRF-TOKEN=378919f8-b85c-4b4b-b8cf-bd8ca97d930d; tfstk=gTZIRI97CBAC1H6dwBWwhPhKl1o7NOS29LM8n8KeeDnKN0w7GykrTJH8N5NDLJyR-Ts7N76lK8C3NuGTszzzp6m7V82XYXnrYbI7nWGEzJFPVbemv44EaXlSV8VfQsSV0J2nqqCVgi52vs3mmQdpvQStBYmSpkfMa4wnq0CwQ3QVcJVIiJWS20BsXYHkv03KphBshxmJv4KpWChie0nJv4etBvkBvYn8wRBsEfh-22F-XOMo6bn-2vE9fYQIHJ6uOwAGk_M8pftJ2kIoSjgHz3t7fvgQmJh_QRrsd2GjzDbymkFaekrnSsOxqRzbNzFluFmQeynK3JjBfmeL7uMa4T8S9Wq_Bl363no7JWa-oPsDo23SOPEK5LK8I0atkzNCOecL85gmBVp5mAPq6JqL5TATpSlIvA3NDtwtyPrnok59AmU0LDz8ZZ8iA8UKfg-W0jOT5U9so3MsgO66rU49_qCO9Gb5V2HidsW1CBYoJADsgO66rU0KIvwVCOOHr; isg=BBUVSIPX03NqVPemqUb3oHKbJBHPEskk1xeE8pe6tAzb7jTgWWG094-ovPLYaeHc
+origin
+https://careers-tongyi.alibaba.com
+priority
+u=1, i
+referer
+https://careers-tongyi.alibaba.com/off-campus/position-list?lang=zh&search=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
