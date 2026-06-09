@@ -1,0 +1,36 @@
+{
+  "company": "京东",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-09",
+  "cutoff_date": "2026-03-09",
+  "source_total": 80,
+  "eligible_total": 36,
+  "scored_total": 36,
+  "top_n": 36,
+  "concurrency": 5,
+  "distribution": {
+    "count": 36,
+    "min": 20,
+    "max": 76,
+    "mean": 47.22,
+    "stddev": 14.43,
+    "p10": 32.0,
+    "p50": 47.0,
+    "p90": 70.5,
+    "buckets": {
+      "0_59": 29,
+      "60_69": 2,
+      "70_79": 5,
+      "80_89": 0,
+      "90_100": 0
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top36_模型初筛.csv"
+  }
+}

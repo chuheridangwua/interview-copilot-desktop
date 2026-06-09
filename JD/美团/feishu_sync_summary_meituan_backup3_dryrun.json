@@ -1,0 +1,73 @@
+﻿{
+    "generated_at":  "2026-06-09 15:54:31",
+    "dry_run":  true,
+    "base_token":  "IF3UbUejZaSTDTsE5IkckdPFn4c",
+    "table_id":  "tblVEj5n5JATZhY0",
+    "existing_count":  71,
+    "desired_count":  3,
+    "action_count":  3,
+    "update_count":  0,
+    "create_count":  3,
+    "actions":  [
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "SaaS-餐饮门店系统产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4257328451\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_backup3.csv",
+                        "source_row":  "",
+                        "rank":  "1"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "中台产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/social?token=c6ab1e83799a47d8b74143c2e0713657\u0026keyword=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_backup3.csv",
+                        "source_row":  "",
+                        "rank":  "2"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "交易履约产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4061597370\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_backup3.csv",
+                        "source_row":  "",
+                        "rank":  "3"
+                    }
+                ],
+    "results":  [
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "SaaS-餐饮门店系统产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  ""
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "中台产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  ""
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "交易履约产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  ""
+                    }
+                ],
+    "result_count":  3
+}

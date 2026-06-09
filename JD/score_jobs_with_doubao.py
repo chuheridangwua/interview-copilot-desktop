@@ -27,10 +27,15 @@ DATE_PATTERNS = [
     re.compile(r"(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})"),
     re.compile(r"(?P<y>\d{4})年(?P<m>\d{1,2})月(?P<d>\d{1,2})日"),
 ]
-FIVE_PLUS_RE = re.compile(r"(?:^|[^0-9])(?:5年(?:及以上|以上)|五年(?:及以上|以上)|至少5年|5\+\s*年)")
 MASTER_PLUS_RE = re.compile(
     r"(?:硕士(?:研究生)?(?:及以上|以上)?学历|研究生(?:及以上|以上)?学历|硕士及以上|研究生及以上|仅限硕士|必须硕士|硕博(?:及以上)?|硕士研究生)"
 )
+YEAR_RANGE_RE = re.compile(r"(?P<start>\d{1,2})\s*[-~～至到]\s*(?P<end>\d{1,2})\s*年")
+YEAR_PLUS_RE = re.compile(r"(?P<years>\d{1,2})\s*(?:年(?:及以上|以上)|\+\s*年)")
+AT_LEAST_YEAR_RE = re.compile(r"(?:至少|不少于|不低于)\s*(?P<years>\d{1,2})\s*年")
+CHINESE_YEAR_RANGE_RE = re.compile(r"(?P<start>[一二三四五六七八九十两]{1,3})\s*[-~～至到]\s*(?P<end>[一二三四五六七八九十两]{1,3})\s*年")
+CHINESE_YEAR_PLUS_RE = re.compile(r"(?P<years>[一二三四五六七八九十两]{1,3})\s*年(?:及以上|以上)")
+CHINESE_AT_LEAST_YEAR_RE = re.compile(r"(?:至少|不少于|不低于)\s*(?P<years>[一二三四五六七八九十两]{1,3})\s*年")
 
 SYSTEM_PROMPT = """你是一个严谨的中文岗位匹配评分员。
 
@@ -282,7 +287,54 @@ def normalize_row(path: Path, company: str, row_index: int, row: dict[str, str])
 
 def requires_five_plus(text: str) -> bool:
     normalized = re.sub(r"\s+", "", str(text or ""))
-    return bool(FIVE_PLUS_RE.search(normalized))
+    for match in YEAR_RANGE_RE.finditer(normalized):
+        if int(match["start"]) >= 5:
+            return True
+    for match in YEAR_PLUS_RE.finditer(normalized):
+        if int(match["years"]) >= 5:
+            return True
+    for match in AT_LEAST_YEAR_RE.finditer(normalized):
+        if int(match["years"]) >= 5:
+            return True
+    for match in CHINESE_YEAR_RANGE_RE.finditer(normalized):
+        if chinese_number_to_int(match["start"]) >= 5:
+            return True
+    for match in CHINESE_YEAR_PLUS_RE.finditer(normalized):
+        if chinese_number_to_int(match["years"]) >= 5:
+            return True
+    for match in CHINESE_AT_LEAST_YEAR_RE.finditer(normalized):
+        if chinese_number_to_int(match["years"]) >= 5:
+            return True
+    return False
+
+
+def chinese_number_to_int(text: str) -> int:
+    value = str(text or "").strip()
+    if not value:
+        return 0
+    direct = {
+        "零": 0,
+        "一": 1,
+        "二": 2,
+        "两": 2,
+        "三": 3,
+        "四": 4,
+        "五": 5,
+        "六": 6,
+        "七": 7,
+        "八": 8,
+        "九": 9,
+        "十": 10,
+    }
+    if value in direct:
+        return direct[value]
+    if value.endswith("十") and len(value) == 2 and value[0] in direct:
+        return direct[value[0]] * 10
+    if value.startswith("十") and len(value) == 2 and value[1] in direct:
+        return 10 + direct[value[1]]
+    if "十" in value and len(value) == 3 and value[0] in direct and value[2] in direct:
+        return direct[value[0]] * 10 + direct[value[2]]
+    return 0
 
 
 def requires_master_plus(text: str) -> bool:

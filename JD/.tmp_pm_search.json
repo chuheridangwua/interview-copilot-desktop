@@ -1,0 +1,9 @@
+﻿Invoke-RestMethod : The underlying connection was closed: An unexpected error occurred on a send.
+At line:24 char:11
++   $resp = Invoke-RestMethod -Uri 'https://zhaopin.meituan.com/api/off ...
++           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-RestMethod], WebExc 
+   eption
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand
+ 
+

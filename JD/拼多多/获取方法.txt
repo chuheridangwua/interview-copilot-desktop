@@ -1,0 +1,178 @@
+列表
+
+请求网址
+https://careers.pddglobalhr.com/api/recruit/position/list
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+strict-origin-when-cross-origin
+access-control-allow-credentials
+true
+access-control-allow-headers
+Origin, X-Requested-With, Content-Type, X_Requested_With, Accept, X-HTTP-Method-Override, Cookie, AccessToken, PASSID, VerifyAuthToken, ddjb-gray-id, Anti-Content, Access-Token, User-Type, client-type, jinbaouser, ddjbpassid, wid, env, Etag, ddjbveg, x-cos-meta-object-set-callback, orgType, p-appname, host-id, app-name, ddjbloginscene, warehouse-group-id, ddjb-app-sign, ddjb-sign, rctk, rctk-sign, x-xsec-sign, x-pdd-open-test, X-PDD-Pati
+access-control-allow-methods
+POST, GET, OPTIONS, DELETE, PUT, HEAD
+access-control-allow-origin
+https://careers.pddglobalhr.com
+access-control-expose-headers
+*
+access-control-max-age
+5
+cip
+60.208.81.222
+content-encoding
+gzip
+content-security-policy
+default-src 'self' *.yangkeduo.com *.pinduoduo.com *.pinduoduo.net *.pddglobalhr.net *.pddpic.com *.pddugc.com 'unsafe-inline' data: blob:;script-src 'self' *.yangkeduo.com *.pinduoduo.com *.pinduoduo.net *.pddglobalhr.net *.pddpic.com *.pddugc.com blob: 'unsafe-eval' 'unsafe-inline';report-uri /api/sec-csp/27/report
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 07:47:43 GMT
+server
+nginx
+vary
+Accept-Encoding
+vary
+Origin
+x-frame-options
+SAMEORIGIN
+x-yak-request-id
+1780991263036-029a8591070856289c21ffa1321e5fb0
+yak-timeinfo
+1780991263036|26
+:authority
+careers.pddglobalhr.com
+:method
+POST
+:path
+/api/recruit/position/list
+:scheme
+https
+accept
+*/*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+823
+content-type
+application/json
+cookie
+_nano_fp=XpmJX0UbXpPxn5dJXo_d0p1iyouHH1Tviw0rnnnY
+origin
+https://careers.pddglobalhr.com
+priority
+u=1, i
+referer
+https://careers.pddglobalhr.com/jobs
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+
+{"job":"","page":1,"pageSize":10,"name":"产品经理","workLocationList":[],"anti_content":"0aqAfoyY0iSg8gd2L4rRRvl87pwT_oMlt_CixAbcxDzSkzCPzytHnsAg9afrK1mhuqhAUFnJK_j0cKCwBy5Okk4CKT1GTCvViPlTZlS3_kJe26mB1m16wKWEcdnMRirhGmNw2PguW8EGFy2RNNKSOkyrM1G3UNSJSuI4p79QuuGy9phYvvd-1APt5jQxc96ACJOCOLKwjCs89m8o97-Xk101NomkS0Ip9dyowIE95Nq0y6btdvNeA3ZaErpk97NaG_S079GIPXWoTkJodxV7R9kXJnkJ0fEWUEwsW9sl9jcCILKBDTfrOt8YWcsOhWwvHueity52WYNmtI3qyMou0OHT-ZRLMGab2h1qobePLuj_lyuUL_u_AuxuhENqxW551JrzmrzOf_fg8gqr72fMlshJg_zlfzbmtZhu6prmt0GPoctjlQq_If7F0x_u9JkoAN7QEI6Ix5VdKi3rwd-JUz5l6BUCgQJF-Bkmvr-2nEikFCkq-WeJTCI4KqTxNf9U7IeCZfyHLjjDA15A-GTxQBxOJWqt1arX29f0eyFpznmexLKx76mqT3U6eqwAv6xmdtrjf6Jznoa0UbtDO7l2s7V_UtyoovGySP15--4GwKsQ2UPZfBDwFboGXct8-FhRUaD5eI49sEMPOZXa4DFxyEotKK0vNW4cuVohaUlRdEAMQ5LSMoRq3dopKF3bqnGy2Ke7EJ3arAfhYUMq7T02-HgL"}
+
+
+详情
+
+请求网址
+https://careers.pddglobalhr.com/api/recruit/position/detail
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+127.0.0.1:7892
+引荐来源网址政策
+strict-origin-when-cross-origin
+access-control-allow-credentials
+true
+access-control-allow-headers
+Origin, X-Requested-With, Content-Type, X_Requested_With, Accept, X-HTTP-Method-Override, Cookie, AccessToken, PASSID, VerifyAuthToken, ddjb-gray-id, Anti-Content, Access-Token, User-Type, client-type, jinbaouser, ddjbpassid, wid, env, Etag, ddjbveg, x-cos-meta-object-set-callback, orgType, p-appname, host-id, app-name, ddjbloginscene, warehouse-group-id, ddjb-app-sign, ddjb-sign, rctk, rctk-sign, x-xsec-sign, x-pdd-open-test, X-PDD-Pati
+access-control-allow-methods
+POST, GET, OPTIONS, DELETE, PUT, HEAD
+access-control-allow-origin
+https://careers.pddglobalhr.com
+access-control-expose-headers
+*
+access-control-max-age
+5
+cip
+60.208.81.222
+content-encoding
+gzip
+content-security-policy
+default-src 'self' *.yangkeduo.com *.pinduoduo.com *.pinduoduo.net *.pddglobalhr.net *.pddpic.com *.pddugc.com 'unsafe-inline' data: blob:;script-src 'self' *.yangkeduo.com *.pinduoduo.com *.pinduoduo.net *.pddglobalhr.net *.pddpic.com *.pddugc.com blob: 'unsafe-eval' 'unsafe-inline';report-uri /api/sec-csp/27/report
+content-type
+application/json;charset=UTF-8
+date
+Tue, 09 Jun 2026 07:48:27 GMT
+server
+nginx
+vary
+Accept-Encoding
+vary
+Origin
+x-frame-options
+SAMEORIGIN
+x-yak-request-id
+1780991307719-3a18c6de3063e95ada2ba210581f8335
+yak-timeinfo
+1780991307719|21
+:authority
+careers.pddglobalhr.com
+:method
+POST
+:path
+/api/recruit/position/detail
+:scheme
+https
+accept
+*/*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+493
+content-type
+application/json
+cookie
+_nano_fp=XpmJX0UbXpPxn5dJXo_d0p1iyouHH1Tviw0rnnnY
+origin
+https://careers.pddglobalhr.com
+priority
+u=1, i
+referer
+https://careers.pddglobalhr.com/jobs/detail?code=PR023686
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+
+{"code":"PR023686","anti_content":"0aqWfac5YcQa-99ZzOayA6npEn6pGpiCmW5gufVaqOnzB-ApgOouh78crwsaPSwx2ZJ2SujuE2aNpWbg6RwgXykdHLdrRwkZM6ArqErF6onXyo8NDRWu-i3wUWB7wDSxYYCixtgF1pGVR4DvnNUabdHy34_KErt2qUYX0SHya4A7MyKpIIhXooZqEk3OmoDXTigdwezqd2vzkPvdApl2g86Z5sPu98LcpVrZRli68Rl3RlcB7JplyqPxqOu2PvhUVPLdv6G2VGFe9MO2jvhVkFIsyg-UVSIPHRlXjLwng3pTDsh8OJBPp2bZX93LKiKgzp64TywGNVL2Yu267_VfCU_O5VbuzZYbPEoxneOvKtDTJO2U9vN1xQdslxmQPzfsgEh_umvpWqb2sD1Xre1OEOd1wJzEPgyGVA7jMcz5nEvlq_Of_oNAoERO7fR9DGfmwg02MOg_"}

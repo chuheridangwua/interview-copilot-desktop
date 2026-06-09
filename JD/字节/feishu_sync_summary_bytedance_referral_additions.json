@@ -1,0 +1,111 @@
+﻿{
+    "generated_at":  "2026-06-09 14:51:38",
+    "dry_run":  false,
+    "base_token":  "IF3UbUejZaSTDTsE5IkckdPFn4c",
+    "table_id":  "tblVEj5n5JATZhY0",
+    "existing_count":  55,
+    "desired_count":  5,
+    "action_count":  5,
+    "update_count":  0,
+    "create_count":  5,
+    "actions":  [
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "字节跳动",
+                        "role_name":  "高级AI产品经理-飞书多维表格",
+                        "link":  "https://jobs.bytedance.com/referral/pc/position/7555486407952795911/detail?token=MjsxNzgwOTg2MTQ4MTM2OzY5NDExODI2MzM4MDQwMzk3MTA7NzY0OTI2OTcwMDc0MDMwMzE1Nzsx",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_内推补充_人工筛选.csv",
+                        "source_row":  "7555486407952795911",
+                        "rank":  "1"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "字节跳动",
+                        "role_name":  "AI产品经理-飞书多维表格",
+                        "link":  "https://jobs.bytedance.com/referral/pc/position/7446633165428574482/detail?token=MjsxNzgwOTg2MTQ4MTM2OzY5NDExODI2MzM4MDQwMzk3MTA7NzY0OTI2OTcwMDc0MDMwMzE1Nzsx",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_内推补充_人工筛选.csv",
+                        "source_row":  "7446633165428574482",
+                        "rank":  "2"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "字节跳动",
+                        "role_name":  "资深AI产品经理-飞书多维表格",
+                        "link":  "https://jobs.bytedance.com/referral/pc/position/7424441750486272283/detail?token=MjsxNzgwOTg2MTQ4MTM2OzY5NDExODI2MzM4MDQwMzk3MTA7NzY0OTI2OTcwMDc0MDMwMzE1Nzsx",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_内推补充_人工筛选.csv",
+                        "source_row":  "7424441750486272283",
+                        "rank":  "3"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "字节跳动",
+                        "role_name":  "高级AI产品经理-飞书多维表格",
+                        "link":  "https://jobs.bytedance.com/referral/pc/position/7571096273624631557/detail?token=MjsxNzgwOTg2MTQ4MTM2OzY5NDExODI2MzM4MDQwMzk3MTA7NzY0OTI2OTcwMDc0MDMwMzE1Nzsx",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_内推补充_人工筛选.csv",
+                        "source_row":  "7571096273624631557",
+                        "rank":  "4"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "字节跳动",
+                        "role_name":  "AI产品经理-飞书多维表格（深圳/北京）",
+                        "link":  "https://jobs.bytedance.com/referral/pc/position/7446633165428574482/detail?token=MjsxNzgwOTg2MTQ4MTM2OzY5NDExODI2MzM4MDQwMzk3MTA7NzY0OTI2OTcwMDc0MDMwMzE1Nzsx",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\字节\\bytedance_jobs_AI产品经理_内推补充_人工筛选.csv",
+                        "source_row":  "7446633165428574482",
+                        "rank":  "5"
+                    }
+                ],
+    "results":  [
+                    {
+                        "action":  "create",
+                        "company":  "字节跳动",
+                        "role_name":  "高级AI产品经理-飞书多维表格",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "字节跳动",
+                        "role_name":  "AI产品经理-飞书多维表格",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "字节跳动",
+                        "role_name":  "资深AI产品经理-飞书多维表格",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "字节跳动",
+                        "role_name":  "高级AI产品经理-飞书多维表格",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "字节跳动",
+                        "role_name":  "AI产品经理-飞书多维表格（深圳/北京）",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    }
+                ],
+    "result_count":  5
+}

@@ -1,0 +1,149 @@
+﻿{
+    "generated_at":  "2026-06-09 15:36:39",
+    "dry_run":  false,
+    "base_token":  "IF3UbUejZaSTDTsE5IkckdPFn4c",
+    "table_id":  "tblVEj5n5JATZhY0",
+    "existing_count":  64,
+    "desired_count":  7,
+    "action_count":  7,
+    "update_count":  0,
+    "create_count":  7,
+    "actions":  [
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理",
+                        "link":  "https://zhaopin.jd.com/web/job-info-detail?requementId=217421",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top7_人工筛选.csv",
+                        "source_row":  "30",
+                        "rank":  "1"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理岗",
+                        "link":  "https://zhaopin.jd.com/web/job-info-detail?requementId=217583",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top7_人工筛选.csv",
+                        "source_row":  "26",
+                        "rank":  "2"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理岗",
+                        "link":  "https://zhaopin.jd.com/web/job-info-detail?requementId=218427",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top7_人工筛选.csv",
+                        "source_row":  "12",
+                        "rank":  "3"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "京东",
+                        "role_name":  "AI 产品经理-财务方向",
+                        "link":  "https://zhaopin.jd.com/web/job-info-detail?requementId=215353",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top7_人工筛选.csv",
+                        "source_row":  "53",
+                        "rank":  "4"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理岗",
+                        "link":  "https://zhaopin.jd.com/web/job-info-detail?requementId=218428",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top7_人工筛选.csv",
+                        "source_row":  "13",
+                        "rank":  "5"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理",
+                        "link":  "https://zhaopin.jd.com/web/job-info-detail?requementId=217808",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top7_人工筛选.csv",
+                        "source_row":  "20",
+                        "rank":  "6"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "京东",
+                        "role_name":  "应用产品经理",
+                        "link":  "https://zhaopin.jd.com/web/job-info-detail?requementId=215621",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\京东\\jd_jobs_产品经理_top7_人工筛选.csv",
+                        "source_row":  "55",
+                        "rank":  "7"
+                    }
+                ],
+    "results":  [
+                    {
+                        "action":  "create",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理岗",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理岗",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "京东",
+                        "role_name":  "AI 产品经理-财务方向",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理岗",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "京东",
+                        "role_name":  "AI产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "京东",
+                        "role_name":  "应用产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    }
+                ],
+    "result_count":  7
+}

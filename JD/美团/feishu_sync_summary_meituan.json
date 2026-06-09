@@ -1,0 +1,206 @@
+﻿{
+    "generated_at":  "2026-06-09 13:47:02",
+    "dry_run":  false,
+    "base_token":  "IF3UbUejZaSTDTsE5IkckdPFn4c",
+    "table_id":  "tblVEj5n5JATZhY0",
+    "existing_count":  49,
+    "desired_count":  10,
+    "action_count":  10,
+    "update_count":  0,
+    "create_count":  10,
+    "actions":  [
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "AI应用产品经理（B端）",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3343483756\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "1"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "LongCat大模型 - Agent 评测产品经理（欢迎算法/工程转型）",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4301295312\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "2"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "小团Agent AI Builder",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3777123757\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "3"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "LongCat大模型 - 大模型评测平台产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3506281745\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "4"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "闪购-商家端产品经理（经营工具方向）",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3839496996\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "5"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "SaaS-餐饮门店系统产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4257328451\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "6"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "履约服务及安全治理产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4058240729\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "7"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "交易履约产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4061597370\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "8"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4131315764\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "9"
+                    },
+                    {
+                        "action":  "create",
+                        "record_id":  "",
+                        "company":  "美团",
+                        "role_name":  "无人车业务部-营销产品经理",
+                        "link":  "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4260189790\u0026highlightType=social",
+                        "existing_status":  "",
+                        "source_file":  "E:\\CLX\\project\\interview-copilot-desktop\\JD\\美团\\meituan_jobs_ai_pm_top10_人工筛选_全详情_简历对齐.csv",
+                        "source_row":  "",
+                        "rank":  "10"
+                    }
+                ],
+    "results":  [
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "AI应用产品经理（B端）",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "LongCat大模型 - Agent 评测产品经理（欢迎算法/工程转型）",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "小团Agent AI Builder",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "LongCat大模型 - 大模型评测平台产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "闪购-商家端产品经理（经营工具方向）",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "SaaS-餐饮门店系统产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "履约服务及安全治理产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "交易履约产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    },
+                    {
+                        "action":  "create",
+                        "company":  "美团",
+                        "role_name":  "无人车业务部-营销产品经理",
+                        "record_id":  "",
+                        "ok":  true,
+                        "identity":  "user"
+                    }
+                ],
+    "result_count":  10
+}

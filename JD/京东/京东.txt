@@ -1,0 +1,83 @@
+请求网址
+https://zhaopin.jd.com/web/job/job_list
+请求方法
+POST
+状态代码
+200 OK
+远程地址
+111.13.28.103:443
+引荐来源网址政策
+strict-origin-when-cross-origin
+access-control-allow-credentials
+true
+access-control-allow-headers
+token,Origin, X-Requested-With, Content-Type, Accept,mid,X-Token,sec-ch-ua,sec-ch-ua-mobile,sec-ch-ua-platform,Upgrade-Insecure-Requests
+access-control-allow-methods
+POST, GET, PUT, OPTIONS, DELETE, PATCH
+access-control-allow-origin
+https://zhaopin.jd.com
+access-control-max-age
+3600
+cache-control
+max-age=0
+content-encoding
+gzip
+content-type
+text/plain;charset=UTF-8
+date
+Tue, 09 Jun 2026 07:18:19 GMT
+expires
+Tue, 09 Jun 2026 07:18:19 GMT
+server
+jfe
+set-cookie
+JSESSIONID=EE992DE9CFBEA2653B51E451FE728B60.s1; Path=/; HttpOnly
+strict-transport-security
+max-age=7776000
+vary
+Accept-Encoding
+:authority
+zhaopin.jd.com
+:method
+POST
+:path
+/web/job/job_list
+:scheme
+https
+accept
+*/*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+128
+content-type
+application/x-www-form-urlencoded; charset=UTF-8
+cookie
+light_key=AASBKE7rOxgWQziEhC_QY6yaQtLs7Cem4deqeUwVIx9e9NMefr-6kJhv97rK5ejDYwTOHcs1; __jdu=1768302784829802633257; shshshfpa=d82c0cad-384c-cb04-8391-fae437af3d5a-1768302786; shshshfpx=d82c0cad-384c-cb04-8391-fae437af3d5a-1768302786; mba_muid=1768302784829802633257; joyya=1769150854.1769150867.20.1uncfx5; shshshfpb=BApXWgR65QfhA2qK9ygslsDFYk5OMaYyABipxIKlp9xJ1Fpl-K8P3wF_K2m7fZcNRUvB5l-SihocXBq086rh7485ZNk2QqLEeHr2xRFUZQR3itKZuD5miGu267lNPnuI; __jdv=176729966|www.google.com|-|referral|-|1780988321272; 3AB9D23F7A4B3CSS=jdd03TCEBOBA2GWXQ5D7IM3TTNVBTJZMH7V2UKQDGPCGYREX4WDVHKU2EV4FCLODLSLFMC3GLOMPLVTWXHARMMPLBBWEX2IAAAAM6VMWXBAYAAAAADZ22MYNKAMGTNUX; wlfstk_smdl=plbxncr774qmwpx016q9fgsdypbah0n6; 3AB9D23F7A4B3C9B=TCEBOBA2GWXQ5D7IM3TTNVBTJZMH7V2UKQDGPCGYREX4WDVHKU2EV4FCLODLSLFMC3GLOMPLVTWXHARMMPLBBWEX2I; _pst=jd_RkfCBdXtZWPz; logintype=wx; logining=1; npin=jd_RkfCBdXtZWPz; thor=7F2FFF070B1A4AC9C3A9C75AEB05F5552A53BEEF78FA77839A2CEFCFF9F75B6915B600C921FEDC5E789544AB457B456F5859FB5FA0C98FF2F6F6D21A39D44E1CBDD548335661EF7CF5330212912EB0368E020432CC63E7CDC328750B7A184462C5BA7CB6DC81C2757A404BDB017A805641E9E05AA54234B308CB58517971BA58056906E4D847652D0A2C5C81D9845A24734F73451F0424BBAF16F7BBB170C744; _tp=VQ3P%2FQV3wAmgvwSU%2BKUOFg%3D%3D; pinId=im58H4-EoZmL2NQ3hju6VA; flash=3_GrqG5w19x7YzHviJ2gOHD1dEWGMF1E0kOpYEeECC9XJfm6Km7u6TErCQY2-Bvvc2O3iAOncryi-HEQWU1g6-NCbwllYjMsfKFQQ-zAtkeBp7gxJPWtEwpJsBT8k8G1eaeBlM3sAR-IHNoY7kA184zXbH__iDxD5sDsQ80kncfk**; __jda=176729966.1768302784829802633257.1768302784.1778729477.1780988321.8; __jdb=176729966.27.1768302784829802633257|8.1780988321; __jdc=176729966; JSESSIONID=762FEB95DC6021169ABEA0F26CE55D05.s1
+origin
+https://zhaopin.jd.com
+priority
+u=1, i
+referer
+https://zhaopin.jd.com/web/job_info_list/3?isHunterFlag=false
+sec-ch-ua
+"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+x-requested-with
+XMLHttpRequest
+
+
+pageIndex=1&pageSize=10&workCityJson=%5B%5D&jobTypeJson=%5B%5D&jobSearch=%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86&depTypeJson=%5B%5D

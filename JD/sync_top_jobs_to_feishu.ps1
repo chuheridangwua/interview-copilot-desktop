@@ -6,6 +6,8 @@ param(
     [string]$ByteDanceCsv = "E:\CLX\project\interview-copilot-desktop\JD\字节\bytedance_jobs_AI产品经理_top10_人工筛选.csv",
     [string]$BaiduCsv = "",
     [string]$AlibabaCsv = "E:\CLX\project\interview-copilot-desktop\JD\阿里系\本科可投_产品经理\alibaba_family_jobs_产品经理_top20_人工重排.csv",
+    [string]$MeituanCsv = "",
+    [string]$JdCsv = "",
     [string]$TempDir = ".\JD\.tmp_feishu_sync",
     [string]$SummaryPath = "E:\CLX\project\interview-copilot-desktop\JD\feishu_sync_summary.json",
     [string]$DefaultStatus = "未投递",
@@ -247,6 +249,10 @@ function Import-TopJobsCsv {
         $potentialGap = Get-FirstColumnValue -Row $row -Names @("PotentialGap", "main_gap")
         $sourceRow = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("SourceRowIndex", "source_row_index", "来源序号"))
         $rank = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("Rank", "manual_rank", "排名"))
+        $status = Normalize-Text (Get-FirstColumnValue -Row $row -Names @("Status", "status", "状态"))
+        if (-not $status) {
+            $status = $DefaultStatus
+        }
 
         if (-not $company) {
             throw "CSV row missing company: $Path / 岗位=$jobName"
@@ -264,7 +270,7 @@ function Import-TopJobsCsv {
             发布日期 = Convert-DateText (Get-FirstColumnValue -Row $row -Names @("LastUpdateTime", "publish_date", "发布日期"))
             JD内容   = $jdContent
             匹配原因 = Build-MatchReason -ManualMatchReason $manualMatchReason -PotentialGap $potentialGap
-            状态     = $DefaultStatus
+            状态     = $status
             来源文件 = $Path
             来源序号 = $sourceRow
             排名     = $rank
@@ -412,6 +418,8 @@ Add-DesiredJobs -Target $desired -Path $TencentCsv -CompanyName "腾讯"
 Add-DesiredJobs -Target $desired -Path $ByteDanceCsv -CompanyName "字节跳动"
 Add-DesiredJobs -Target $desired -Path $BaiduCsv -CompanyName "百度"
 Add-DesiredJobs -Target $desired -Path $AlibabaCsv -CompanyName ""
+Add-DesiredJobs -Target $desired -Path $MeituanCsv -CompanyName "美团"
+Add-DesiredJobs -Target $desired -Path $JdCsv -CompanyName "京东"
 
 $existing = Get-CurrentRecords -BaseTokenValue $BaseToken -TableIdValue $TableId
 $existingMap = @{}
