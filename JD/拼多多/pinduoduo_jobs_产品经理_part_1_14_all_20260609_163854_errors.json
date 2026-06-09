@@ -1,0 +1,26 @@
+[
+  {
+    "code": "PR023849",
+    "title": "商家入驻产品经理",
+    "error": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"O4DCyDR_ojKak-WtSxxJzA4b4b11b09fcfbe7c0\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}",
+    "errorCode": "54001",
+    "retryable": true,
+    "raw": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"O4DCyDR_ojKak-WtSxxJzA4b4b11b09fcfbe7c0\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}"
+  },
+  {
+    "code": "PR023850",
+    "title": "商品内容产品经理",
+    "error": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"4ab3XYiMHLS9sm8lnsyc1A9860801430ba95ccf\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}",
+    "errorCode": "54001",
+    "retryable": true,
+    "raw": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"4ab3XYiMHLS9sm8lnsyc1A9860801430ba95ccf\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}"
+  },
+  {
+    "code": "PR022054",
+    "title": "B端物流产品经理",
+    "error": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"XdnIVEckBVlZuJBDWlf7Vgdbdb384c06ff252dd\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}",
+    "errorCode": "54001",
+    "retryable": true,
+    "raw": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"XdnIVEckBVlZuJBDWlf7Vgdbdb384c06ff252dd\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}"
+  }
+]

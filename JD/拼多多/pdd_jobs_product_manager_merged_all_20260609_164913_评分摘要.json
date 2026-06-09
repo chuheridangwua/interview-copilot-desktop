@@ -1,0 +1,36 @@
+{
+  "company": "拼多多",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pdd_jobs_product_manager_merged_all_20260609_164913.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-09",
+  "cutoff_date": "2026-03-09",
+  "source_total": 58,
+  "eligible_total": 38,
+  "scored_total": 38,
+  "top_n": 38,
+  "concurrency": 5,
+  "distribution": {
+    "count": 38,
+    "min": 28,
+    "max": 74,
+    "mean": 42.92,
+    "stddev": 12.08,
+    "p10": 30.7,
+    "p50": 40.0,
+    "p90": 58.0,
+    "buckets": {
+      "0_59": 35,
+      "60_69": 2,
+      "70_79": 1,
+      "80_89": 0,
+      "90_100": 0
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pdd_jobs_product_manager_merged_all_20260609_164913_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pdd_jobs_product_manager_merged_all_20260609_164913_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pdd_jobs_product_manager_merged_all_20260609_164913_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pdd_jobs_product_manager_merged_all_20260609_164913_top38_模型初筛.csv"
+  }
+}

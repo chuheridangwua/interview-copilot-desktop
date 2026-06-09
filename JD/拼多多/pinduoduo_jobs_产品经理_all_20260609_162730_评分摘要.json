@@ -1,0 +1,36 @@
+{
+  "company": "拼多多",
+  "input": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pinduoduo_jobs_产品经理_all_20260609_162730.csv",
+  "resume": "E:\\CLX\\project\\interview-copilot-desktop\\resources\\jianli.md",
+  "model": "doubao-seed-2-0-pro-260215",
+  "reference_date": "2026-06-09",
+  "cutoff_date": "2026-03-09",
+  "source_total": 10,
+  "eligible_total": 8,
+  "scored_total": 8,
+  "top_n": 8,
+  "concurrency": 5,
+  "distribution": {
+    "count": 8,
+    "min": 32,
+    "max": 67,
+    "mean": 48.38,
+    "stddev": 12.99,
+    "p10": 32.0,
+    "p50": 47.5,
+    "p90": 64.9,
+    "buckets": {
+      "0_59": 6,
+      "60_69": 2,
+      "70_79": 0,
+      "80_89": 0,
+      "90_100": 0
+    }
+  },
+  "files": {
+    "filtered_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pinduoduo_jobs_产品经理_all_20260609_162730_筛选后.csv",
+    "filter_audit_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pinduoduo_jobs_产品经理_all_20260609_162730_筛选审计.csv",
+    "scored_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pinduoduo_jobs_产品经理_all_20260609_162730_评分结果.csv",
+    "top_csv": "E:\\CLX\\project\\interview-copilot-desktop\\JD\\拼多多\\pinduoduo_jobs_产品经理_all_20260609_162730_top8_模型初筛.csv"
+  }
+}

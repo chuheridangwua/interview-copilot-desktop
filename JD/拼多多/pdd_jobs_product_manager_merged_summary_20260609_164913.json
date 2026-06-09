@@ -1,0 +1,39 @@
+{
+  "raw_csv_files": [
+    "pinduoduo_jobs_产品经理_all_20260609_162018.csv",
+    "pinduoduo_jobs_产品经理_all_20260609_162730 copy.csv",
+    "pinduoduo_jobs_产品经理_all_20260609_162730.csv",
+    "pinduoduo_jobs_产品经理_all_20260609_162730_筛选后.csv",
+    "pinduoduo_jobs_产品经理_all_20260609_162730_筛选审计.csv",
+    "pinduoduo_jobs_产品经理_all_20260609_162730_评分结果.csv",
+    "pinduoduo_jobs_产品经理_all_20260609_162730_top8_模型初筛.csv",
+    "pinduoduo_jobs_产品经理_part_1_14_all_20260609_163854.csv",
+    "pinduoduo_jobs_产品经理_part_12_23_all_20260609_164011.csv",
+    "pinduoduo_jobs_产品经理_part_23_33_all_20260609_164104.csv",
+    "pinduoduo_jobs_产品经理_part_32_43_all_20260609_164257.csv",
+    "pinduoduo_jobs_产品经理_part_44_55_all_20260609_164338.csv"
+  ],
+  "error_json_files": [
+    "pinduoduo_jobs_产品经理_all_20260609_162018_errors.json",
+    "pinduoduo_jobs_产品经理_all_20260609_162730_errors copy.json",
+    "pinduoduo_jobs_产品经理_all_20260609_162730_errors.json",
+    "pinduoduo_jobs_产品经理_part_1_14_all_20260609_163854_errors.json",
+    "pinduoduo_jobs_产品经理_part_12_23_all_20260609_164011_errors.json",
+    "pinduoduo_jobs_产品经理_part_23_33_all_20260609_164104_errors.json"
+  ],
+  "merged_success_total": 58,
+  "merged_unique_codes": 58,
+  "unresolved_total": 3,
+  "unresolved_codes": [
+    "PR022276",
+    "PR022771",
+    "PR023947"
+  ],
+  "audit_total": 58,
+  "generated_files": {
+    "merged_csv": "pdd_jobs_product_manager_merged_all_20260609_164913.csv",
+    "audit_csv": "pdd_jobs_product_manager_merged_audit_20260609_164913.csv",
+    "unresolved_csv": "pdd_jobs_product_manager_merged_unresolved_20260609_164913.csv",
+    "summary_json": "pdd_jobs_product_manager_merged_summary_20260609_164913.json"
+  }
+}

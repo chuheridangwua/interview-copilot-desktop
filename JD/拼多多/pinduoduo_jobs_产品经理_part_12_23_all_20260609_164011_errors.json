@@ -1,0 +1,10 @@
+[
+  {
+    "code": "PR023947",
+    "title": "品牌产品经理",
+    "error": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"JyrtKkgOVr_rVwVUDa755Q08c31985b047436d7\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}",
+    "errorCode": "54001",
+    "retryable": true,
+    "raw": "{\"statusCode\":200,\"success\":false,\"errorCode\":54001,\"errorMsg\":null,\"result\":{\"verifyAuthToken\":\"JyrtKkgOVr_rVwVUDa755Q08c31985b047436d7\",\"name\":null,\"code\":null,\"recruitType\":null,\"workLocation\":null,\"job\":null,\"serveRequirement\":null,\"jobDuty\":null,\"bonus\":null,\"updateTime\":null}}"
+  }
+]

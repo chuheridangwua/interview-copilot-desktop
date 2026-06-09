@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PDD Jobs Exporter
 // @namespace    https://careers.pddglobalhr.com/
-// @version      0.2.0
+// @version      0.4.0
 // @description  Export Pinduoduo jobs to a CSV compatible with local scoring scripts.
 // @match        https://careers.pddglobalhr.com/jobs*
 // @match        https://careers.pddglobalhr.net/jobs*
@@ -17,7 +17,12 @@
   var COMPANY_NAME = "拼多多";
   var DEFAULT_KEYWORD = "产品经理";
   var DEFAULT_PAGE_SIZE = 50;
-  var DEFAULT_CONCURRENCY = 3;
+  var DEFAULT_CONCURRENCY = 1;
+  var DEFAULT_GAP_MS = 1800;
+  var DEFAULT_RETRY_COUNT = 2;
+  var DEFAULT_START_INDEX = 1;
+  var DEFAULT_MAX_ITEMS = 12;
+  var RETRYABLE_ERROR_ABORT_THRESHOLD = 3;
   var DETAIL_TIMEOUT_MS = 25000;
   var PANEL_ID = "pdd-jobs-exporter-panel";
 
@@ -26,6 +31,8 @@
     cancelled: false,
     items: [],
   };
+  var listApiModulePromise = null;
+  var apiCoreModulePromise = null;
 
   function sleep(ms) {
     return new Promise(function (resolve) {
@@ -65,6 +72,14 @@
     return target;
   }
 
+  function safeJsonStringify(value) {
+    try {
+      return JSON.stringify(value);
+    } catch (error) {
+      return String(value);
+    }
+  }
+
   function normalizeText(value) {
     return String(value == null ? "" : value)
       .replace(/\u00a0/g, " ")
@@ -89,6 +104,50 @@
     if (match) return match[1] + "-" + pad2(match[2]) + "-" + pad2(match[3]);
 
     return raw;
+  }
+
+  function htmlToText(html) {
+    var div;
+    if (!html) return "";
+    div = document.createElement("div");
+    div.innerHTML = String(html);
+    return normalizeText(div.innerText || div.textContent || "");
+  }
+
+  function waitWithJitter(baseMs) {
+    var jitter = Math.floor(Math.random() * 600);
+    return sleep(baseMs + jitter);
+  }
+
+  function describeError(error) {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (error && typeof error === "object") {
+      if (error.errorMsg) return String(error.errorMsg);
+      if (error.message) return String(error.message);
+      return safeJsonStringify(error);
+    }
+    return String(error);
+  }
+
+  function getErrorCode(error) {
+    if (error && typeof error === "object" && error.errorCode != null) {
+      return String(error.errorCode);
+    }
+    return "";
+  }
+
+  function isRetryableDetailError(error) {
+    var code = getErrorCode(error);
+    var message = describeError(error);
+    return (
+      code === "54001" ||
+      /Failed to fetch/i.test(message) ||
+      /ERR_FAILED/i.test(message) ||
+      /verify/i.test(message) ||
+      /token/i.test(message)
+    );
   }
 
   function escapeCsv(value) {
@@ -189,13 +248,29 @@
   }
 
   function getListApiModule() {
-    return getWebpackRequire(15000).then(function (webpackRequire) {
-      var apiModule = webpackRequire(78948);
-      if (!apiModule || typeof apiModule.Go !== "function") {
-        throw new Error("未找到拼多多列表 API 模块（78948.Go）");
-      }
-      return apiModule;
-    });
+    if (!listApiModulePromise) {
+      listApiModulePromise = getWebpackRequire(15000).then(function (webpackRequire) {
+        var apiModule = webpackRequire(78948);
+        if (!apiModule || typeof apiModule.Go !== "function") {
+          throw new Error("未找到拼多多列表 API 模块（78948.Go）");
+        }
+        return apiModule;
+      });
+    }
+    return listApiModulePromise;
+  }
+
+  function getApiCoreModule() {
+    if (!apiCoreModulePromise) {
+      apiCoreModulePromise = getWebpackRequire(15000).then(function (webpackRequire) {
+        var apiCore = webpackRequire(33401);
+        if (!apiCore || typeof apiCore.AT !== "function") {
+          throw new Error("未找到拼多多核心请求模块（33401.AT）");
+        }
+        return apiCore;
+      });
+    }
+    return apiCoreModulePromise;
   }
 
   function requestListPage(apiModule, payload) {
@@ -296,115 +371,95 @@
   }
 
   function fetchOneDetail(job) {
-    return new Promise(function (resolve, reject) {
-      var code = normalizeText(job && job.code);
-      var iframe = document.createElement("iframe");
-      var pollTimer = null;
-      var timeoutTimer = null;
-      var finished = false;
+    var code = normalizeText(job && job.code);
+    var referral = normalizeText(new URLSearchParams(location.search).get("r"));
 
-      iframe.style.cssText =
-        "position:fixed;left:-99999px;top:-99999px;width:1280px;height:900px;border:0;opacity:0;pointer-events:none;";
-      iframe.src = buildDetailUrl(code);
-
-      function cleanup() {
-        if (pollTimer) clearInterval(pollTimer);
-        if (timeoutTimer) clearTimeout(timeoutTimer);
-        iframe.remove();
-      }
-
-      function fail(error) {
-        if (finished) return;
-        finished = true;
-        cleanup();
-        reject(error);
-      }
-
-      function succeed(payload) {
-        if (finished) return;
-        finished = true;
-        cleanup();
-        resolve(payload);
-      }
-
-      function tryRead() {
-        var doc;
-        var notFound;
-        var title;
-        var sections;
-        var responsibility;
-        var requirement;
-        var bonus;
-        var businessLine;
-        var location;
-        var updateTime;
-        var jdTextParts;
-
-        try {
-          doc = iframe.contentDocument;
-          if (!doc) return false;
-
-          notFound = doc.querySelector(".recruit-not-found-content");
-          if (notFound) {
-            fail(new Error("详情页不存在或已过期: " + code));
-            return true;
-          }
-
-          title = normalizeText(
-            (doc.querySelector(".detail-header-title") && doc.querySelector(".detail-header-title").textContent) ||
-              (job && job.name) ||
-              "",
-          );
-          sections = extractDetailSections(doc);
-          responsibility = sections["岗位职责"] || "";
-          requirement = sections["任职要求"] || "";
-          bonus = sections["加分项"] || "";
-
-          if (!title) return false;
-          if (!responsibility && !requirement && !bonus) return false;
-
-          businessLine = normalizeText(job && job.job);
-          location = normalizeText(job && job.workLocation);
-          updateTime = normalizeDate(job && job.updateTime);
-          jdTextParts = [];
-          if (responsibility) jdTextParts.push("岗位职责：\n" + responsibility);
-          if (requirement) jdTextParts.push("任职要求：\n" + requirement);
-          if (bonus) jdTextParts.push("加分项：\n" + bonus);
-
-          succeed({
-            company: COMPANY_NAME,
-            source_schema: "pdd_tampermonkey",
-            code: code,
-            title: title,
-            business_line: businessLine,
-            department: "",
-            project: "",
-            category_name: businessLine,
-            batch_name: "",
-            location: location,
-            publish_date: updateTime,
-            raw_update_time: normalizeText(job && job.updateTime),
-            post_url: buildDetailUrl(code),
-            responsibility: responsibility,
-            requirement_text: requirement,
-            bonus: bonus,
-            experience_text: requirement,
-            jd_text: jdTextParts.join("\n\n"),
-            list_job_name: normalizeText(job && job.name),
-            list_job_category: businessLine,
-          });
-          return true;
-        } catch (error) {
-          return false;
+    return getApiCoreModule().then(function (apiCore) {
+      function requestDetail() {
+        var body = { code: code };
+        if (referral) {
+          body.r = referral;
         }
+        return apiCore.AT({
+          url: "api/recruit/position/detail",
+          body: body,
+          isVerification: true,
+          captchaCallback: requestDetail,
+        });
       }
 
-      iframe.addEventListener("load", tryRead);
-      pollTimer = setInterval(tryRead, 500);
-      timeoutTimer = setTimeout(function () {
-        fail(new Error("详情页超时: " + code));
-      }, DETAIL_TIMEOUT_MS);
-      document.body.appendChild(iframe);
+      function requestDetailWithRetry(attempt, retryCount, gapMs) {
+        return Promise.race([
+          requestDetail(),
+          new Promise(function (_, reject) {
+            setTimeout(function () {
+              reject(new Error("详情接口超时: " + code));
+            }, DETAIL_TIMEOUT_MS);
+          }),
+        ]).catch(function (error) {
+          if (attempt < retryCount && isRetryableDetailError(error)) {
+            appendLog(
+              "详情重试：" +
+                code +
+                " attempt=" +
+                (attempt + 1) +
+                "/" +
+                retryCount +
+                " error=" +
+                describeError(error),
+            );
+            return waitWithJitter(gapMs * (attempt + 1)).then(function () {
+              return requestDetailWithRetry(attempt + 1, retryCount, gapMs);
+            });
+          }
+          throw error;
+        });
+      }
+
+      return requestDetailWithRetry(0, state.retries || DEFAULT_RETRY_COUNT, state.gapMs || DEFAULT_GAP_MS).then(function (detail) {
+        var title = normalizeText((detail && detail.name) || (job && job.name) || "");
+        var responsibility = htmlToText(detail && detail.jobDuty);
+        var requirement = htmlToText(detail && detail.serveRequirement);
+        var bonus = htmlToText(detail && detail.bonus);
+        var businessLine = normalizeText((job && job.job) || (detail && detail.recruitType) || "");
+        var location = normalizeText((detail && detail.workLocation) || (job && job.workLocation) || "");
+        var updateTime = normalizeDate((detail && detail.updateTime) || (job && job.updateTime) || "");
+        var jdTextParts = [];
+
+        if (!title) {
+          throw new Error("详情接口未返回岗位标题: " + code);
+        }
+        if (!responsibility && !requirement && !bonus) {
+          throw new Error("详情接口未返回有效 JD: " + code);
+        }
+
+        if (responsibility) jdTextParts.push("岗位职责：\n" + responsibility);
+        if (requirement) jdTextParts.push("任职要求：\n" + requirement);
+        if (bonus) jdTextParts.push("加分项：\n" + bonus);
+
+        return {
+          company: COMPANY_NAME,
+          source_schema: "pdd_tampermonkey",
+          code: code,
+          title: title,
+          business_line: businessLine,
+          department: "",
+          project: "",
+          category_name: businessLine,
+          batch_name: "",
+          location: location,
+          publish_date: updateTime,
+          raw_update_time: normalizeText((detail && detail.updateTime) || (job && job.updateTime) || ""),
+          post_url: buildDetailUrl(code),
+          responsibility: responsibility,
+          requirement_text: requirement,
+          bonus: bonus,
+          experience_text: requirement,
+          jd_text: jdTextParts.join("\n\n"),
+          list_job_name: normalizeText(job && job.name),
+          list_job_category: businessLine,
+        };
+      });
     });
   }
 
@@ -414,9 +469,11 @@
     var index = 0;
     var workers = [];
     var i;
+    var retryableErrorCount = 0;
+    var abortedReason = "";
 
     function runner(workerId) {
-      if (index >= items.length || state.cancelled) {
+      if (index >= items.length || state.cancelled || abortedReason) {
         return Promise.resolve();
       }
 
@@ -429,19 +486,37 @@
 
       return worker(item, currentIndex)
         .then(function (result) {
+          retryableErrorCount = 0;
           results[currentIndex] = result;
         })
         .catch(function (error) {
-          var message = error instanceof Error ? error.message : String(error);
+          var message = describeError(error);
+          var retryable = isRetryableDetailError(error);
           appendLog("详情失败：" + normalizeText(item && item.code) + " " + message);
           errors.push({
             code: normalizeText(item && item.code),
             title: normalizeText(item && item.name),
             error: message,
+            errorCode: getErrorCode(error),
+            retryable: retryable,
+            raw: safeJsonStringify(error),
           });
+          if (retryable) {
+            retryableErrorCount += 1;
+            if (retryableErrorCount >= RETRYABLE_ERROR_ABORT_THRESHOLD && !abortedReason) {
+              abortedReason =
+                "连续触发 verify/token 类错误，当前页面令牌大概率已失效。请刷新页面后，从下一段起始序号继续。";
+              appendLog("提前停止：" + abortedReason);
+            }
+          } else {
+            retryableErrorCount = 0;
+          }
         })
         .then(function () {
-          return sleep(120).then(function () {
+          if (abortedReason || state.cancelled) {
+            return Promise.resolve();
+          }
+          return waitWithJitter(state.gapMs || DEFAULT_GAP_MS).then(function () {
             return runner(workerId);
           });
         });
@@ -460,6 +535,7 @@
       return {
         results: compactResults,
         errors: errors,
+        abortedReason: abortedReason,
       };
     });
   }
@@ -469,9 +545,17 @@
     var keywordNode;
     var pageSizeNode;
     var concurrencyNode;
+    var gapMsNode;
+    var retriesNode;
+    var startIndexNode;
+    var maxItemsNode;
     var keyword;
     var pageSize;
     var concurrency;
+    var gapMs;
+    var retries;
+    var startIndex;
+    var maxItems;
 
     if (!root) {
       throw new Error("未找到脚本面板");
@@ -480,15 +564,27 @@
     keywordNode = root.querySelector("input[name='keyword']");
     pageSizeNode = root.querySelector("input[name='pageSize']");
     concurrencyNode = root.querySelector("input[name='concurrency']");
+    gapMsNode = root.querySelector("input[name='gapMs']");
+    retriesNode = root.querySelector("input[name='retries']");
+    startIndexNode = root.querySelector("input[name='startIndex']");
+    maxItemsNode = root.querySelector("input[name='maxItems']");
 
     keyword = normalizeText(keywordNode ? keywordNode.value : "") || DEFAULT_KEYWORD;
     pageSize = Number(pageSizeNode ? pageSizeNode.value : DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
     concurrency = Number(concurrencyNode ? concurrencyNode.value : DEFAULT_CONCURRENCY) || DEFAULT_CONCURRENCY;
+    gapMs = Number(gapMsNode ? gapMsNode.value : DEFAULT_GAP_MS) || DEFAULT_GAP_MS;
+    retries = Number(retriesNode ? retriesNode.value : DEFAULT_RETRY_COUNT);
+    startIndex = Number(startIndexNode ? startIndexNode.value : DEFAULT_START_INDEX) || DEFAULT_START_INDEX;
+    maxItems = Number(maxItemsNode ? maxItemsNode.value : DEFAULT_MAX_ITEMS) || DEFAULT_MAX_ITEMS;
 
     return {
       keyword: keyword,
       pageSize: Math.min(Math.max(pageSize, 10), 100),
       concurrency: Math.min(Math.max(concurrency, 1), 6),
+      gapMs: Math.min(Math.max(gapMs, 300), 10000),
+      retries: Math.min(Math.max(retries, 0), 5),
+      startIndex: Math.max(startIndex, 1),
+      maxItems: Math.min(Math.max(maxItems, 1), 30),
     };
   }
 
@@ -505,22 +601,53 @@
     state.running = true;
     state.cancelled = false;
     state.items = [];
+    state.gapMs = config.gapMs;
+    state.retries = config.retries;
     updateStatus("准备开始");
-    appendLog("开始导出，关键词=" + config.keyword + "，并发=" + config.concurrency);
+    appendLog(
+      "开始导出，关键词=" +
+        config.keyword +
+        "，并发=" +
+        config.concurrency +
+        "，间隔=" +
+        config.gapMs +
+        "ms，重试=" +
+        config.retries +
+        "，起始序号=" +
+        config.startIndex +
+        "，批量=" +
+        config.maxItems,
+    );
 
     fetchAllListItems(config.keyword, config.pageSize)
       .then(function (listItems) {
+        var slicedItems = listItems.slice(config.startIndex - 1, config.startIndex - 1 + config.maxItems);
         if (!listItems.length) {
           throw new Error("关键词 " + config.keyword + " 未抓到任何岗位");
         }
-        return runWithConcurrency(listItems, fetchOneDetail, config.concurrency);
+        if (!slicedItems.length) {
+          throw new Error("指定的起始序号超出列表范围");
+        }
+        appendLog(
+          "本次仅处理第 " +
+            config.startIndex +
+            " 到 " +
+            (config.startIndex + slicedItems.length - 1) +
+            " 条，共 " +
+            slicedItems.length +
+            " 条",
+        );
+        return runWithConcurrency(slicedItems, fetchOneDetail, config.concurrency);
       })
       .then(function (output) {
         var results = output.results;
         var errors = output.errors;
+        var abortedReason = output.abortedReason;
         var columns;
         var csv;
         var fileBase;
+        var rangeEnd;
+        var rangeLabel;
 
         if (!results.length) {
           throw new Error("列表已抓到，但详情一个都没成功，建议刷新页面后重试");
@@ -550,9 +677,16 @@
         ];
 
         csv = rowsToCsv(results, columns);
+        rangeEnd = config.startIndex + results.length + errors.length - 1;
+        rangeLabel =
+          "_part_" +
+          String(config.startIndex) +
+          "_" +
+          String(rangeEnd);
         fileBase =
           "pinduoduo_jobs_" +
           config.keyword.replace(/[\\/:*?"<>|]/g, "_") +
+          rangeLabel +
           "_all_" +
           timestampForFile();
 
@@ -567,8 +701,14 @@
         }
 
         state.items = results;
-        updateStatus("完成：成功 " + results.length + " 条，失败 " + errors.length + " 条");
-        appendLog("导出完成，成功 " + results.length + " 条，失败 " + errors.length + " 条");
+        if (abortedReason) {
+          updateStatus("提前停止：成功 " + results.length + " 条，失败 " + errors.length + " 条");
+          appendLog("导出提前停止，成功 " + results.length + " 条，失败 " + errors.length + " 条");
+          appendLog(abortedReason);
+        } else {
+          updateStatus("完成：成功 " + results.length + " 条，失败 " + errors.length + " 条");
+          appendLog("导出完成，成功 " + results.length + " 条，失败 " + errors.length + " 条");
+        }
         appendLog("CSV 已自动下载，可直接喂给本地 score_jobs_with_doubao.py");
       })
       .catch(function (error) {
@@ -579,6 +719,8 @@
       .finally(function () {
         state.running = false;
         state.cancelled = false;
+        state.gapMs = DEFAULT_GAP_MS;
+        state.retries = DEFAULT_RETRY_COUNT;
       });
   }
 
@@ -611,13 +753,25 @@
       '<label>并发<input name="concurrency" type="number" min="1" max="6" value="' +
       DEFAULT_CONCURRENCY +
       '" /></label>' +
+      '<label>间隔毫秒<input name="gapMs" type="number" min="300" max="10000" value="' +
+      DEFAULT_GAP_MS +
+      '" /></label>' +
+      '<label>失败重试<input name="retries" type="number" min="0" max="5" value="' +
+      DEFAULT_RETRY_COUNT +
+      '" /></label>' +
+      '<label>起始序号<input name="startIndex" type="number" min="1" value="' +
+      DEFAULT_START_INDEX +
+      '" /></label>' +
+      '<label>本批条数<input name="maxItems" type="number" min="1" max="30" value="' +
+      DEFAULT_MAX_ITEMS +
+      '" /></label>' +
       '<div class="pdd-exp-buttons">' +
       '<button type="button" class="start-btn">开始导出</button>' +
       '<button type="button" class="stop-btn">停止</button>' +
       "</div>" +
       '<div class="pdd-exp-status">待命</div>' +
       '<textarea class="pdd-exp-log" readonly placeholder="运行日志会显示在这里"></textarea>' +
-      '<div class="pdd-exp-tip">如页面弹出验证，请先完成验证，脚本会继续。</div>';
+      '<div class="pdd-exp-tip">建议并发 1、间隔 1800ms，每次抓 10-12 条。失败后刷新页面，把起始序号改到下一段继续。</div>';
 
     style = document.createElement("style");
     style.textContent =
